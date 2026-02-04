@@ -89,7 +89,7 @@ def get_current_configuration():
 
     q_base = 0.0
     q_lift = bound_range('joint_lift', robot.joint_state.position[robot.joint_state.name.index('joint_lift')])
-    q_arml = bound_range('joint_arm_l0', robot.joint_state.position[robot.joint_state.name.index('joint_arm_l0')] / 4.0)
+    q_arml = bound_range('joint_arm', robot.joint_state.position[robot.joint_state.name.index('joint_arm')] / 4.0)
     q_yaw = bound_range('joint_wrist_yaw', robot.joint_state.position[robot.joint_state.name.index('joint_wrist_yaw')])
     q_pitch = bound_range('joint_wrist_pitch', robot.joint_state.position[robot.joint_state.name.index('joint_wrist_pitch')])
     q_roll = bound_range('joint_wrist_roll', robot.joint_state.position[robot.joint_state.name.index('joint_wrist_roll')])
