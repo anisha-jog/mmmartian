@@ -4,18 +4,22 @@ import numpy as np
 import ikpy.chain
 import stretch_body.robot
 import importlib.resources as importlib_resources
+import hello_helpers.hello_misc as hm
 
 # NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx`
 
 target_point = [-0.043, -0.441, 0.654]
 target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll, pitch, yaw]
 
-# Setup the Python API
-robot = stretch_body.robot.Robot()
-robot.startup()
-# Ensure robot is homed
-if not robot.is_calibrated():
-    robot.home()
+# # Setup the Python API
+# robot = stretch_body.robot.Robot()
+# robot.startup()
+# # Ensure robot is homed
+# if not robot.is_calibrated():
+#     robot.home()
+
+robot = hm.HelloNode.quick_create('robot', wait_for_first_pointcloud=False)
+robot.stow_the_robot()
 
 pkg_path = str(importlib_resources.files('stretch_urdf'))
 urdf_file_path = pkg_path + '/SE3/stretch_description_SE3_eoa_wrist_dw3_tool_sg3.urdf'
@@ -36,6 +40,19 @@ for jr in joints_to_remove:
     modified_urdf._joints.remove(jr)
 
 # Add virtual base joint
+joint_base_rotation = urdfpy.Joint(name='joint_base_rotation',
+                                      parent='base_link',
+                                      child='link_base_rotation',
+                                      joint_type='revolute',
+                                      axis=np.array([0.0, 0.0, 1.0]),
+                                      origin=np.eye(4, dtype=np.float64),
+                                      limit=urdfpy.JointLimit(effort=100.0, velocity=1.0, lower=-1.0, upper=1.0))
+modified_urdf._joints.append(joint_base_rotation)
+link_base_rotation = urdfpy.Link(name='link_base_rotation',
+                                    inertial=None,
+                                    visuals=None,
+                                    collisions=None)
+modified_urdf._links.append(link_base_rotation)
 joint_base_translation = urdfpy.Joint(name='joint_base_translation',
                                       parent='base_link',
                                       child='link_base_translation',
@@ -53,6 +70,7 @@ modified_urdf._links.append(link_base_translation)
 for j in modified_urdf._joints:
     if j.name == 'joint_mast':
         j.parent = 'link_base_translation'
+    # add to this?
 
 new_urdf_path = "/tmp/iktutorial/stretch.urdf"
 modified_urdf.save(new_urdf_path)
@@ -70,11 +88,11 @@ def get_current_configuration():
         return min(max(value, bounds[0]), bounds[1])
 
     q_base = 0.0
-    q_lift = bound_range('joint_lift', robot.lift.status['pos'])
-    q_arml = bound_range('joint_arm_l0', robot.arm.status['pos'] / 4.0)
-    q_yaw = bound_range('joint_wrist_yaw', robot.end_of_arm.status['wrist_yaw']['pos'])
-    q_pitch = bound_range('joint_wrist_pitch', robot.end_of_arm.status['wrist_pitch']['pos'])
-    q_roll = bound_range('joint_wrist_roll', robot.end_of_arm.status['wrist_roll']['pos'])
+    q_lift = bound_range('joint_lift', robot.joint_state.position[robot.joint_state.name.index('joint_lift')])
+    q_arml = bound_range('joint_arm_l0', robot.joint_state.position[robot.joint_state.name.index('joint_arm')] / 4.0)
+    q_yaw = bound_range('joint_wrist_yaw', robot.joint_state.position[robot.joint_state.name.index('joint_wrist_yaw')])
+    q_pitch = bound_range('joint_wrist_pitch', robot.joint_state.position[robot.joint_state.name.index('joint_wrist_pitch')])
+    q_roll = bound_range('joint_wrist_roll', robot.joint_state.position[robot.joint_state.name.index('joint_wrist_roll')])
     return [0.0, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, 0.0]
 
 def move_to_configuration(q):
@@ -84,13 +102,21 @@ def move_to_configuration(q):
     q_yaw = q[9]
     q_pitch = q[11]
     q_roll = q[12]
-    robot.base.translate_by(q_base)
-    robot.lift.move_to(q_lift)
-    robot.arm.move_to(q_arm)
-    robot.end_of_arm.move_to('wrist_yaw', q_yaw)
-    robot.end_of_arm.move_to('wrist_pitch', q_pitch)
-    robot.end_of_arm.move_to('wrist_roll', q_roll)
-    robot.push_command()
+    # robot.base.translate_by(q_base)
+    # robot.lift.move_to(q_lift)
+    # robot.arm.move_to(q_arm)
+    # robot.end_of_arm.move_to('wrist_yaw', q_yaw)
+    # robot.end_of_arm.move_to('wrist_pitch', q_pitch)
+    # robot.end_of_arm.move_to('wrist_roll', q_roll)
+    # robot.push_command()
+    robot.move_to_pose({'translate_mobile_base':
+            robot.joint_state.position[robot.joint_state.name.index('translate_mobile_base')] +
+            q_base}, blocking=True)
+    robot.move_to_pose({'joint_lift': q_lift}, blocking=True)
+    robot.move_to_pose({'joint_arm': q_arm}, blocking=True)
+    robot.move_to_pose({'joint_wrist_yaw': q_yaw}, blocking=True)
+    robot.move_to_pose({'joint_wrist_pitch': q_pitch}, blocking=True)
+    robot.move_to_pose({'joint_wrist_roll': q_roll}, blocking=True)
 
 def move_to_grasp_goal(target_point, target_orientation):
     q_init = get_current_configuration()
