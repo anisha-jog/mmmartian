@@ -147,6 +147,7 @@ def get_current_grasp_pose():
     return chain.forward_kinematics(q)
 
 
-# robot.stow()
+robot.stow_the_robot()
 move_to_grasp_goal(target_point, target_orientation)
 print(get_current_grasp_pose())
+print("Done!")
