@@ -9,8 +9,8 @@ import time
 # NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx`
 
 # target_point = [0.2, -0.441, 0.235]
-cup1 = [0.1, -0.441, 0.8]
-above_cup1 = [-0.1, -0.6, 1.0]
+cup1 = [0, -0.441, 0.8]
+above_cup1 = [0, -0.441, 1.0]
 # above_cup2 = [0.2, 0.1, 0.3]
 # cup2 = [0.2, 0.1, 0.025]
 
