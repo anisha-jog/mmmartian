@@ -12,7 +12,7 @@ import time
 cup1 = [0, -0.6, 0.8]
 above_cup1 = [0, -0.6, 1.0]
 above_cup2 = [-0.3, -0.6, 1.0]
-cup2 = [-0.1, -0.6, 0.85]
+cup2 = [-0.05, -0.6, 0.85]
 
 target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll, pitch, yaw]
 
@@ -27,7 +27,7 @@ robot = hm.HelloNode.quick_create('robot', wait_for_first_pointcloud=False)
 # robot.move_to_pose({'joint_gripper_finger_left': 100.0}, blocking=True, duration=3)
 # robot.move_to_pose({'joint_gripper_finger_right': 100.0}, blocking=True, duration=3)
 
-robot.move_to_pose({'translate_mobile_base': 0.3}, blocking=True)
+robot.move_to_pose({'translate_mobile_base': 0.35}, blocking=True)
 robot.stow_the_robot()
 
 
