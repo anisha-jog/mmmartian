@@ -10,7 +10,7 @@ import hello_helpers.hello_misc as hm
 
 # target_point = [0.2, -0.441, 0.235]
 cup1 = [0.1, -0.441, 0.2]
-above_cup1 = [0.1, -0.441, 0.2]
+above_cup1 = [-0.1, -0.441, 0.5]
 # above_cup2 = [0.2, 0.1, 0.3]
 # cup2 = [0.2, 0.1, 0.025]
 
@@ -152,7 +152,7 @@ def get_current_grasp_pose():
     return chain.forward_kinematics(q)
 
 
-robot.stow_the_robot()
+# robot.stow_the_robot()
 print("gripper open")
 
 move_to_grasp_goal(above_cup1, target_orientation)
