@@ -86,6 +86,7 @@ def get_current_configuration():
         index = robot.joint_state.name.index(name)
         print("links in chain links", chain.links)
         bounds = chain.links[index].bounds
+        print("tried to find index ", index, " for name ", name, " in robot joint state with names ", robot.joint_state.name)
         return min(max(value, bounds[0]), bounds[1])
 
     q_base = 0.0
