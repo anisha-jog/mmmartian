@@ -9,10 +9,10 @@ import hello_helpers.hello_misc as hm
 # NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx`
 
 # target_point = [0.2, -0.441, 0.235]
-cup1 = [0.1, -0.6, 0.025 ]
-above_cup1 = [0.1, -0.6, 0.3]
-above_cup2 = [0.2, -0.6, 0.3]
-cup2 = [0.2, -0.6, 0.025]
+cup1 = [0.1, -0.6, 0.5]
+above_cup1 = [0.1, 0.1, 0.3]
+above_cup2 = [0.2, 0.1, 0.3]
+cup2 = [0.2, 0.1, 0.025]
 
 target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll, pitch, yaw]
 
@@ -156,8 +156,8 @@ robot.stow_the_robot()
 print("gripper open")
 
 move_to_grasp_goal(above_cup1, target_orientation)
-robot.move_to_pose({'joint_gripper_left': 1.0}, blocking=True, duration=3)
-robot.move_to_pose({'joint_gripper_right': 1.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_left': 30.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_right': 30.0}, blocking=True, duration=3)
 # robot.move_to_pose({'joint_gripper_left': 0.1}, blocking=True, duration=3)
 # robot.move_to_pose({'joint_gripper_right': 0.1}, blocking=True, duration=3)
 # print("gripper close")
