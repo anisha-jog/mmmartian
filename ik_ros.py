@@ -9,10 +9,10 @@ import hello_helpers.hello_misc as hm
 # NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx`
 
 # target_point = [0.2, -0.441, 0.235]
-cup1 = [0.1, -0.6, 0.05 ]
-above_cup1 = [0.1, -0.6, 0.1]
-above_cup2 = [0.2, -0.6, 0.1]
-cup2 = [0.2, -0.6, 0.05]
+cup1 = [0.1, -0.6, 0.025 ]
+above_cup1 = [0.1, -0.6, 0.3]
+above_cup2 = [0.2, -0.6, 0.3]
+cup2 = [0.2, -0.6, 0.025]
 
 target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll, pitch, yaw]
 
@@ -121,7 +121,7 @@ def move_to_configuration(q):
     # robot.end_of_arm.move_to('wrist_pitch', q_pitch)
     # robot.end_of_arm.move_to('wrist_roll', q_roll)
     # robot.push_command()
-    print(robot.joint_state.name)
+    # print(robot.joint_state.name)
     robot.move_to_pose({'translate_mobile_base': q_base}, blocking=True)
     robot.move_to_pose({'joint_lift': q_lift}, blocking=True)
     robot.move_to_pose({'joint_arm': q_arm}, blocking=True)
@@ -131,14 +131,14 @@ def move_to_configuration(q):
 
 def move_to_grasp_goal(target_point, target_orientation):
     q_init = get_current_configuration()
-    print('Initial configuration:', q_init)
-    print('Target point:', target_point)
-    print('Target orientation:\n', target_orientation)
-    print("len(q_init):", len(q_init))
-    print("len(active_links_mask):", len(chain.active_links_mask))
-    print("active count:", sum(chain.active_links_mask))
+    # print('Initial configuration:', q_init)
+    # print('Target point:', target_point)
+    # print('Target orientation:\n', target_orientation)
+    # print("len(q_init):", len(q_init))
+    # print("len(active_links_mask):", len(chain.active_links_mask))
+    # print("active count:", sum(chain.active_links_mask))
     q_soln = chain.inverse_kinematics(target_point, target_orientation, orientation_mode='all', initial_position=q_init)
-    print('Solution:', q_soln)
+    # print('Solution:', q_soln)
 
     err = np.linalg.norm(chain.forward_kinematics(q_soln)[:3, 3] - target_point)
     if not np.isclose(err, 0.0, atol=1e-2):
@@ -153,16 +153,21 @@ def get_current_grasp_pose():
 
 
 robot.stow_the_robot()
-robot.move_to_pose({'joint_gripper_left': 1.0}, blocking=True, duration=1.5)
-robot.move_to_pose({'joint_gripper_right': 1.0}, blocking=True, duration=1.5)
+print("gripper open")
+robot.move_to_pose({'joint_gripper_left': 1.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_right': 1.0}, blocking=True, duration=3)
 move_to_grasp_goal(cup1, target_orientation)
-robot.move_to_pose({'joint_gripper_left': 0.1}, blocking=True, duration=1.5)
-robot.move_to_pose({'joint_gripper_right': 0.1}, blocking=True, duration=1.5)
+robot.move_to_pose({'joint_gripper_left': 0.1}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_right': 0.1}, blocking=True, duration=3)
+print("gripper close")
 move_to_grasp_goal(above_cup1, target_orientation)
 move_to_grasp_goal(above_cup2, target_orientation)
+print("moved above second cup")
 move_to_grasp_goal(cup2, target_orientation)
-robot.move_to_pose({'joint_gripper_left': 1.0}, blocking=True, duration=1.5)
-robot.move_to_pose({'joint_gripper_right': 1.0}, blocking=True, duration=1.5)
+print("moved down to second cup")
+robot.move_to_pose({'joint_gripper_left': 1.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_right': 1.0}, blocking=True, duration=3)
+
 
 print(get_current_grasp_pose())
 print("Done!")
