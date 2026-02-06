@@ -84,7 +84,7 @@ def get_current_configuration():
     def bound_range(name, value):
         # names = [l.name for l in chain.links]
         index = robot.joint_state.name.index(name)
-        print(chain.links[index].name, value)
+        print(chain.links)
         bounds = chain.links[index].bounds
         return min(max(value, bounds[0]), bounds[1])
 
