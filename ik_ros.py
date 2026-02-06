@@ -27,8 +27,9 @@ robot = hm.HelloNode.quick_create('robot', wait_for_first_pointcloud=False)
 # robot.move_to_pose({'joint_gripper_finger_left': 100.0}, blocking=True, duration=3)
 # robot.move_to_pose({'joint_gripper_finger_right': 100.0}, blocking=True, duration=3)
 
-
+robot.move_to_pose({'translate_mobile_base': 0.3}, blocking=True)
 robot.stow_the_robot()
+
 
 pkg_path = str(importlib_resources.files('stretch_urdf'))
 urdf_file_path = pkg_path + '/SE3/stretch_description_SE3_eoa_wrist_dw3_tool_sg3.urdf'
