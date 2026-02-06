@@ -8,7 +8,7 @@ import hello_helpers.hello_misc as hm
 
 # NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx`
 
-target_point = [-0.043, -0.441, 0.654]
+target_point = [0.2, -0.441, 0.354]
 target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll, pitch, yaw]
 
 # # Setup the Python API
