@@ -12,7 +12,7 @@ import time
 cup1 = [0, -0.6, 0.8]
 above_cup1 = [0, -0.6, 1.0]
 above_cup2 = [-0.3, -0.6, 1.0]
-cup2 = [0, -0.6, 0.9]
+cup2 = [-0.1, -0.6, 0.85]
 
 target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll, pitch, yaw]
 
