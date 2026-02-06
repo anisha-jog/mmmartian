@@ -70,7 +70,8 @@ modified_urdf._links.append(link_base_translation)
 for j in modified_urdf._joints:
     if j.name == 'joint_mast':
         j.parent = 'link_base_translation'
-    if j.name == 'joint_lift':
+for j in modified_urdf._joints:
+    if j.name == 'link_base_translation':
         j.parent = 'link_base_rotation'
 
 new_urdf_path = "/tmp/iktutorial/stretch.urdf"
