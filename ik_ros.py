@@ -85,13 +85,16 @@ def get_current_configuration():
         # names = [l.name for l in chain.links]
         index = robot.joint_state.name.index(name)
         print("links in chain links", chain.links)
-        bounds = chain.links[index].bounds
         print("tried to find index ", index, " for name ", name, " in robot joint state with names ", robot.joint_state.name)
+        bounds = chain.links[index].bounds
+        for l in chain.links:
+            print(f"link {l.name} has bounds {l.bounds}")
+        # print("tried to find index ", index, " for name ", name, " in robot joint state with names ", robot.joint_state.name)
         return min(max(value, bounds[0]), bounds[1])
 
     q_base = 0.0
     q_lift = bound_range('joint_lift', robot.joint_state.position[robot.joint_state.name.index('joint_lift')])
-    print(robot.joint_state.name, f"index of arm l0{robot.joint_state.name.index('joint_arm_l0')}")
+    # print(robot.joint_state.name, f"index of arm l0{robot.joint_state.name.index('joint_arm_l0')}")
     q_arml = bound_range('joint_arm_l0', robot.joint_state.position[robot.joint_state.name.index('joint_arm_l0')] / 4.0)
     q_yaw = bound_range('joint_wrist_yaw', robot.joint_state.position[robot.joint_state.name.index('joint_wrist_yaw')])
     q_pitch = bound_range('joint_wrist_pitch', robot.joint_state.position[robot.joint_state.name.index('joint_wrist_pitch')])
