@@ -72,6 +72,7 @@ for j in modified_urdf._joints:
         j.parent = 'link_base_translation'
 for j in modified_urdf._joints:
     if j.name == 'link_base_translation':
+        print("--------found joint link_base_translation, changing its parent from base_link to joint_base_translation------")
         j.parent = 'link_base_rotation'
 
 new_urdf_path = "/tmp/iktutorial/stretch.urdf"
