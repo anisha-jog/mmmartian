@@ -9,10 +9,10 @@ import hello_helpers.hello_misc as hm
 # NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx`
 
 # target_point = [0.2, -0.441, 0.235]
-cup1 = [0.1, 0.1, 0.5]
-above_cup1 = [0.1, 0.1, 0.3]
-above_cup2 = [0.2, 0.1, 0.3]
-cup2 = [0.2, 0.1, 0.025]
+cup1 = [0.1, -0.441, 0.2]
+# above_cup1 = [0.1, 0.1, 0.3]
+# above_cup2 = [0.2, 0.1, 0.3]
+# cup2 = [0.2, 0.1, 0.025]
 
 target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll, pitch, yaw]
 
