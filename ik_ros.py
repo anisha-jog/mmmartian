@@ -85,8 +85,8 @@ def get_current_configuration():
     def bound_range(name, value):
         # names = [l.name for l in chain.links]
         index = robot.joint_state.name.index(name)
-        print("links in chain links", chain.links)
-        print("tried to find index ", index, " for name ", name, " in robot joint state with names ", robot.joint_state.name)
+        # print("links in chain links", chain.links)
+        # print("tried to find index ", index, " for name ", name, " in robot joint state with names ", robot.joint_state.name)
         bounds = chain.links[index].bounds
         
         # print("tried to find index ", index, " for name ", name, " in robot joint state with names ", robot.joint_state.name)
@@ -126,6 +126,9 @@ def move_to_configuration(q):
 
 def move_to_grasp_goal(target_point, target_orientation):
     q_init = get_current_configuration()
+    print('Initial configuration:', q_init)
+    print('Target point:', target_point)
+    print('Target orientation:\n', target_orientation)
     q_soln = chain.inverse_kinematics(target_point, target_orientation, orientation_mode='all', initial_position=q_init)
     print('Solution:', q_soln)
 
