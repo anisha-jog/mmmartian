@@ -129,6 +129,9 @@ def move_to_grasp_goal(target_point, target_orientation):
     print('Initial configuration:', q_init)
     print('Target point:', target_point)
     print('Target orientation:\n', target_orientation)
+    print("len(q_init):", len(q_init))
+    print("len(active_links_mask):", len(chain.active_links_mask))
+    print("active count:", sum(chain.active_links_mask))
     q_soln = chain.inverse_kinematics(target_point, target_orientation, orientation_mode='all', initial_position=q_init)
     print('Solution:', q_soln)
 
