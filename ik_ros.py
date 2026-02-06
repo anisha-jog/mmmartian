@@ -117,9 +117,7 @@ def move_to_configuration(q):
     # robot.end_of_arm.move_to('wrist_roll', q_roll)
     # robot.push_command()
     print(robot.joint_state.name)
-    robot.move_to_pose({'translate_mobile_base':
-            robot.joint_state.position[robot.joint_state.name.index('joint_mast')] +
-            q_base}, blocking=True)
+    robot.move_to_pose({'translate_mobile_base': q_base}, blocking=True)
     robot.move_to_pose({'joint_lift': q_lift}, blocking=True)
     robot.move_to_pose({'joint_arm': q_arm}, blocking=True)
     robot.move_to_pose({'joint_wrist_yaw': q_yaw}, blocking=True)
