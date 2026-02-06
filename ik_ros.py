@@ -5,7 +5,7 @@ import ikpy.chain
 import stretch_body.robot
 import importlib.resources as importlib_resources
 import hello_helpers.hello_misc as hm
-
+import time
 # NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx`
 
 # target_point = [0.2, -0.441, 0.235]
@@ -156,8 +156,9 @@ def get_current_grasp_pose():
 print("gripper open")
 
 move_to_grasp_goal(above_cup1, target_orientation)
-robot.move_to_pose({'joint_gripper_left': 30.0}, blocking=True, duration=3)
-robot.move_to_pose({'joint_gripper_right': 30.0}, blocking=True, duration=3)
+time.sleep(3)
+robot.move_to_pose({'joint_gripper_left': 100.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_right': 100.0}, blocking=True, duration=3)
 # robot.move_to_pose({'joint_gripper_left': 0.1}, blocking=True, duration=3)
 # robot.move_to_pose({'joint_gripper_right': 0.1}, blocking=True, duration=3)
 # print("gripper close")
