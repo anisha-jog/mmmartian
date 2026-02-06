@@ -170,6 +170,8 @@ robot.move_to_pose({'joint_gripper_finger_right': 0.1}, blocking=True, duration=
 move_to_grasp_goal(above_cup1, target_orientation)
 time.sleep(2)
 move_to_grasp_goal(above_cup2, target_orientation)
+time.sleep(2)
+move_to_grasp_goal(cup2, target_orientation)
 # move_to_grasp_goal(cup2, target_orientation)
 robot.move_to_pose({'joint_gripper_finger_left': 100.0}, blocking=True, duration=3)
 robot.move_to_pose({'joint_gripper_finger_right': 100.0}, blocking=True, duration=3)
