@@ -8,7 +8,12 @@ import hello_helpers.hello_misc as hm
 
 # NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx`
 
-target_point = [0.2, -0.441, 0.235]
+# target_point = [0.2, -0.441, 0.235]
+cup1 = [0.1, -0.6, 0.05 ]
+above_cup1 = [0.1, -0.6, 0.1]
+above_cup2 = [0.2, -0.6, 0.1]
+cup2 = [0.2, -0.6, 0.05]
+
 target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll, pitch, yaw]
 
 # # Setup the Python API
@@ -148,6 +153,16 @@ def get_current_grasp_pose():
 
 
 robot.stow_the_robot()
-move_to_grasp_goal(target_point, target_orientation)
+robot.move_to_pose({'joint_gripper_left': 1.0}, blocking=True, duration=1.5)
+robot.move_to_pose({'joint_gripper_right': 1.0}, blocking=True, duration=1.5)
+move_to_grasp_goal(cup1, target_orientation)
+robot.move_to_pose({'joint_gripper_left': 0.1}, blocking=True, duration=1.5)
+robot.move_to_pose({'joint_gripper_right': 0.1}, blocking=True, duration=1.5)
+move_to_grasp_goal(above_cup1, target_orientation)
+move_to_grasp_goal(above_cup2, target_orientation)
+move_to_grasp_goal(cup2, target_orientation)
+robot.move_to_pose({'joint_gripper_left': 1.0}, blocking=True, duration=1.5)
+robot.move_to_pose({'joint_gripper_right': 1.0}, blocking=True, duration=1.5)
+
 print(get_current_grasp_pose())
 print("Done!")
