@@ -24,6 +24,10 @@ target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll,
 #     robot.home()
 
 robot = hm.HelloNode.quick_create('robot', wait_for_first_pointcloud=False)
+robot.move_to_pose({'joint_gripper_finger_left': 100.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_finger_right': 100.0}, blocking=True, duration=3)
+
+
 robot.stow_the_robot()
 
 pkg_path = str(importlib_resources.files('stretch_urdf'))
@@ -161,9 +165,11 @@ robot.move_to_pose({'joint_gripper_finger_left': 100.0}, blocking=True, duration
 robot.move_to_pose({'joint_gripper_finger_right': 100.0}, blocking=True, duration=3)
 move_to_grasp_goal(cup1, target_orientation)
 # time.sleep(5)
-robot.move_to_pose({'joint_gripper_finger_left': -30.0}, blocking=True, duration=3)
-robot.move_to_pose({'joint_gripper_finger_right': -30.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_finger_left': 0.1}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_finger_right': 0.1}, blocking=True, duration=3)
 move_to_grasp_goal(above_cup1, target_orientation)
+robot.move_to_pose({'joint_gripper_finger_left': 100.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_finger_right': 100.0}, blocking=True, duration=3)
 # time.sleep(5)
 # robot.move_to_pose({'joint_gripper_left': 0.1}, blocking=True, duration=3)
 # robot.move_to_pose({'joint_gripper_right': 0.1}, blocking=True, duration=3)
