@@ -40,19 +40,6 @@ for jr in joints_to_remove:
     modified_urdf._joints.remove(jr)
 
 # Add virtual base joint
-joint_base_rotation = urdfpy.Joint(name='joint_base_rotation',
-                                      parent='base_link',
-                                      child='link_base_rotation',
-                                      joint_type='revolute',
-                                      axis=np.array([0.0, 0.0, 1.0]),
-                                      origin=np.eye(4, dtype=np.float64),
-                                      limit=urdfpy.JointLimit(effort=100.0, velocity=1.0, lower=-1.0, upper=1.0))
-modified_urdf._joints.append(joint_base_rotation)
-link_base_rotation = urdfpy.Link(name='link_base_rotation',
-                                    inertial=None,
-                                    visuals=None,
-                                    collisions=None)
-modified_urdf._links.append(link_base_rotation)
 joint_base_translation = urdfpy.Joint(name='joint_base_translation',
                                       parent='base_link',
                                       child='link_base_translation',
@@ -66,14 +53,26 @@ link_base_translation = urdfpy.Link(name='link_base_translation',
                                     visuals=None,
                                     collisions=None)
 modified_urdf._links.append(link_base_translation)
+joint_base_rotation = urdfpy.Joint(name='joint_base_rotation',
+                                      parent='link_base_translation',
+                                      child='link_base_rotation',
+                                      joint_type='revolute',
+                                      axis=np.array([0.0, 0.0, 1.0]),
+                                      origin=np.eye(4, dtype=np.float64),
+                                      limit=urdfpy.JointLimit(effort=100.0, velocity=1.0, lower=-1.0, upper=1.0))
+modified_urdf._joints.append(joint_base_rotation)
+link_base_rotation = urdfpy.Link(name='link_base_rotation',
+                                    inertial=None,
+                                    visuals=None,
+                                    collisions=None)
+modified_urdf._links.append(link_base_rotation)
 # amend the chain
 for j in modified_urdf._joints:
     if j.name == 'joint_mast':
         j.parent = 'link_base_translation'
-for j in modified_urdf._joints:
-    if j.name == 'link_base_translation':
-        print("--------found joint link_base_translation, changing its parent from base_link to joint_base_translation------")
+    if j.name == 'joint_lift':
         j.parent = 'link_base_rotation'
+    # maybe add here? used to be 
 
 new_urdf_path = "/tmp/iktutorial/stretch.urdf"
 modified_urdf.save(new_urdf_path)
