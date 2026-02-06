@@ -9,7 +9,7 @@ import time
 # NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx`
 
 # target_point = [0.2, -0.441, 0.235]
-cup1 = [0.1, -0.441, 0.2]
+cup1 = [0.1, -0.441, 0.8]
 above_cup1 = [-0.1, -0.6, 1.0]
 # above_cup2 = [0.2, 0.1, 0.3]
 # cup2 = [0.2, 0.1, 0.025]
@@ -156,9 +156,15 @@ def get_current_grasp_pose():
 print("gripper open")
 
 move_to_grasp_goal(above_cup1, target_orientation)
-time.sleep(3)
+time.sleep(5)
 robot.move_to_pose({'joint_gripper_finger_left': 100.0}, blocking=True, duration=3)
 robot.move_to_pose({'joint_gripper_finger_right': 100.0}, blocking=True, duration=3)
+move_to_grasp_goal(cup1, target_orientation)
+time.sleep(5)
+robot.move_to_pose({'joint_gripper_finger_left': 1.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_finger_right': 1.0}, blocking=True, duration=3)
+move_to_grasp_goal(above_cup1, target_orientation)
+time.sleep(5)
 # robot.move_to_pose({'joint_gripper_left': 0.1}, blocking=True, duration=3)
 # robot.move_to_pose({'joint_gripper_right': 0.1}, blocking=True, duration=3)
 # print("gripper close")
