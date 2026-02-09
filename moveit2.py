@@ -18,7 +18,24 @@ class MoveMe(HelloNode):
         planning_group = 'mobile_base_arm'
         moveit, moveit_plan, planning_params = moveit2_utils.setup_moveit(planning_group)
         
-        for i in range(1):
+        goal1 = goal_state.set_joint_group_positions(planning_group, 
+                                [-0.2, -0.2, 1.57, 
+                                 self.get_joint_pos('joint_lift') + (0.5-(self.get_joint_pos('joint_lift'))),
+                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        
+        goal2 = goal_state.set_joint_group_positions(planning_group, 
+                                [0.6, 0.0, 1.57, 
+                                 self.get_joint_pos('joint_lift'), 0.1, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0])
+        
+        goal3 = goal_state.set_joint_group_positions(planning_group,
+                                [0.4, 0.2, 1.57, 
+                                 self.get_joint_pos('joint_lift'), 0.0, 0.0, 0.0, 0.0, 0.785, 0.785, 0.785])
+        goal4 = goal_state.set_joint_group_positions(planning_group,
+                                [0.2, 0.2, 3.14, 
+                                 self.get_joint_pos('joint_lift'), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        
+        
+        for i in range(4):
             print(f'--- Planning Step {i} ---')
             goal_state = RobotState(moveit.get_robot_model())
           
