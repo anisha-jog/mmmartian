@@ -35,21 +35,26 @@ class MoveMe(HelloNode):
         #                         [0.2, 0.2, 3.14, 
         #                          self.get_joint_pos('joint_lift'), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         
-        goal1 = [0.1, 0.1, 0.1, 
-                self.get_joint_pos('joint_lift'), self.get_joint_pos('joint_arm_l3'), 
-                self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
-                self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
+        # goal1 = [0.1, 0.1, 0.1, 
+        #         self.get_joint_pos('joint_lift'), self.get_joint_pos('joint_arm_l3'), 
+        #         self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
+        #         self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
         
-        # goal1 = [-0.2, -0.2, 1.57, self.get_joint_pos('joint_lift') + (0.5-(self.get_joint_pos('joint_lift'))),
-        #                          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        goal1 = [-0.2, -0.2, 1.57, self.get_joint_pos('joint_lift') + (0.5-(self.get_joint_pos('joint_lift'))),
+                                 self.get_joint_pos('joint_arm_l3'), 
+                                 self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
+                                 self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
         goal2 =  [0.6, 0.0, 1.57, 
-                                 self.get_joint_pos('joint_lift'), 0.1, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0]
+                                 self.get_joint_pos('joint_lift'), 0.1, 0.1, 0.1, 0.1, self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
         goal3 = [0.4, 0.2, 1.57, 
-                                 self.get_joint_pos('joint_lift'), 0.0, 0.0, 0.0, 0.0, 0.785, 0.785, 0.785]
+                                 self.get_joint_pos('joint_lift'), self.get_joint_pos('joint_arm_l3'), 
+                                 self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 0.785, 0.785, 0.785]
         goal4 =  [0.2, 0.2, 3.14, 
-                                 self.get_joint_pos('joint_lift'), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                                 self.get_joint_pos('joint_lift'), self.get_joint_pos('joint_arm_l3'), 
+                                 self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
+                                 self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
     
-        goals = [goal1,goal2,goal3, goal4]
+        goals = [goal1, goal2, goal3, goal4]
         
 
         for i in range(1):
