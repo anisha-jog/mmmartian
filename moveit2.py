@@ -57,7 +57,7 @@ class MoveMe(HelloNode):
         goals = [goal1, goal2, goal3, goal4]
         
 
-        for i in range(1):
+        for i in range(4):
             print(f'--- Planning Step {i} ---')
             goal_state = RobotState(moveit.get_robot_model())
 
