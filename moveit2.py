@@ -18,30 +18,26 @@ class MoveMe(HelloNode):
         planning_group = 'mobile_base_arm'
         moveit, moveit_plan, planning_params = moveit2_utils.setup_moveit(planning_group)
         
-        goal1 = goal_state.set_joint_group_positions(planning_group, 
-                                [-0.2, -0.2, 1.57, 
-                                 self.get_joint_pos('joint_lift') + (0.5-(self.get_joint_pos('joint_lift'))),
-                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        
-        goal2 = goal_state.set_joint_group_positions(planning_group, 
-                                [0.6, 0.0, 1.57, 
-                                 self.get_joint_pos('joint_lift'), 0.1, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0])
-        
-        goal3 = goal_state.set_joint_group_positions(planning_group,
-                                [0.4, 0.2, 1.57, 
-                                 self.get_joint_pos('joint_lift'), 0.0, 0.0, 0.0, 0.0, 0.785, 0.785, 0.785])
-        goal4 = goal_state.set_joint_group_positions(planning_group,
-                                [0.2, 0.2, 3.14, 
-                                 self.get_joint_pos('joint_lift'), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        
-        
-        for i in range(4):
+        for i in range(1):
             print(f'--- Planning Step {i} ---')
             goal_state = RobotState(moveit.get_robot_model())
-          
+
+            # Example goal state: demonstrates commanding the robot to move forward by 0.3 meters
+            # We pass in the current joint position as the goal for each joint in the arm + wrist since we don't want them to move
             # Ordering: [x, y, theta, lift, arm/4, arm/4, arm/4, arm/4, yaw, pitch, roll]
-            goal_state.set_joint_group_positions(planning_group, [0.3, 0.0, 0.0, self.get_joint_pos('joint_lift'), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+            # For driving the base: the positive x-axis is pointing out of the front of the robot (the flat side of the base). 
+            # Positive y-axis is on the left of the robot (opposite direction the arm is facing).
+            goal_state.set_joint_group_positions(planning_group, 
+                [0.3, 0.0, 0.0, 
+                self.get_joint_pos('joint_lift'), self.get_joint_pos('joint_arm_l3'), 
+                self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
+                self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
+            )
+            # NOTE: You should delete the above example and replace it with your own goal states.
+            
             # TODO: Your code will likely go here. Note that I gave you a for loop already, which you can edit and use.
+            # For base motion (x, y, theta) each goal state should be defined according to the robot's current position (or its previous goal).
+            # Reminder: You can use the RViz GUI for MoveIt 2 to get a better intuition for what these goal positions should be.
 
             moveit_plan.set_start_state_to_current_state()
             moveit_plan.set_goal_state(robot_state=goal_state)
