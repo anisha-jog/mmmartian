@@ -65,7 +65,8 @@ class MoveMe(HelloNode):
 
         for i in range(4):
             print(f'------- Planning Step {i} --------')
-            print("===="*10)
+            print("===="*30)
+            print("===="*30)
             goal_state = RobotState(moveit.get_robot_model())
 
             # Example goal state: demonstrates commanding the robot to move forward by 0.3 meters
