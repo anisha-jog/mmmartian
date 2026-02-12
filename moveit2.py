@@ -48,7 +48,12 @@ class MoveMe(HelloNode):
                                  self.get_joint_pos('joint_lift'), 0.1, 0.1, 0.1, 0.1, self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
         goal3 = [0.4, 0.2, 1.57, 
                                  self.get_joint_pos('joint_lift'), self.get_joint_pos('joint_arm_l3'), 
-                                 self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'),  self.get_joint_pos('joint_wrist_yaw') + (3.14/4), self.get_joint_pos('joint_wrist_pitch') + (3.14/4), self.get_joint_pos('joint_wrist_roll') + (3.14/4)]
+                                 self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), 
+                                 self.get_joint_pos('joint_arm_l0'),  
+                                 (3.14/4), 
+                                 (3.14/4), 
+                                 (3.14/4)]
+        
         goal4 =  [0.2, 0.2, 3.14, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     
         goals = [goal1, goal2, goal3, goal4]
@@ -59,7 +64,8 @@ class MoveMe(HelloNode):
         
 
         for i in range(4):
-            print(f'--- Planning Step {i} ---')
+            print(f'------- Planning Step {i} --------')
+            print("===="*10)
             goal_state = RobotState(moveit.get_robot_model())
 
             # Example goal state: demonstrates commanding the robot to move forward by 0.3 meters
