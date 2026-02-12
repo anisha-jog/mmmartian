@@ -57,7 +57,7 @@ class MoveMe(HelloNode):
         goals = [goal1, goal2, goal3, goal4]
         
 
-        for i in range(1):
+        for i in range(4):
             print(f'--- Planning Step {i} ---')
             goal_state = RobotState(moveit.get_robot_model())
 
@@ -88,7 +88,7 @@ class MoveMe(HelloNode):
             moveit_plan.set_goal_state(robot_state=goal_state)
             
             plan = None
-            for i in range(3): 
+            for i in range(30): 
                 plan = moveit_plan.plan(parameters=planning_params)
                 if plan.trajectory is not None:
                     break
