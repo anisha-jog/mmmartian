@@ -87,6 +87,7 @@ class MoveMe(HelloNode):
 
             moveit_plan.set_goal_state(robot_state=goal_state)
             
+            plan = None
             for i in range(3): 
                 plan = moveit_plan.plan(parameters=planning_params)
                 if plan.trajectory is not None:
