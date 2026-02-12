@@ -89,11 +89,10 @@ class MoveMe(HelloNode):
             
             for i in range(3): 
                 plan = moveit_plan.plan(parameters=planning_params)
-                print("PRINT")
-                print(plan)
-                print(plan.trajectory)
                 if plan.trajectory is not None:
                     break
+                else:
+                    print("NO TRAJECTORY FOUND")
 
             print(plan.trajectory.get_robot_trajectory_msg())
     
