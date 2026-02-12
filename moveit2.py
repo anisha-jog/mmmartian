@@ -50,9 +50,9 @@ class MoveMe(HelloNode):
                                  self.get_joint_pos('joint_lift'), self.get_joint_pos('joint_arm_l3'), 
                                  self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), 
                                  self.get_joint_pos('joint_arm_l0'),  
-                                 (3.14/4), 
-                                 (3.14/4), 
-                                 (3.14/4)]
+                                 self.get_joint_pos('joint_wrist_yaw')+ (3.14/4), 
+                                 self.get_joint_pos('joint_wrist_pitch') + (3.14/4), 
+                                 self.get_joint_pos('joint_wrist_roll') + (3.14/4)]
         
         goal4 =  [0.2, 0.2, 3.14, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     
@@ -64,6 +64,8 @@ class MoveMe(HelloNode):
         
 
         for i in range(4):
+            print("===="*30)
+            print("===="*30)
             print(f'------- Planning Step {i} --------')
             print("===="*30)
             print("===="*30)
@@ -104,7 +106,7 @@ class MoveMe(HelloNode):
                     print("NO TRAJECTORY FOUND")
                     robot = moveit.get_robot_model()
                     jmg = robot.get_joint_model_group("mobile_base_arm")
-                    print(jmg.variable_names)
+                    # print(jmg.variable_names)
 
             print(plan.trajectory.get_robot_trajectory_msg())
     
