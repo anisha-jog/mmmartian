@@ -84,7 +84,6 @@ class MoveMe(HelloNode):
                 goals[i])
             
 
-
             moveit_plan.set_goal_state(robot_state=goal_state)
             
             for i in range(3): 
