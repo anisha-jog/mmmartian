@@ -40,7 +40,7 @@ class MoveMe(HelloNode):
         #         self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
         #         self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
         
-        goal1 = [0.1, 0.2, 0.1, 
+        goal1 = [0.3, 0.0, 0.0, 
                   self.get_joint_pos('joint_lift'), self.get_joint_pos('joint_arm_l3'), 
                  self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
                  self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
@@ -84,7 +84,6 @@ class MoveMe(HelloNode):
                 goals[i])
             goal_state.update()
             
-
 
             moveit_plan.set_goal_state(robot_state=goal_state)
             
