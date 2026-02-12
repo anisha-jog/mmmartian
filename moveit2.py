@@ -40,7 +40,7 @@ class MoveMe(HelloNode):
         #         self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
         #         self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
         
-        goal1 = [ 0.1, 0.1, 0.1, self.get_joint_pos('joint_lift'),
+        goal1 = [ 0.0, 0.0, 0.0, self.get_joint_pos('joint_lift'),
                   self.get_joint_pos('joint_lift'), self.get_joint_pos('joint_arm_l3'), 
                  self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
                  self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
@@ -57,7 +57,7 @@ class MoveMe(HelloNode):
         goals = [goal1, goal2, goal3, goal4]
         
 
-        for i in range(4):
+        for i in range(1):
             print(f'--- Planning Step {i} ---')
             goal_state = RobotState(moveit.get_robot_model())
 
