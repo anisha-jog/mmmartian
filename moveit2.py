@@ -94,8 +94,9 @@ class MoveMe(HelloNode):
                     break
                 else:
                     print("NO TRAJECTORY FOUND")
-                    jmg = goal_state.get_joint_model_group("mobile_base_arm")
-                    print(jmg.getVariableNames())
+                    robot = moveit.get_robot_model()
+                    jmg = robot.get_joint_model_group("mobile_base_arm")
+                    print(jmg.variable_names)
 
             print(plan.trajectory.get_robot_trajectory_msg())
     
