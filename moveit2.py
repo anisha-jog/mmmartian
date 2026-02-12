@@ -82,6 +82,7 @@ class MoveMe(HelloNode):
             
             goal_state.set_joint_group_positions(planning_group, 
                 goals[i])
+            goal_state.update()
             
 
 
