@@ -40,7 +40,7 @@ class MoveMe(HelloNode):
         #         self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
         #         self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
         
-        goal1 = [0.8, 0.9, 0.1, self.get_joint_pos('joint_lift'),
+        goal1 = [0.1, 0.2, 0.1, 
                   self.get_joint_pos('joint_lift'), self.get_joint_pos('joint_arm_l3'), 
                  self.get_joint_pos('joint_arm_l2'), self.get_joint_pos('joint_arm_l1'), self.get_joint_pos('joint_arm_l0'), 
                  self.get_joint_pos('joint_wrist_yaw'), self.get_joint_pos('joint_wrist_pitch'), self.get_joint_pos('joint_wrist_roll')]
