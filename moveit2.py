@@ -52,6 +52,10 @@ class MoveMe(HelloNode):
         goal4 =  [0.2, 0.2, 3.14, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     
         goals = [goal1, goal2, goal3, goal4]
+
+        for goal in goals:
+            if len(goal) != 11:
+                raise Exception("Each goal should have 11 values corresponding to the 11 joints in the 'mobile_base_arm' planning group.")
         
 
         for i in range(4):
