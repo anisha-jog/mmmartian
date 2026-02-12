@@ -87,7 +87,11 @@ class MoveMe(HelloNode):
 
             moveit_plan.set_goal_state(robot_state=goal_state)
             
-            plan = moveit_plan.plan(parameters=planning_params)
+            for i in range(3): 
+                plan = moveit_plan.plan(parameters=planning_params)
+                if plan is not None:
+                    break
+
             print(plan.trajectory.get_robot_trajectory_msg())
     
             self.execute_plan(plan)
