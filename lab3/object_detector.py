@@ -98,9 +98,9 @@ class YOLOEObjectDetector(Node):
         # TODO: ------------- start --------------
         # fill with your response
         #   pass the color frame to YOLO-E, parse the results using detection_utils.parse_results()
+        results = self.model.predict(self.latest_color)
 
-
-        detections = None
+        detections = detection_utils.parse_results(results)
         # TODO: -------------- end ---------------
 
         # create visualizations from the detections
