@@ -84,12 +84,12 @@ class YOLOEObjectDetector(Node):
         #.  if you are unpacking frames correctly, you should see the live color and depth output
         #   plotted in a cv2 window by detection_utils.visualize_detection_masks()
         # in part 2, you may need to make changes to the code to handle the head camera orientation
-
-        # self.latest_color = ...
-        # self.latest_depth = ...
-        # self.latest_color_cam_info = ...
-
-        pass
+        try: 
+            self.latest_color = self.bridge.imgmsg_to_cv2(color_msg, desired_encoding='passthrough')
+            self.latest_depth = self.bridge.imgmsg_to_cv2(depth_msg, desired_encoding='passthrough')
+            self.latest_color_cam_info = color_cam_info_msg
+        except:
+            print("Frames missing, skipping this callback")
         # TODO: -------------- end ---------------
 
 
