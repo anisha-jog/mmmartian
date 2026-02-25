@@ -58,6 +58,19 @@ def get_modified_urdf():
     # TODO: ------------- start --------------
     # fill with your response
     #   your implementation from lab 2 - add a virtual base rotation joint to the urdf
+    joint_base_rotation = urdfpy.Joint(name='joint_base_rotation',
+                                      parent='base_link',
+                                      child='link_base_rotation',
+                                      joint_type='revolute',
+                                      axis=np.array([0.0, 0.0, 1.0]),
+                                      origin=np.eye(4, dtype=np.float64),
+                                      limit=urdfpy.JointLimit(effort=100.0, velocity=1.0, lower=-1.0, upper=1.0))
+    modified_urdf._joints.append(joint_base_rotation)
+    link_base_rotation = urdfpy.Link(name='link_base_rotation',
+                                        inertial=None,
+                                        visuals=None,
+                                        collisions=None)
+    modified_urdf._links.append(link_base_rotation)
     # TODO: -------------- end ---------------
 
     joint_base_translation = urdfpy.Joint(name='joint_base_translation',
@@ -94,7 +107,20 @@ def get_current_configuration(joint_state):
     #   your implementation from lab 2 - get the current configuration from the joint state
     #   note: this time you can use the joint state callback provided for you in target_following.py which provides joint states as a
     #   dictionary that can be indexed by joint name, e.g. joint_state['joint_lift']
-    q = None
+    def bound_range(name, value):
+        # names = [l.name for l in chain.links]
+        index = joint_state.index(name)
+        bounds = chain.links[index].bounds
+        return min(max(value, bounds[0]), bounds[1])
+
+    q_base_rotation = 0.0
+    q_base = 0.0
+    q_lift = bound_range('joint_lift', joint_state['joint_lift'])
+    q_arml = bound_range('joint_arm_l0', joint_state['joint_arm_l0'] / 4.0)
+    q_yaw = bound_range('joint_wrist_yaw', joint_state['joint_wrist_yaw'])
+    q_pitch = bound_range('joint_wrist_pitch', joint_state['joint_wrist_pitch'])
+    q_roll = bound_range('joint_wrist_roll', joint_state['joint_wrist_roll'])
+    q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0]
 
     return q
     # TODO: -------------- end ---------------
@@ -105,7 +131,7 @@ def get_current_grasp_pose():
 
 def get_grasp_goal(target_point, target_orientation, q_init):
     # previously the move_to_grasp() function from lab 2
-    #   moved to it's own function without the final move_to_configuration() call for convenience in this lab
+    #   moved to its own function without the final move_to_configuration() call for convenience in this lab
     q_soln = chain.inverse_kinematics(target_point, target_orientation, orientation_mode='all', initial_position=q_init)
     # print('Solution:', q_soln)
     print("Solution Found")
@@ -121,7 +147,20 @@ def move_to_configuration(node, q):
     # TODO: ------------- start --------------
     # fill with your response
     #   your implementation from lab 2 - unpack the q solution to appropriate ros2 joints and command the robot joints to move accordingly
-    
+    q_base_rotation = q[1]
+    q_base = q[2]
+    q_lift = q[4]
+    q_arm = q[6] + q[7] + q[8] + q[9]
+    q_yaw = q[10]
+    q_pitch = q[12]
+    q_roll = q[13]
+    node.move_to_pose({'rotate_mobile_base': q_base_rotation}, blocking=True)
+    node.move_to_pose({'translate_mobile_base': q_base}, blocking=True)
+    node.move_to_pose({'joint_lift': q_lift}, blocking=True)
+    node.move_to_pose({'joint_arm': q_arm}, blocking=True)
+    node.move_to_pose({'joint_wrist_yaw': q_yaw}, blocking=True)
+    node.move_to_pose({'joint_wrist_pitch': q_pitch}, blocking=True)
+    node.move_to_pose({'joint_wrist_roll': q_roll}, blocking=True)
     # TODO: -------------- end ---------------
 
 def print_q(q):

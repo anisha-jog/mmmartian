@@ -50,21 +50,8 @@ for jr in joints_to_remove:
     modified_urdf._joints.remove(jr)
 
 # Add virtual base joint
-joint_base_translation = urdfpy.Joint(name='joint_base_translation',
-                                      parent='base_link',
-                                      child='link_base_translation',
-                                      joint_type='prismatic',
-                                      axis=np.array([1.0, 0.0, 0.0]),
-                                      origin=np.eye(4, dtype=np.float64),
-                                      limit=urdfpy.JointLimit(effort=100.0, velocity=1.0, lower=-1.0, upper=1.0))
-modified_urdf._joints.append(joint_base_translation)
-link_base_translation = urdfpy.Link(name='link_base_translation',
-                                    inertial=None,
-                                    visuals=None,
-                                    collisions=None)
-modified_urdf._links.append(link_base_translation)
 joint_base_rotation = urdfpy.Joint(name='joint_base_rotation',
-                                      parent='link_base_translation',
+                                      parent='base_link',
                                       child='link_base_rotation',
                                       joint_type='revolute',
                                       axis=np.array([0.0, 0.0, 1.0]),
@@ -76,6 +63,20 @@ link_base_rotation = urdfpy.Link(name='link_base_rotation',
                                     visuals=None,
                                     collisions=None)
 modified_urdf._links.append(link_base_rotation)
+joint_base_translation = urdfpy.Joint(name='joint_base_translation',
+                                      parent='joint_base_rotation',
+                                      child='link_base_translation',
+                                      joint_type='prismatic',
+                                      axis=np.array([1.0, 0.0, 0.0]),
+                                      origin=np.eye(4, dtype=np.float64),
+                                      limit=urdfpy.JointLimit(effort=100.0, velocity=1.0, lower=-1.0, upper=1.0))
+modified_urdf._joints.append(joint_base_translation)
+link_base_translation = urdfpy.Link(name='link_base_translation',
+                                    inertial=None,
+                                    visuals=None,
+                                    collisions=None)
+modified_urdf._links.append(link_base_translation)
+
 # amend the chain
 for j in modified_urdf._joints:
     if j.name == 'joint_mast':
@@ -114,6 +115,7 @@ def get_current_configuration():
 
 def move_to_configuration(q):
     q_base = q[1]
+    q_base_rotation = q[2] # was it 2 or 0?
     q_lift = q[3]
     q_arm = q[5] + q[6] + q[7] + q[8]
     q_yaw = q[9]
@@ -127,6 +129,7 @@ def move_to_configuration(q):
     # robot.end_of_arm.move_to('wrist_roll', q_roll)
     # robot.push_command()
     # print(robot.joint_state.name)
+    robot.move_to_pose({'rotate_mobile_base': q_base_rotation}, blocking=True)
     robot.move_to_pose({'translate_mobile_base': q_base}, blocking=True)
     robot.move_to_pose({'joint_lift': q_lift}, blocking=True)
     robot.move_to_pose({'joint_arm': q_arm}, blocking=True)
