@@ -7,7 +7,7 @@ from control_msgs.action import FollowJointTrajectory
 from hello_helpers.hello_misc import HelloNode
 import threading
 import tf2_ros
-from tf2_geometry_msgs import TransformStamped
+from tf2_geometry_msgs import TransformStamped, do_transform_pose_stamped
 from sensor_msgs.msg import JointState
 import ik_ros_utils as ik
 import ikpy
@@ -43,8 +43,13 @@ class IKTargetFollowing(HelloNode):
         # TODO: ------------- start --------------
         # fill with your response
         #   transform the goal pose to the base frame
-
-        goal_transformed = None
+        transform = self.tf_buffer.lookup_transform(
+            self.target_frame,
+            goal_msg.header.frame_id,
+            rclpy.time.Time(),
+            timeout=rclpy.duration.Duration(seconds=1.0),
+        )
+        goal_transformed = do_transform_pose_stamped(goal_msg, transform)
         # TODO: -------------- end ---------------
 
         return goal_transformed
