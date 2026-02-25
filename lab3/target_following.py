@@ -55,11 +55,14 @@ class IKTargetFollowing(HelloNode):
         return goal_transformed
 
     def get_gripper_pose_in_base_frame(self):
-        # TODO: ------------- start --------------
-        # fill with your response
-        #   transform the gripper pose to the base frame
-
-        gripper_transformed = None
+        transform = self.tf_buffer.lookup_transform(
+            self.target_frame,
+            goal_msg.header.frame_id,
+            rclpy.time.Time(),
+            timeout=rclpy.duration.Duration(seconds=1.0),
+        )
+        gripper_transformed = do_transform_pose_stamped(gripper_msg, transform)
+        
         # TODO: -------------- end ---------------
 
         return gripper_transformed
