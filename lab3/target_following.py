@@ -78,7 +78,7 @@ class IKTargetFollowing(HelloNode):
         # fill with your response
         #   use the same functions you used for IK in Lab 2, now in `ik_ros_utils.py`, 
         #   to move the robot to the transformed goal point.
-        q_soln = None
+        q_soln = ik.get_grasp_goal(waypoint_pos, waypoint_orient, ik.get_current_configuration(self.joint_state))
         # TODO: -------------- end ---------------
 
         # NOTE: if you find that the robot's base is moving too much, its likely that the ik solver is
@@ -104,7 +104,12 @@ class IKTargetFollowing(HelloNode):
         #   in this case, find a waypoint toward the goal position that is delta away from the gripper position (make some progress towards the goal)
         #   otherwise, the goal is close and we can move there directly
 
-        waypoint_pos = None
+        waypoint_pos = goal_pos
+        dist = (sum(abs(goal_pos - gripper_pos)**2))**0.5
+        delta = 0.2
+        if dist > delta:
+            # goal is too far
+            waypoint_pos = (goal_pos - gripper_pos) / dist * delta
         # TODO: -------------- end ---------------
 
         # use an zero rotation for the waypoint (its a point so we don't need to worry about orientation)
