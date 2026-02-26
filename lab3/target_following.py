@@ -143,7 +143,7 @@ class IKTargetFollowing(HelloNode):
         self.callback_group = ReentrantCallbackGroup()
         self.joint_states_subscriber = self.create_subscription(JointState, '/stretch/joint_states', callback=self.joint_states_callback, qos_profile=1)
 
-        # self.stow_the_robot()
+        self.stow_the_robot()
         self.move_to_ready_pose()
         print("At Ready Pose")
 
