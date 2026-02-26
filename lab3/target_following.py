@@ -11,6 +11,7 @@ from tf2_geometry_msgs import TransformStamped, do_transform_pose_stamped
 from sensor_msgs.msg import JointState
 import ik_ros_utils as ik
 import ikpy
+import detection_utils
 
 # Make sure to run:
 #   ros2 launch stretch_core stretch_driver.launch.py
@@ -57,11 +58,14 @@ class IKTargetFollowing(HelloNode):
     def get_gripper_pose_in_base_frame(self):
         transform = self.tf_buffer.lookup_transform(
             self.target_frame,
-            goal_msg.header.frame_id,
+            self.gripper_frame,
             rclpy.time.Time(),
             timeout=rclpy.duration.Duration(seconds=1.0),
         )
-        gripper_transformed = do_transform_pose_stamped(gripper_msg, transform)
+        xyz_out =[transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z ]
+        new_msg = detection_utils.get_pose_msg(transform.header.stamp, transform.header.frame_id, xyz_out)
+
+        gripper_transformed = do_transform_pose_stamped(new_msg, transform)
         
         # TODO: -------------- end ---------------
 
