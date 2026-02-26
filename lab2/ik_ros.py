@@ -130,7 +130,11 @@ while True:
             print("需要恰好 7 个数字 (x y z qx qy qz qw)，请重试。")
             continue
         x, y, z, qx, qy, qz, qw = vals
-        target_point = [x, y, TOP_Z + z]   # 目标位置 = (x, y, top_z + z)
+        target_z = TOP_Z + z
+        if target_z > TOP_Z:
+            target_z = TOP_Z
+            print("目标 z 已限制为 top_z（输入 z>0 时不再高于顶端）")
+        target_point = [x, y, target_z]   # 目标位置 = (x, y, top_z + z)，且 z 不超过 top_z
         target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
         move_to_grasp_goal(target_point, target_orientation)
     except ValueError as e:
