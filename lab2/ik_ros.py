@@ -74,10 +74,11 @@ def get_current_configuration():
 
 
 def move_to_configuration(q):
-    # Stretch 底盘只有 translate_by(delta) 相对位移，无 move_to。IK 的 q[1] 是绝对 x，需转为增量
+    # Stretch 底盘只有 translate_by(delta) 相对位移，无 move_to。IK 的 q[1] 是绝对 x，需转为增量；左右与预期相反则取反
     desired_base_x = q[1]
     current_base_x = robot.base.status['x']
     delta_x = desired_base_x - current_base_x
+    delta_x = -delta_x   # 底盘左右与输入相反
     q_lift = q[3]
     q_arm = q[5] + q[6] + q[7] + q[8]
     q_yaw = q[9]
@@ -102,11 +103,11 @@ def _clamp_to_chain_bounds(q):
 
 
 def move_to_grasp_goal(target_point, target_orientation_matrix):
-    """target_orientation_matrix: 3x3 旋转矩阵。orientation_mode='Z' 时 ikpy 需要 (3,) 的 Z 轴向量。"""
+    """target_point: (x,y,z)。姿态固定为夹爪朝下，用完整 3x3 矩阵 + orientation_mode='all'。"""
     q_init = get_current_configuration()
-    # 夹爪朝向固定为向下（base_link 中 Z 向上，故向下为 [0,0,-1]）；忽略输入姿态
-    z_axis = np.array([0.0, 0.0, -1.0])
-    q_soln = chain.inverse_kinematics(target_point, z_axis, orientation_mode='Z', initial_position=q_init)
+    # 夹爪朝下：base_link 中 Z 向上，末端 Z 轴指向 (0,0,-1)。绕 X 转 180° 的旋转矩阵
+    gripper_down_rotation = np.array([[1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, -1.0]], dtype=np.float64)
+    q_soln = chain.inverse_kinematics(target_point, gripper_down_rotation, orientation_mode='all', initial_position=q_init)
     print('Solution:', q_soln)
     q_use = _clamp_to_chain_bounds(q_soln)
     err = np.linalg.norm(chain.forward_kinematics(q_use)[:3, 3] - np.array(target_point))
@@ -151,7 +152,6 @@ while True:
             continue
         x, y, z, qx, qy, qz, qw = vals
         x, y, z = 0.01 * x, 0.01 * y, 0.01 * z   # 输入尺度 x100，转为米
-        x = -x   # 底盘左右与输入相反，取反
         target_z = TOP_Z + z
         if target_z > TOP_Z:
             target_z = TOP_Z
