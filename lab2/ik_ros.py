@@ -145,28 +145,18 @@ STRETCH_X_CENTER = 0.25  # Stretch 前方手臂舒适中心 x
 STRETCH_Y_CENTER = 0.0
 PANDA_TO_STRETCH_SCALE_X = 0.8   # Panda 方向 x 缩放
 PANDA_TO_STRETCH_SCALE_Y = 0.8
-PANDA_TO_STRETCH_SCALE_Z = 1.0   # Panda z 相对桌面 → Stretch z 相对 top_z
-ARM_EXTEND_OFFSET = 0.3   
-Z_OFFSET_CM = 0.09         # 所有目标 z 加高 5 cm
+PANDA_TO_STRETCH_SCALE_Z = 1.0   # Panda z 相对桌面 → Stretch z 缩放
+STRETCH_Z_REF = 0.5               # Stretch 目标 z 的固定参考高度 (m)，不再用 top
+ARM_EXTEND_OFFSET = 0.3
+Z_OFFSET_CM = 0.09                # 所有目标 z 加高
 
 
-def panda_to_stretch_position(x_panda, y_panda, z_panda, top_z):
-    """将 Panda/LIBERO 空间末端位置 (米) 转为 Stretch base_link 下目标 (x,y,z)。"""
+def panda_to_stretch_position(x_panda, y_panda, z_panda):
+    """将 Panda/LIBERO 空间末端位置 (米) 转为 Stretch base_link 下目标 (x,y,z)。不再用 top_z。"""
     x_s = (x_panda - PANDA_X_CENTER) * PANDA_TO_STRETCH_SCALE_X + STRETCH_X_CENTER + ARM_EXTEND_OFFSET
     y_s = (y_panda - PANDA_Y_CENTER) * PANDA_TO_STRETCH_SCALE_Y + STRETCH_Y_CENTER - ARM_EXTEND_OFFSET
-    z_s = top_z + (z_panda - PANDA_Z_CENTER) * PANDA_TO_STRETCH_SCALE_Z + Z_OFFSET_CM
+    z_s = STRETCH_Z_REF + (z_panda - PANDA_Z_CENTER) * PANDA_TO_STRETCH_SCALE_Z + Z_OFFSET_CM
     return (x_s, y_s, z_s)
-
-
-# ---------- 启动：top = lift(max - 0.18)，记录 top_z 供 Panda→Stretch z 映射 ----------
-print("正在升到 top = lift(max - 0.18)...")
-_lift_lo, _lift_hi = robot.lift.soft_motion_limits['hard']
-robot.lift.move_to(_lift_hi - 0.18)
-robot.push_command()
-robot.wait_command()
-_top_pose = get_current_grasp_pose()
-TOP_Z = float(_top_pose[2, 3])
-print("top_z = %.4f m；输入为 Panda/LIBERO 空间 (x,y,z) 米，将映射到 Stretch。")
 
 # ---------- 死循环：输入 Panda 空间 x y z qx qy qz qw，转 Stretch 后执行 ----------
 print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（Panda/LIBERO 单位：米）。Ctrl+C 退出。")
@@ -181,11 +171,7 @@ while True:
             continue
         x_p, y_p, z_p, qx, qy, qz, qw = vals
         x_p, y_p, z_p = 0.1 * x_p, 0.1 * y_p, 0.1 * z_p   # 输入尺度 x10，转为米
-        target_point = list(panda_to_stretch_position(x_p, y_p, z_p, TOP_Z))
-        target_z = target_point[2]
-        if target_z > TOP_Z:
-            target_point[2] = TOP_Z
-            print("目标 z 已限制为 top_z（映射后高于顶端时钳位）")
+        target_point = list(panda_to_stretch_position(x_p, y_p, z_p))
         target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
         move_to_grasp_goal(target_point, target_orientation)
     except ValueError as e:
