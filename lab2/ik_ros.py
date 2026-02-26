@@ -146,14 +146,13 @@ STRETCH_Y_CENTER = 0.0
 PANDA_TO_STRETCH_SCALE_X = 0.8   # Panda 方向 x 缩放
 PANDA_TO_STRETCH_SCALE_Y = 0.8
 PANDA_TO_STRETCH_SCALE_Z = 1.0   # Panda z 相对桌面 → Stretch z 相对 top_z
-
-
-Z_OFFSET_CM = 0   # 所有目标 z 加高 20 cm
+ARM_EXTEND_OFFSET = 0.05   # 手臂多伸出 5 cm（加在 x 上）
+Z_OFFSET_CM = 0.05         # 所有目标 z 加高 5 cm
 
 
 def panda_to_stretch_position(x_panda, y_panda, z_panda, top_z):
     """将 Panda/LIBERO 空间末端位置 (米) 转为 Stretch base_link 下目标 (x,y,z)。"""
-    x_s = (x_panda - PANDA_X_CENTER) * PANDA_TO_STRETCH_SCALE_X + STRETCH_X_CENTER
+    x_s = (x_panda - PANDA_X_CENTER) * PANDA_TO_STRETCH_SCALE_X + STRETCH_X_CENTER + ARM_EXTEND_OFFSET
     y_s = (y_panda - PANDA_Y_CENTER) * PANDA_TO_STRETCH_SCALE_Y + STRETCH_Y_CENTER
     z_s = top_z + (z_panda - PANDA_Z_CENTER) * PANDA_TO_STRETCH_SCALE_Z + Z_OFFSET_CM
     return (x_s, y_s, z_s)
