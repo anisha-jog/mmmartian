@@ -108,18 +108,18 @@ def get_current_grasp_pose():
     return chain.forward_kinematics(q)
 
 
-# ---------- 启动：升到距顶端留 0.17 m 余量的位置，记录该高度 ----------
-print("正在升到距顶端留 0.17 m 余量的位置...")
+# ---------- 启动：top = lift(max - 0.18)，记录此时末端 z 为 top_z；之后目标位置均为 (x, y, top_z + z) ----------
+print("正在升到 top = lift(max - 0.18)...")
 _lift_lo, _lift_hi = robot.lift.soft_motion_limits['hard']
 robot.lift.move_to(_lift_hi - 0.18)
 robot.push_command()
 robot.wait_command()
 _top_pose = get_current_grasp_pose()
-TOP_Z = float(_top_pose[2, 3])
-print("参考高度 z = %.4f m（顶端下 0.17 m）；后续输入的 z 为相对该高度的偏移（负值=向下）。" % TOP_Z)
+TOP_Z = float(_top_pose[2, 3])   # top_z
+print("top_z = %.4f m；之后目标位置均为 (x, y, top_z + z)。" % TOP_Z)
 
-# ---------- 死循环：先打印当前位姿，再输入 action（7 个数 x y z qx qy qz qw），z 为参考高度+z 偏移 ----------
-print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（z=相对参考高度偏移，负=向下）。Ctrl+C 退出。")
+# ---------- 死循环：目标位置 (x, y, top_z + z)，输入 x y z qx qy qz qw ----------
+print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（目标 z = top_z + z）。Ctrl+C 退出。")
 while True:
     print("当前位姿 (4x4):")
     print(get_current_grasp_pose())
@@ -130,7 +130,7 @@ while True:
             print("需要恰好 7 个数字 (x y z qx qy qz qw)，请重试。")
             continue
         x, y, z, qx, qy, qz, qw = vals
-        target_point = [x, y, TOP_Z + z]
+        target_point = [x, y, TOP_Z + z]   # 目标位置 = (x, y, top_z + z)
         target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
         move_to_grasp_goal(target_point, target_orientation)
     except ValueError as e:
