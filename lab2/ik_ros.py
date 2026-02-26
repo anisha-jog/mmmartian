@@ -96,6 +96,7 @@ def move_to_grasp_goal(target_point, target_orientation):
     err = np.linalg.norm(chain.forward_kinematics(q_soln)[:3, 3] - np.array(target_point))
     if not np.isclose(err, 0.0, atol=5e-2):
         print("IKPy did not find a valid solution (position error %.4f m)" % err)
+        print("提示：从顶端降下来请用负的 z（相对顶端偏移），例如 z=-0.05 表示降 5 cm；z 为正表示比顶端还高，可能不可达。")
         return None
     print("执行动作中...")
     move_to_configuration(q=q_soln)
@@ -107,18 +108,18 @@ def get_current_grasp_pose():
     return chain.forward_kinematics(q)
 
 
-# ---------- 启动：先升到顶端，记录顶端高度 ----------
-print("正在升到顶端...")
+# ---------- 启动：升到距顶端留 0.17 m 余量的位置，记录该高度 ----------
+print("正在升到距顶端留 0.17 m 余量的位置...")
 _lift_lo, _lift_hi = robot.lift.soft_motion_limits['hard']
-robot.lift.move_to(_lift_hi)
+robot.lift.move_to(_lift_hi - 0.18)
 robot.push_command()
 robot.wait_command()
 _top_pose = get_current_grasp_pose()
 TOP_Z = float(_top_pose[2, 3])
-print("顶端高度 z = %.4f m；后续输入的 z 为相对顶端的偏移（负值=从顶端向下）。" % TOP_Z)
+print("参考高度 z = %.4f m（顶端下 0.17 m）；后续输入的 z 为相对该高度的偏移（负值=向下）。" % TOP_Z)
 
-# ---------- 死循环：先打印当前位姿，再输入 action（7 个数 x y z qx qy qz qw），z 为顶端+z 偏移，执行即从顶端降下来 ----------
-print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（z=相对顶端偏移，负=向下）。Ctrl+C 退出。")
+# ---------- 死循环：先打印当前位姿，再输入 action（7 个数 x y z qx qy qz qw），z 为参考高度+z 偏移 ----------
+print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（z=相对参考高度偏移，负=向下）。Ctrl+C 退出。")
 while True:
     print("当前位姿 (4x4):")
     print(get_current_grasp_pose())
