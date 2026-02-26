@@ -6,8 +6,13 @@ import stretch_body.robot
 import importlib.resources as importlib_resources
 import hello_helpers.hello_misc as hm
 import time
-from scipy.spatial.transform import Rotation
-# NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx scipy`
+# NOTE before running: `python3 -m pip install --upgrade ikpy graphviz urchin networkx`
+
+# target_point = [0.2, -0.441, 0.235]
+cup1 = [0, -0.6, 0.8]
+above_cup1 = [0, -0.6, 1.0]
+above_cup2 = [-0.3, -0.6, 1.0]
+cup2 = [-0.05, -0.6, 0.85]
 
 target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll, pitch, yaw]
 
@@ -155,31 +160,37 @@ def get_current_grasp_pose():
     return chain.forward_kinematics(q)
 
 
-# ---------- 先给出 prior p（当前抓取位姿） ----------
-print("Prior p (current grasp pose 4x4 matrix):")
-prior_pose = get_current_grasp_pose()
-print(prior_pose)
-print()
+# robot.stow_the_robot()
+print("gripper open")
 
-# ---------- 循环：每次输入 7 位位姿 (x y z qx qy qz qw) 并执行 ----------
-print("输入 7 位位姿: x y z qx qy qz qw（单位：米 + 四元数），空行退出。")
-while True:
-    s = input("位姿 > ").strip()
-    if s == "":
-        print("退出。")
-        break
-    try:
-        vals = [float(x) for x in s.split()]
-        if len(vals) != 7:
-            print("需要恰好 7 个数字 (x y z qx qy qz qw)，请重试。")
-            continue
-        x, y, z, qx, qy, qz, qw = vals
-        target_point = [x, y, z]
-        target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
-        move_to_grasp_goal(target_point, target_orientation)
-        print("执行完成。当前位姿:\n", get_current_grasp_pose())
-    except ValueError as e:
-        print("解析失败，请输入 7 个数字，用空格分隔。", e)
-    except Exception as e:
-        print("执行出错:", e)
+move_to_grasp_goal(above_cup1, target_orientation)
+# time.sleep(5)
+robot.move_to_pose({'joint_gripper_finger_left': 100.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_finger_right': 100.0}, blocking=True, duration=3)
+move_to_grasp_goal(cup1, target_orientation)
+# time.sleep(5)
+robot.move_to_pose({'joint_gripper_finger_left': 0.1}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_finger_right': 0.1}, blocking=True, duration=3)
+move_to_grasp_goal(above_cup1, target_orientation)
+time.sleep(2)
+move_to_grasp_goal(above_cup2, target_orientation)
+time.sleep(2)
+move_to_grasp_goal(cup2, target_orientation)
+# move_to_grasp_goal(cup2, target_orientation)
+robot.move_to_pose({'joint_gripper_finger_left': 100.0}, blocking=True, duration=3)
+robot.move_to_pose({'joint_gripper_finger_right': 100.0}, blocking=True, duration=3)
+# time.sleep(5)
+# robot.move_to_pose({'joint_gripper_left': 0.1}, blocking=True, duration=3)
+# robot.move_to_pose({'joint_gripper_right': 0.1}, blocking=True, duration=3)
+# print("gripper close")
+# move_to_grasp_goal(above_cup1, target_orientation)
+# move_to_grasp_goal(above_cup2, target_orientation)
+# print("moved above second cup")
+# move_to_grasp_goal(cup2, target_orientation)
+# print("moved down to second cup")
+# robot.move_to_pose({'joint_gripper_left': 1.0}, blocking=True, duration=3)
+# robot.move_to_pose({'joint_gripper_right': 1.0}, blocking=True, duration=3)
+
+
+print(get_current_grasp_pose())
 print("Done!")
