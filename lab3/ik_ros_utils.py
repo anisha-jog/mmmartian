@@ -108,10 +108,12 @@ def get_current_configuration(joint_state):
     #   note: this time you can use the joint state callback provided for you in target_following.py which provides joint states as a
     #   dictionary that can be indexed by joint name, e.g. joint_state['joint_lift']
     def bound_range(name, value):
-        # names = [l.name for l in chain.links]
         print(joint_state)
         print("THIS IS A CHANGE")
-        index = joint_state.name.index(name)
+        names = [l.name for l in chain.links]
+        if name not in names:
+            return value
+        index = names.index(name)
         bounds = chain.links[index].bounds
         return min(max(value, bounds[0]), bounds[1])
 
