@@ -107,8 +107,18 @@ def get_current_grasp_pose():
     return chain.forward_kinematics(q)
 
 
-# ---------- 死循环：先打印当前位姿，再输入 action（7 个数 x y z qx qy qz qw）并执行（Ctrl+C 退出）----------
-print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw。Ctrl+C 退出。")
+# ---------- 启动：先升到顶端，记录顶端高度 ----------
+print("正在升到顶端...")
+_lift_lo, _lift_hi = robot.lift.soft_motion_limits['hard']
+robot.lift.move_to(_lift_hi)
+robot.push_command()
+robot.wait_command()
+_top_pose = get_current_grasp_pose()
+TOP_Z = float(_top_pose[2, 3])
+print("顶端高度 z = %.4f m；后续输入的 z 为相对顶端的偏移（负值=从顶端向下）。" % TOP_Z)
+
+# ---------- 死循环：先打印当前位姿，再输入 action（7 个数 x y z qx qy qz qw），z 为顶端+z 偏移，执行即从顶端降下来 ----------
+print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（z=相对顶端偏移，负=向下）。Ctrl+C 退出。")
 while True:
     print("当前位姿 (4x4):")
     print(get_current_grasp_pose())
@@ -119,7 +129,7 @@ while True:
             print("需要恰好 7 个数字 (x y z qx qy qz qw)，请重试。")
             continue
         x, y, z, qx, qy, qz, qw = vals
-        target_point = [x, y, z]
+        target_point = [x, y, TOP_Z + z]
         target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
         move_to_grasp_goal(target_point, target_orientation)
     except ValueError as e:
