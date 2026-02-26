@@ -126,6 +126,7 @@ def get_current_configuration(joint_state):
     q_roll = bound_range('joint_wrist_roll', joint_state['joint_wrist_roll'])
     q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0]
 
+    print("current configuration retrieved")
     # return q
     return [0.0, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, 0.0]
     # TODO: -------------- end ---------------
