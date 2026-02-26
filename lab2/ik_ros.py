@@ -150,6 +150,7 @@ while True:
             print("需要恰好 7 个数字 (x y z qx qy qz qw)，请重试。")
             continue
         x, y, z, qx, qy, qz, qw = vals
+        x, y, z = 0.01 * x, 0.01 * y, 0.01 * z   # 输入尺度 x100，转为米
         target_z = TOP_Z + z
         if target_z > TOP_Z:
             target_z = TOP_Z
