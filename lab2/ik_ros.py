@@ -11,6 +11,10 @@ robot = stretch_body.robot.Robot()
 robot.startup()
 if not robot.is_calibrated():
     robot.home()
+# 先 stow 到安全收拢姿态
+robot.stow()
+robot.push_command()
+robot.wait_command()
 
 pkg_path = str(importlib_resources.files('stretch_urdf'))
 urdf_file_path = pkg_path + '/SE3/stretch_description_SE3_eoa_wrist_dw3_tool_sg3.urdf'
