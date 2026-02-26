@@ -104,8 +104,14 @@ def _clamp_to_chain_bounds(q):
 def move_to_grasp_goal(target_point, target_orientation_matrix):
     """target_point: (x,y,z)。姿态固定为夹爪朝下，用完整 3x3 矩阵 + orientation_mode='all'。"""
     q_init = get_current_configuration()
-    # 夹爪朝下：Stretch 末端“接近方向”在 URDF 里多为 X 轴（朝右/前），需让该轴指向 (0,0,-1)。绕 Y 转 90°：X -> -Z
-    gripper_down_rotation = np.array([[0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]], dtype=np.float64)
+    # 夹爪朝下且朝右：base 中 Y 左、Z 上，故“下右”为 (0, 1, -1) 单位化；末端接近轴取为该方向
+    _inv_sqrt2 = 1.0 / np.sqrt(2.0)
+    approach = np.array([0.0, _inv_sqrt2, -_inv_sqrt2])   # 下右
+    forward = np.array([1.0, 0.0, 0.0])                    # 前
+    right = np.cross(approach, forward)
+    right = right / np.linalg.norm(right)
+    forward = np.cross(right, approach)
+    gripper_down_rotation = np.column_stack((approach, right, forward)).astype(np.float64)
     q_soln = chain.inverse_kinematics(target_point, gripper_down_rotation, orientation_mode='all', initial_position=q_init)
     print('Solution:', q_soln)
     q_use = _clamp_to_chain_bounds(q_soln)
