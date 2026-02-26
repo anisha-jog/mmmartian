@@ -4,7 +4,6 @@ import ikpy.chain
 import stretch_body.robot
 import importlib.resources as importlib_resources
 from scipy.spatial.transform import Rotation
-import time
 # NOTE: `python3 -m pip install --upgrade ikpy graphviz urchin networkx scipy`
 
 # ---------- Stretch Python API（不用 ROS）----------
@@ -12,12 +11,6 @@ robot = stretch_body.robot.Robot()
 robot.startup()
 if not robot.is_calibrated():
     robot.home()
-
-# 正式流程：底座前移 + stow
-robot.base.translate_by(0.35)
-robot.push_command()
-robot.stow()
-time.sleep(2)
 
 pkg_path = str(importlib_resources.files('stretch_urdf'))
 urdf_file_path = pkg_path + '/SE3/stretch_description_SE3_eoa_wrist_dw3_tool_sg3.urdf'
@@ -113,56 +106,12 @@ def get_current_grasp_pose():
     return chain.forward_kinematics(q)
 
 
-def _gripper_open():
-    try:
-        robot.end_of_arm.move_to('stretch_gripper', 100.0)
-        robot.push_command()
-    except Exception:
-        print("[gripper] open skipped (no stretch_gripper?)")
-
-
-def _gripper_close():
-    try:
-        robot.end_of_arm.move_to('stretch_gripper', 0.0)
-        robot.push_command()
-    except Exception:
-        print("[gripper] close skipped")
-
-
-# ---------- 先给出 prior p（当前抓取位姿）----------
-print("Prior p (current grasp pose 4x4 matrix):")
-prior_pose = get_current_grasp_pose()
-print(prior_pose)
-print()
-
-# ---------- 正式流程：杯子抓取演示 ----------
-TARGET_ORIENTATION = np.array(ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi / 2))
-cup1 = [0, -0.6, 0.8]
-above_cup1 = [0, -0.6, 1.0]
-above_cup2 = [-0.3, -0.6, 1.0]
-cup2 = [-0.05, -0.6, 0.85]
-
-print("正式流程：above_cup1 -> 张开夹爪 -> cup1 -> 闭合 -> above_cup1 -> above_cup2 -> cup2 -> 张开")
-move_to_grasp_goal(above_cup1, TARGET_ORIENTATION)
-_gripper_open()
-time.sleep(1)
-move_to_grasp_goal(cup1, TARGET_ORIENTATION)
-_gripper_close()
-time.sleep(1)
-move_to_grasp_goal(above_cup1, TARGET_ORIENTATION)
-time.sleep(1)
-move_to_grasp_goal(above_cup2, TARGET_ORIENTATION)
-time.sleep(1)
-move_to_grasp_goal(cup2, TARGET_ORIENTATION)
-_gripper_open()
-time.sleep(1)
-print("正式流程结束。")
-print()
-
-# ---------- 死循环：每次输入 7 位位姿 (x y z qx qy qz qw) 并执行（Ctrl+C 退出）----------
-print("输入 7 位位姿: x y z qx qy qz qw（米 + 四元数）。Ctrl+C 退出。")
+# ---------- 死循环：先打印当前位姿，再输入 action（7 个数 x y z qx qy qz qw）并执行（Ctrl+C 退出）----------
+print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw。Ctrl+C 退出。")
 while True:
-    s = input("位姿 > ").strip()
+    print("当前位姿 (4x4):")
+    print(get_current_grasp_pose())
+    s = input("action > ").strip()
     try:
         vals = [float(x) for x in s.split()]
         if len(vals) != 7:
@@ -172,7 +121,6 @@ while True:
         target_point = [x, y, z]
         target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
         move_to_grasp_goal(target_point, target_orientation)
-        print("执行完成。当前位姿:\n", get_current_grasp_pose())
     except ValueError as e:
         print("解析失败，请输入 7 个数字，用空格分隔。", e)
     except Exception as e:
