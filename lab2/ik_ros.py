@@ -158,16 +158,16 @@ def panda_to_stretch_position(x_panda, y_panda, z_panda):
     z_s = STRETCH_Z_REF + (z_panda - PANDA_Z_CENTER) * PANDA_TO_STRETCH_SCALE_Z + Z_OFFSET_CM
     return (x_s, y_s, z_s)
 
-# ---------- 启动：记录 z_top 供复位用 ----------
+# ---------- 启动：只复位一次到 (0, 0, z_top) ----------
 Z_TOP = float(get_current_grasp_pose()[2, 3])
-print("z_top = %.4f m；每轮先复位到 (0, 0, z_top)，再输入 action。")
+print("复位到 (0, 0, z_top)...")
+move_to_grasp_goal([0.0, 0.0, Z_TOP], np.eye(3))
+robot.wait_command()
+print("z_top = %.4f m；已复位，之后每轮只输入 action。")
 
-# ---------- 死循环：每轮先复位到 (0,0,z_top)，再输入 Panda 空间 x y z qx qy qz qw 并执行 ----------
-print("每轮先复位到 (0,0,z_top)，再输入 action: x y z qx qy qz qw（Panda/LIBERO 单位：米）。Ctrl+C 退出。")
+# ---------- 死循环：输入 Panda 空间 x y z qx qy qz qw 并执行 ----------
+print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（Panda/LIBERO 单位：米）。Ctrl+C 退出。")
 while True:
-    print("复位到 (0, 0, z_top)...")
-    move_to_grasp_goal([0.0, 0.0, Z_TOP], np.eye(3))
-    robot.wait_command()
     print("当前位姿 (4x4):")
     print(get_current_grasp_pose())
     s = input("action > ").strip()
