@@ -104,8 +104,8 @@ def _clamp_to_chain_bounds(q):
 def move_to_grasp_goal(target_point, target_orientation_matrix):
     """target_point: (x,y,z)。姿态固定为夹爪朝下，用完整 3x3 矩阵 + orientation_mode='all'。"""
     q_init = get_current_configuration()
-    # 夹爪朝下：base_link 中 Z 向上，末端 Z 轴指向 (0,0,-1)。绕 X 转 180° 的旋转矩阵
-    gripper_down_rotation = np.array([[1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, -1.0]], dtype=np.float64)
+    # 夹爪朝下：Stretch 末端“接近方向”在 URDF 里多为 X 轴（朝右/前），需让该轴指向 (0,0,-1)。绕 Y 转 90°：X -> -Z
+    gripper_down_rotation = np.array([[0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]], dtype=np.float64)
     q_soln = chain.inverse_kinematics(target_point, gripper_down_rotation, orientation_mode='all', initial_position=q_init)
     print('Solution:', q_soln)
     q_use = _clamp_to_chain_bounds(q_soln)
@@ -142,11 +142,14 @@ PANDA_TO_STRETCH_SCALE_Y = 0.8
 PANDA_TO_STRETCH_SCALE_Z = 1.0   # Panda z 相对桌面 → Stretch z 相对 top_z
 
 
+Z_OFFSET_CM = 0.20   # 所有目标 z 加高 20 cm
+
+
 def panda_to_stretch_position(x_panda, y_panda, z_panda, top_z):
     """将 Panda/LIBERO 空间末端位置 (米) 转为 Stretch base_link 下目标 (x,y,z)。"""
     x_s = (x_panda - PANDA_X_CENTER) * PANDA_TO_STRETCH_SCALE_X + STRETCH_X_CENTER
     y_s = (y_panda - PANDA_Y_CENTER) * PANDA_TO_STRETCH_SCALE_Y + STRETCH_Y_CENTER
-    z_s = top_z + (z_panda - PANDA_Z_CENTER) * PANDA_TO_STRETCH_SCALE_Z
+    z_s = top_z + (z_panda - PANDA_Z_CENTER) * PANDA_TO_STRETCH_SCALE_Z + Z_OFFSET_CM
     return (x_s, y_s, z_s)
 
 
