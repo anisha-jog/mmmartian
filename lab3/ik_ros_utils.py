@@ -109,7 +109,8 @@ def get_current_configuration(joint_state):
     #   dictionary that can be indexed by joint name, e.g. joint_state['joint_lift']
     def bound_range(name, value):
         # names = [l.name for l in chain.links]
-        index = joint_state.index(name)
+        print(joint_state)
+        index = joint_state.name.index(name)
         bounds = chain.links[index].bounds
         return min(max(value, bounds[0]), bounds[1])
 
