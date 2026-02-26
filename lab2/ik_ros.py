@@ -184,7 +184,7 @@ print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（Panda
 while True:
     pose_4x4 = get_current_grasp_pose()
     pose_8 = pose_4x4_to_8(pose_4x4)
-    print("当前位姿 (8 位):", " ".join("%.6g" % v for v in pose_8))
+    print("当前位姿 (8 位):", ",".join("%g" % v for v in pose_8))
     s = input("action > ").strip()
     try:
         vals = [float(x) for x in s.split()]
