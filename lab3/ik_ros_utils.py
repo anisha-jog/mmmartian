@@ -108,10 +108,10 @@ def get_current_configuration(joint_state):
     #   note: this time you can use the joint state callback provided for you in target_following.py which provides joint states as a
     #   dictionary that can be indexed by joint name, e.g. joint_state['joint_lift']
     def bound_range(name, value):
-        print(joint_state)
-        print("THIS IS A CHANGE")
+        # print(joint_state)
+        # print("THIS IS A CHANGE")
         names = [l.name for l in chain.links]
-        print(len(names), names)
+        # print(len(names), names)
         # ['Base link', 'joint_base_rotation', 'joint_base_translation', 'joint_mast', 'joint_lift', 'joint_arm_l4', 'joint_arm_l3', 'joint_arm_l2', 'joint_arm_l1', 'joint_arm_l0', 'joint_wrist_yaw', 'joint_wrist_yaw_bottom', 'joint_wrist_pitch', 'joint_wrist_roll', 'joint_gripper_s3_body', 'joint_grasp_center']
         if name not in names:
             return value
@@ -128,9 +128,8 @@ def get_current_configuration(joint_state):
     q_roll = bound_range('joint_wrist_roll', joint_state['joint_wrist_roll'])
     q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, 0.0]
 
-    print("current configuration retrieved")
+    # print("current configuration retrieved")
     return q
-    # return [0.0, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, 0.0]
     # TODO: -------------- end ---------------
 
 def get_current_grasp_pose():
@@ -155,20 +154,20 @@ def move_to_configuration(node, q):
     # TODO: ------------- start --------------
     # fill with your response
     #   your implementation from lab 2 - unpack the q solution to appropriate ros2 joints and command the robot joints to move accordingly
-    # q_base_rotation = q[1]
-    # q_base = q[2]
-    # q_lift = q[4]
-    # q_arm = q[6] + q[7] + q[8] + q[9]
-    # q_yaw = q[10]
-    # q_pitch = q[12]
-    # q_roll = q[13]
-    q_base = q[1]
-    q_base_rotation = q[2] # was it 2 or 0?
-    q_lift = q[3]
-    q_arm = q[5] + q[6] + q[7] + q[8]
-    q_yaw = q[9]
-    q_pitch = q[11]
-    q_roll = q[12]
+    q_base_rotation = q[1]
+    q_base = q[2]
+    q_lift = q[4]
+    q_arm = q[6] + q[7] + q[8] + q[9]
+    q_yaw = q[10]
+    q_pitch = q[12]
+    q_roll = q[13]
+    # q_base = q[1]
+    # q_base_rotation = q[2] # was it 2 or 0?
+    # q_lift = q[3]
+    # q_arm = q[5] + q[6] + q[7] + q[8]
+    # q_yaw = q[9]
+    # q_pitch = q[11]
+    # q_roll = q[12]
     node.move_to_pose({'rotate_mobile_base': q_base_rotation}, blocking=True)
     node.move_to_pose({'translate_mobile_base': q_base}, blocking=True)
     node.move_to_pose({'joint_lift': q_lift}, blocking=True)
