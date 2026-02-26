@@ -78,7 +78,7 @@ def move_to_configuration(q):
     desired_base_x = q[1]
     current_base_x = robot.base.status['x']
     delta_x = desired_base_x - current_base_x
-    delta_x = -delta_x   # 底盘左右与输入相反
+    delta_x = -delta_x * BASE_DELTA_SCALE   # 左右取反，并缩小底盘移动幅度
     q_lift = q[3]
     q_arm = q[5] + q[6] + q[7] + q[8]
     q_yaw = q[9]
@@ -129,6 +129,10 @@ def get_current_grasp_pose():
     return chain.forward_kinematics(q)
 
 
+# ---------- 底盘幅度缩放、y 偏移（手臂伸出） ----------
+BASE_DELTA_SCALE = 0.2   # 底盘增量缩放，避免跑得过大
+Y_OFFSET = 0.05          # 目标 y 加该值，手臂多伸出一段（米）
+
 # ---------- 启动：top = lift(max - 0.18)，记录此时末端 z 为 top_z；之后目标位置均为 (x, y, top_z + z) ----------
 print("正在升到 top = lift(max - 0.18)...")
 _lift_lo, _lift_hi = robot.lift.soft_motion_limits['hard']
@@ -156,7 +160,7 @@ while True:
         if target_z > TOP_Z:
             target_z = TOP_Z
             print("目标 z 已限制为 top_z（输入 z>0 时不再高于顶端）")
-        target_point = [x, y, target_z]   # 目标位置 = (x, y, top_z + z)，且 z 不超过 top_z
+        target_point = [x, y + Y_OFFSET, target_z]   # 目标 (x, y+偏移, top_z+z)，y 加偏移让手臂伸出
         target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
         move_to_grasp_goal(target_point, target_orientation)
     except ValueError as e:
