@@ -19,11 +19,17 @@ target_orientation = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2) # [roll,
 #     robot.home()
 
 robot = hm.HelloNode.quick_create('robot', wait_for_first_pointcloud=False)
-# robot.move_to_pose({'joint_gripper_finger_left': 100.0}, blocking=True, duration=3)
-# robot.move_to_pose({'joint_gripper_finger_right': 100.0}, blocking=True, duration=3)
-
-robot.move_to_pose({'translate_mobile_base': 0.35}, blocking=True)
-robot.stow_the_robot()
+# 可选：启动时先移动底座并 stow；若 arm action server 未就绪会超时，可注释掉或设 SKIP_INITIAL_MOVE=1 跳过
+import os
+if os.environ.get('SKIP_INITIAL_MOVE', '0') != '1':
+    try:
+        robot.move_to_pose({'translate_mobile_base': 0.35}, blocking=True)
+        robot.stow_the_robot()
+    except Exception as e:
+        print("[WARN] 初始移动/ stow 未执行（arm action server 可能未就绪）:", e)
+        print("        可先启动仿真/机器人后再运行，或设环境变量 SKIP_INITIAL_MOVE=1 跳过。")
+else:
+    print("[INFO] SKIP_INITIAL_MOVE=1，跳过初始移动与 stow。")
 
 
 pkg_path = str(importlib_resources.files('stretch_urdf'))
