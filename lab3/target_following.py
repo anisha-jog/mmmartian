@@ -70,7 +70,7 @@ class IKTargetFollowing(HelloNode):
         
         # TODO: -------------- end ---------------
 
-        return gripper_transformed
+        return new_msg
 
     def goal_callback(self, goal_msg):
         # print(msg)
