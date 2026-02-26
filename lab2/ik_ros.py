@@ -64,7 +64,7 @@ def get_current_configuration():
         bounds = chain.links[index].bounds
         return min(max(value, bounds[0]), bounds[1])
 
-    q_base = 0.0
+    q_base = bound_range('joint_base_translation', robot.base.status['x'])   # 底盘 x 供 IK；执行时转为增量
     q_lift = bound_range('joint_lift', robot.lift.status['pos'])
     q_arml = bound_range('joint_arm_l0', robot.arm.status['pos'] / 4.0)
     q_yaw = bound_range('joint_wrist_yaw', robot.end_of_arm.status['wrist_yaw']['pos'])
@@ -74,13 +74,16 @@ def get_current_configuration():
 
 
 def move_to_configuration(q):
-    q_base = q[1]
+    # Stretch 底盘只有 translate_by(delta) 相对位移，无 move_to。IK 的 q[1] 是绝对 x，需转为增量
+    desired_base_x = q[1]
+    current_base_x = robot.base.status['x']
+    delta_x = desired_base_x - current_base_x
     q_lift = q[3]
     q_arm = q[5] + q[6] + q[7] + q[8]
     q_yaw = q[9]
     q_pitch = q[11]
     q_roll = q[12]
-    robot.base.translate_by(q_base)
+    robot.base.translate_by(delta_x)
     robot.lift.move_to(q_lift)
     robot.arm.move_to(q_arm)
     robot.end_of_arm.move_to('wrist_yaw', q_yaw)
