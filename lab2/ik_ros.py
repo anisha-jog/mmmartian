@@ -89,18 +89,30 @@ def move_to_configuration(q):
     robot.push_command()
 
 
+def _clamp_to_chain_bounds(q):
+    """将关节角限制在 chain 各关节限位内。"""
+    q = np.array(q, dtype=np.float64)
+    for i in range(min(len(q), len(chain.links))):
+        lo, hi = chain.links[i].bounds
+        q[i] = np.clip(q[i], lo, hi)
+    return q
+
+
 def move_to_grasp_goal(target_point, target_orientation):
     q_init = get_current_configuration()
-    q_soln = chain.inverse_kinematics(target_point, target_orientation, orientation_mode='all', initial_position=q_init)
+    q_soln = chain.inverse_kinematics(target_point, target_orientation, orientation_mode='Z', initial_position=q_init)
     print('Solution:', q_soln)
-    err = np.linalg.norm(chain.forward_kinematics(q_soln)[:3, 3] - np.array(target_point))
-    if not np.isclose(err, 0.0, atol=5e-2):
-        print("IKPy did not find a valid solution (position error %.4f m)" % err)
+    q_use = _clamp_to_chain_bounds(q_soln)
+    err = np.linalg.norm(chain.forward_kinematics(q_use)[:3, 3] - np.array(target_point))
+    if err > 0.5:
+        print("IKPy did not find a valid solution (position error %.4f m，钳制后仍超 50 cm)" % err)
         print("提示：从顶端降下来请用负的 z（相对顶端偏移），例如 z=-0.05 表示降 5 cm；z 为正表示比顶端还高，可能不可达。")
         return None
+    if np.any(np.abs(np.array(q_use) - np.array(q_soln)) > 1e-6):
+        print("已按关节限位钳制后执行。")
     print("执行动作中...")
-    move_to_configuration(q=q_soln)
-    return q_soln
+    move_to_configuration(q=q_use)
+    return q_use
 
 
 def get_current_grasp_pose():
