@@ -74,11 +74,10 @@ def get_current_configuration():
 
 
 def move_to_configuration(q):
-    # Stretch 底盘只有 translate_by(delta) 相对位移，无 move_to。IK 的 q[1] 是绝对 x，需转为增量；左右与预期相反则取反
+    # 仅保留绝对值逻辑：Stretch 底盘只有 translate_by(delta)，用 目标x - 当前x 得到增量
     desired_base_x = q[1]
     current_base_x = robot.base.status['x']
     delta_x = desired_base_x - current_base_x
-    delta_x = -delta_x * BASE_DELTA_SCALE   # 左右取反，并缩小底盘移动幅度
     q_lift = q[3]
     q_arm = q[5] + q[6] + q[7] + q[8]
     q_yaw = q[9]
@@ -129,22 +128,40 @@ def get_current_grasp_pose():
     return chain.forward_kinematics(q)
 
 
-# ---------- 底盘幅度缩放、y 偏移（手臂伸出） ----------
-BASE_DELTA_SCALE = 0.2   # 底盘增量缩放，避免跑得过大
-Y_OFFSET = 0.05          # 目标 y 加该值，手臂多伸出一段（米）
+# ---------- Panda (Franka Emika 7-DoF) / LIBERO → Stretch 参数转换 ----------
+# Franka Panda: base 原点，X 前 Y 左 Z 上；名义 workspace 中心 [0.515, 0, 0.226] m，约 0.4^3 盒
+# LIBERO 动作：7 维 (x,y,z, qx,qy,qz,qw) 或 (x,y,z, roll,pitch,yaw, gripper)，单位米
+# Stretch: 同 convention，但臂长/行程不同，用线性缩放+偏移映射到 Stretch 可达范围
+PANDA_X_CENTER = 0.515   # Panda 名义 workspace 中心 x (m)
+PANDA_Y_CENTER = 0.0
+PANDA_Z_CENTER = 0.226   # 桌面高度典型值
+STRETCH_X_CENTER = 0.25  # Stretch 前方手臂舒适中心 x
+STRETCH_Y_CENTER = 0.0
+PANDA_TO_STRETCH_SCALE_X = 0.8   # Panda 方向 x 缩放
+PANDA_TO_STRETCH_SCALE_Y = 0.8
+PANDA_TO_STRETCH_SCALE_Z = 1.0   # Panda z 相对桌面 → Stretch z 相对 top_z
 
-# ---------- 启动：top = lift(max - 0.18)，记录此时末端 z 为 top_z；之后目标位置均为 (x, y, top_z + z) ----------
+
+def panda_to_stretch_position(x_panda, y_panda, z_panda, top_z):
+    """将 Panda/LIBERO 空间末端位置 (米) 转为 Stretch base_link 下目标 (x,y,z)。"""
+    x_s = (x_panda - PANDA_X_CENTER) * PANDA_TO_STRETCH_SCALE_X + STRETCH_X_CENTER
+    y_s = (y_panda - PANDA_Y_CENTER) * PANDA_TO_STRETCH_SCALE_Y + STRETCH_Y_CENTER
+    z_s = top_z + (z_panda - PANDA_Z_CENTER) * PANDA_TO_STRETCH_SCALE_Z
+    return (x_s, y_s, z_s)
+
+
+# ---------- 启动：top = lift(max - 0.18)，记录 top_z 供 Panda→Stretch z 映射 ----------
 print("正在升到 top = lift(max - 0.18)...")
 _lift_lo, _lift_hi = robot.lift.soft_motion_limits['hard']
 robot.lift.move_to(_lift_hi - 0.18)
 robot.push_command()
 robot.wait_command()
 _top_pose = get_current_grasp_pose()
-TOP_Z = float(_top_pose[2, 3])   # top_z
-print("top_z = %.4f m；之后目标位置均为 (x, y, top_z + z)。" % TOP_Z)
+TOP_Z = float(_top_pose[2, 3])
+print("top_z = %.4f m；输入为 Panda/LIBERO 空间 (x,y,z) 米，将映射到 Stretch。")
 
-# ---------- 死循环：目标位置 (x, y, top_z + z)，输入 x y z qx qy qz qw ----------
-print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（目标 z = top_z + z）。Ctrl+C 退出。")
+# ---------- 死循环：输入 Panda 空间 x y z qx qy qz qw，转 Stretch 后执行 ----------
+print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（Panda/LIBERO 单位：米）。Ctrl+C 退出。")
 while True:
     print("当前位姿 (4x4):")
     print(get_current_grasp_pose())
@@ -154,13 +171,12 @@ while True:
         if len(vals) != 7:
             print("需要恰好 7 个数字 (x y z qx qy qz qw)，请重试。")
             continue
-        x, y, z, qx, qy, qz, qw = vals
-        x, y, z = 0.01 * x, 0.01 * y, 0.01 * z   # 输入尺度 x100，转为米
-        target_z = TOP_Z + z
+        x_p, y_p, z_p, qx, qy, qz, qw = vals
+        target_point = list(panda_to_stretch_position(x_p, y_p, z_p, TOP_Z))
+        target_z = target_point[2]
         if target_z > TOP_Z:
-            target_z = TOP_Z
-            print("目标 z 已限制为 top_z（输入 z>0 时不再高于顶端）")
-        target_point = [x, y + Y_OFFSET, target_z]   # 目标 (x, y+偏移, top_z+z)，y 加偏移让手臂伸出
+            target_point[2] = TOP_Z
+            print("目标 z 已限制为 top_z（映射后高于顶端时钳位）")
         target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
         move_to_grasp_goal(target_point, target_orientation)
     except ValueError as e:
