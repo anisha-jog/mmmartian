@@ -134,6 +134,16 @@ def get_current_grasp_pose():
     return chain.forward_kinematics(q)
 
 
+def pose_4x4_to_8(pose_4x4):
+    """将 4x4 位姿矩阵转为 8 维向量：x, y, z, qx, qy, qz, qw, 1。"""
+    pose_4x4 = np.asarray(pose_4x4)
+    x, y, z = pose_4x4[0, 3], pose_4x4[1, 3], pose_4x4[2, 3]
+    R = pose_4x4[:3, :3]
+    quat = Rotation.from_matrix(R).as_quat()  # xyzw
+    qx, qy, qz, qw = quat[0], quat[1], quat[2], quat[3]
+    return [x, y, z, qx, qy, qz, qw, 1.0]
+
+
 # ---------- Panda (Franka Emika 7-DoF) / LIBERO → Stretch 参数转换 ----------
 # Franka Panda: base 原点，X 前 Y 左 Z 上；名义 workspace 中心 [0.515, 0, 0.226] m，约 0.4^3 盒
 # LIBERO 动作：7 维 (x,y,z, qx,qy,qz,qw) 或 (x,y,z, roll,pitch,yaw, gripper)，单位米
@@ -172,8 +182,9 @@ print("已复位，之后每轮只输入 action。")
 # ---------- 死循环：输入 Panda 空间 x y z qx qy qz qw 并执行 ----------
 print("每轮先打印当前位姿，再输入 action: x y z qx qy qz qw（Panda/LIBERO 单位：米）。Ctrl+C 退出。")
 while True:
-    print("当前位姿 (4x4):")
-    print(get_current_grasp_pose())
+    pose_4x4 = get_current_grasp_pose()
+    pose_8 = pose_4x4_to_8(pose_4x4)
+    print("当前位姿 (8 位):", " ".join("%.6g" % v for v in pose_8))
     s = input("action > ").strip()
     try:
         vals = [float(x) for x in s.split()]
