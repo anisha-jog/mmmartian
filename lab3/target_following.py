@@ -65,7 +65,8 @@ class IKTargetFollowing(HelloNode):
         xyz_out =[transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z ]
         new_msg = detection_utils.get_pose_msg(transform.header.stamp, transform.header.frame_id, xyz_out)
 
-        gripper_transformed = do_transform_pose_stamped(new_msg, transform)
+        # gripper_transformed = do_transform_pose_stamped(new_msg, transform)
+        gripper_transformed = new_msg
         
         # TODO: -------------- end ---------------
 
@@ -121,7 +122,7 @@ class IKTargetFollowing(HelloNode):
         delta = 0.2
         if dist > delta:
             # goal is too far
-            waypoint_pos = (goal_pos - gripper_pos) / dist * delta
+            waypoint_pos = gripper_pos + (goal_pos - gripper_pos) / dist * delta
         # TODO: -------------- end ---------------
 
         # use an zero rotation for the waypoint (its a point so we don't need to worry about orientation)
