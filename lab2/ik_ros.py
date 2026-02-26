@@ -148,7 +148,7 @@ PANDA_TO_STRETCH_SCALE_Y = 0.8
 PANDA_TO_STRETCH_SCALE_Z = 1.0   # Panda z 相对桌面 → Stretch z 相对 top_z
 
 
-Z_OFFSET_CM = 0.20   # 所有目标 z 加高 20 cm
+Z_OFFSET_CM = 0   # 所有目标 z 加高 20 cm
 
 
 def panda_to_stretch_position(x_panda, y_panda, z_panda, top_z):
