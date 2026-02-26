@@ -122,7 +122,7 @@ class IKTargetFollowing(HelloNode):
         if dist > self.delta:
             # goal is too far
             waypoint_pos = gripper_pos + (goal_pos - gripper_pos) / dist * self.delta
-        print(waypoint_pos)
+        # print(waypoint_pos)
         # TODO: -------------- end ---------------
 
         # use an zero rotation for the waypoint (its a point so we don't need to worry about orientation)
