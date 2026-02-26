@@ -55,14 +55,6 @@ for link in chain.links:
     print(f"* Link Name: {link.name}, Type: {link.joint_type}")
 
 
-def _get_wrist_pos(joint_name):
-    """腕部/夹爪未连接时返回 0，避免 KeyError。"""
-    try:
-        return robot.end_of_arm.get_joint(joint_name).status['pos']
-    except (KeyError, AttributeError, TypeError):
-        return 0.0
-
-
 def get_current_configuration():
     def bound_range(name, value):
         names = [l.name for l in chain.links]
@@ -75,9 +67,9 @@ def get_current_configuration():
     q_base = bound_range('joint_base_translation', robot.base.status['x'])   # 底盘 x 供 IK；执行时转为增量
     q_lift = bound_range('joint_lift', robot.lift.status['pos'])
     q_arml = bound_range('joint_arm_l0', robot.arm.status['pos'] / 4.0)
-    q_yaw = bound_range('joint_wrist_yaw', _get_wrist_pos('wrist_yaw'))
-    q_pitch = bound_range('joint_wrist_pitch', _get_wrist_pos('wrist_pitch'))
-    q_roll = bound_range('joint_wrist_roll', _get_wrist_pos('wrist_roll'))
+    q_yaw = bound_range('joint_wrist_yaw', robot.end_of_arm.status['wrist_yaw']['pos'])
+    q_pitch = bound_range('joint_wrist_pitch', robot.end_of_arm.status['wrist_pitch']['pos'])
+    q_roll = bound_range('joint_wrist_roll', robot.end_of_arm.status['wrist_roll']['pos'])
     return [0.0, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, 0.0]
 
 
@@ -94,12 +86,9 @@ def move_to_configuration(q):
     robot.base.translate_by(delta_x)
     robot.lift.move_to(q_lift)
     robot.arm.move_to(q_arm)
-    try:
-        robot.end_of_arm.move_to('wrist_yaw', q_yaw)
-        robot.end_of_arm.move_to('wrist_pitch', q_pitch)
-        robot.end_of_arm.move_to('wrist_roll', q_roll)
-    except (KeyError, AttributeError, TypeError):
-        pass   # 腕部/夹爪未连接时跳过
+    robot.end_of_arm.move_to('wrist_yaw', q_yaw)
+    robot.end_of_arm.move_to('wrist_pitch', q_pitch)
+    robot.end_of_arm.move_to('wrist_roll', q_roll)
     robot.push_command()
 
 
