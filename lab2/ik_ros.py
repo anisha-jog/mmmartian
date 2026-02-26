@@ -147,8 +147,8 @@ PANDA_TO_STRETCH_SCALE_X = 0.8   # Panda 方向 x 缩放
 PANDA_TO_STRETCH_SCALE_Y = 0.8
 PANDA_TO_STRETCH_SCALE_Z = 1.0   # Panda z 相对桌面 → Stretch z 缩放
 STRETCH_Z_REF = 0.5               # Stretch 目标 z 的固定参考高度 (m)，不再用 top
-ARM_EXTEND_OFFSET = 0.3
-Z_OFFSET_CM = 0.09                # 所有目标 z 加高
+ARM_EXTEND_OFFSET = 0.25
+Z_OFFSET_CM = 0.1                # 所有目标 z 加高
 
 
 def panda_to_stretch_position(x_panda, y_panda, z_panda):
