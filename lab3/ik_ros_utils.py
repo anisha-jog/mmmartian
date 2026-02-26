@@ -111,6 +111,7 @@ def get_current_configuration(joint_state):
         print(joint_state)
         print("THIS IS A CHANGE")
         names = [l.name for l in chain.links]
+        print(len(names), names)
         if name not in names:
             return value
         index = names.index(name)
