@@ -141,7 +141,7 @@ def get_grasp_goal(target_point, target_orientation, q_init):
     #   moved to its own function without the final move_to_configuration() call for convenience in this lab
     print(q_init)
     q_soln = chain.inverse_kinematics(target_point, target_orientation, orientation_mode='all', initial_position=q_init)
-    # print('Solution:', q_soln)
+    print('Solution:', q_soln)
     print("Solution Found")
 
     err = np.linalg.norm(chain.forward_kinematics(q_soln)[:3, 3] - target_point)
@@ -162,13 +162,6 @@ def move_to_configuration(node, q):
     q_yaw = q[10]
     q_pitch = q[12]
     q_roll = q[13]
-    # q_base = q[1]
-    # q_base_rotation = q[2] # was it 2 or 0?
-    # q_lift = q[3]
-    # q_arm = q[5] + q[6] + q[7] + q[8]
-    # q_yaw = q[9]
-    # q_pitch = q[11]
-    # q_roll = q[12]
     node.move_to_pose({'rotate_mobile_base': q_base_rotation}, blocking=True)
     node.move_to_pose({'translate_mobile_base': q_base}, blocking=True)
     node.move_to_pose({'joint_lift': q_lift}, blocking=True)
