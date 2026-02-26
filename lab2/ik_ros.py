@@ -146,8 +146,8 @@ STRETCH_Y_CENTER = 0.0
 PANDA_TO_STRETCH_SCALE_X = 0.8   # Panda 方向 x 缩放
 PANDA_TO_STRETCH_SCALE_Y = 0.8
 PANDA_TO_STRETCH_SCALE_Z = 1.0   # Panda z 相对桌面 → Stretch z 相对 top_z
-ARM_EXTEND_OFFSET = 0.05   # 手臂多伸出 5 cm（加在 x 上）
-Z_OFFSET_CM = 0.5         # 所有目标 z 加高 5 cm
+ARM_EXTEND_OFFSET = 0.5   # 手臂多伸出 5 cm（加在 x 上）
+Z_OFFSET_CM = 0.05         # 所有目标 z 加高 5 cm
 
 
 def panda_to_stretch_position(x_panda, y_panda, z_panda, top_z):
