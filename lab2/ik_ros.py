@@ -172,6 +172,7 @@ while True:
             print("需要恰好 7 个数字 (x y z qx qy qz qw)，请重试。")
             continue
         x_p, y_p, z_p, qx, qy, qz, qw = vals
+        x_p, y_p, z_p = 0.01 * x_p, 0.01 * y_p, 0.01 * z_p   # 输入尺度 x100，转为米
         target_point = list(panda_to_stretch_position(x_p, y_p, z_p, TOP_Z))
         target_z = target_point[2]
         if target_z > TOP_Z:
