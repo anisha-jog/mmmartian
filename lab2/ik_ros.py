@@ -98,9 +98,12 @@ def _clamp_to_chain_bounds(q):
     return q
 
 
-def move_to_grasp_goal(target_point, target_orientation):
+def move_to_grasp_goal(target_point, target_orientation_matrix):
+    """target_orientation_matrix: 3x3 旋转矩阵。orientation_mode='Z' 时 ikpy 需要 (3,) 的 Z 轴向量。"""
     q_init = get_current_configuration()
-    q_soln = chain.inverse_kinematics(target_point, target_orientation, orientation_mode='Z', initial_position=q_init)
+    # orientation_mode='Z' 时传末端 Z 轴方向向量 (3,)，不能传 3x3
+    z_axis = np.array(target_orientation_matrix)[:3, 2]
+    q_soln = chain.inverse_kinematics(target_point, z_axis, orientation_mode='Z', initial_position=q_init)
     print('Solution:', q_soln)
     q_use = _clamp_to_chain_bounds(q_soln)
     err = np.linalg.norm(chain.forward_kinematics(q_use)[:3, 3] - np.array(target_point))
