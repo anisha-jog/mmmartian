@@ -127,8 +127,8 @@ def get_current_configuration(joint_state):
         bounds = chain.links[index].bounds
         return min(max(value, bounds[0]), bounds[1])
 
-    q_base_rotation = _base_rotation_accum
-    q_base = _base_translation_accum
+    q_base_rotation = 0.0
+    q_base = 0.0
     q_lift = bound_range('joint_lift', joint_state['joint_lift'])
     q_arml = bound_range('joint_arm_l0', joint_state['joint_arm_l0'] / 4.0)
     q_yaw = bound_range('joint_wrist_yaw', joint_state['joint_wrist_yaw'])
