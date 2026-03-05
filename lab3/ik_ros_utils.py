@@ -98,8 +98,16 @@ def get_modified_urdf():
 new_urdf_path = get_modified_urdf()
 chain = ikpy.chain.Chain.from_urdf_file(new_urdf_path)
 
+_base_rotation_accum = 0.0
+_base_translation_accum = 0.0
+
 for link in chain.links:
     print(f"* Link Name: {link.name}, Type: {link.joint_type}")
+
+def update_base_accum(rotation, translation):
+    global _base_rotation_accum, _base_translation_accum
+    _base_rotation_accum = rotation
+    _base_translation_accum = translation
 
 def get_current_configuration(joint_state):
     # TODO: ------------- start --------------
@@ -119,8 +127,8 @@ def get_current_configuration(joint_state):
         bounds = chain.links[index].bounds
         return min(max(value, bounds[0]), bounds[1])
 
-    q_base_rotation = 0.0
-    q_base = 0.0
+    q_base_rotation = _base_rotation_accum
+    q_base = _base_translation_accum
     q_lift = bound_range('joint_lift', joint_state['joint_lift'])
     q_arml = bound_range('joint_arm_l0', joint_state['joint_arm_l0'] / 4.0)
     q_yaw = bound_range('joint_wrist_yaw', joint_state['joint_wrist_yaw'])
@@ -145,7 +153,13 @@ def get_grasp_goal(target_point, target_orientation, q_init):
     print("Solution Calculated")
 
     err = np.linalg.norm(chain.forward_kinematics(q_soln)[:3, 3] - target_point)
+    print("outside err")
     if not np.isclose(err, 0.0, atol=1e-2):
+        print("inside err")
+        print("IK error:", np.linalg.norm(chain.forward_kinematics(q_soln)[:3, 3] - target_point))
+        print("Target:", target_point)
+        print("Achieved:", chain.forward_kinematics(q_soln)[:3, 3])
+
         print("IKPy did not find a valid solution")
         return
     # move_to_configuration(q=q_soln)

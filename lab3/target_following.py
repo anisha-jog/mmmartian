@@ -91,7 +91,8 @@ class IKTargetFollowing(HelloNode):
         # fill with your response
         #   use the same functions you used for IK in Lab 2, now in `ik_ros_utils.py`, 
         #   to move the robot to the transformed goal point.
-        q_soln = ik.get_grasp_goal(waypoint_pos, waypoint_orient, ik.get_current_configuration(self.joint_state))
+        q_init = ik.get_current_configuration(self.joint_state)
+        q_soln = ik.get_grasp_goal(waypoint_pos, waypoint_orient, q_init)
         # TODO: -------------- end ---------------
 
         # NOTE: if you find that the robot's base is moving too much, its likely that the ik solver is
@@ -105,7 +106,11 @@ class IKTargetFollowing(HelloNode):
 
         ik.print_q(q_soln)
         if q_soln is not None:
-            ik.move_to_configuration(self, q_soln)
+            action = q_soln.copy()
+            action[1] = action[1] - ik._base_rotation_accum # scale up arm lift since its a smaller range of motion
+            action[2] = action[2] - ik._base_translation_accum
+            ik.move_to_configuration(self, action)
+        
 
     def compute_waypoint_to_goal(self, goal_pos, gripper_pos):
 
