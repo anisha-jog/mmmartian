@@ -109,6 +109,7 @@ class IKTargetFollowing(HelloNode):
             action = q_soln.copy()
             action[1] = action[1] - ik._base_rotation_accum # scale up arm lift since its a smaller range of motion
             action[2] = action[2] - ik._base_translation_accum
+            ik.update_base_accum(self, q_soln)
             ik.move_to_configuration(self, action)
         
 
