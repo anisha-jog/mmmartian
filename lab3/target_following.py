@@ -93,10 +93,12 @@ class IKTargetFollowing(HelloNode):
             goal_transformed = self.get_goal_pose_in_base_frame(goal_msg)
             gripper_transformed = self.get_gripper_pose_in_base_frame()
 
-            # goal_pos = ik.get_xyz_from_msg(goal_transformed)
-            # gripper_pos = ik.get_xyz_from_msg(gripper_transformed)
-            goal_pos = goal_transformed
-            gripper_pos = gripper_transformed
+            goal_pos = ik.get_xyz_from_msg(goal_transformed)
+            gripper_pos = ik.get_xyz_from_msg(gripper_transformed)
+            # goal_pos = goal_transformed
+            # gripper_pos = gripper_transformed
+            print("Goal in base_link:", goal_pos)
+            print("Gripper in base_link:", gripper_pos)
         except:
             print("Error getting transforms")
             return

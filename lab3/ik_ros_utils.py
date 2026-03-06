@@ -100,8 +100,8 @@ chain = ikpy.chain.Chain.from_urdf_file(new_urdf_path)
 
 
 
-for link in chain.links:
-    print(f"* Link Name: {link.name}, Type: {link.joint_type}")
+# for link in chain.links:
+#     print(f"* Link Name: {link.name}, Type: {link.joint_type}")
 
 
 
@@ -146,12 +146,10 @@ def get_grasp_goal(target_point, target_orientation, q_init):
     # print(q_init)
     q_soln = chain.inverse_kinematics(target_point, target_orientation, orientation_mode="all", initial_position=q_init)
     # print('Solution:', q_soln)
-    print("Solution Calculated")
+    # print("Solution Calculated")
 
     err = np.linalg.norm(chain.forward_kinematics(q_soln)[:3, 3] - target_point)
-    print("outside err")
     if not np.isclose(err, 0.0, atol=1e-2):
-        print("inside err")
         print("IK error:", np.linalg.norm(chain.forward_kinematics(q_soln)[:3, 3] - target_point))
         print("Target:", target_point)
         print("Achieved:", chain.forward_kinematics(q_soln)[:3, 3])
