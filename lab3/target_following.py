@@ -50,23 +50,32 @@ class IKTargetFollowing(HelloNode):
         #     rclpy.time.Time(),
         #     timeout=rclpy.duration.Duration(seconds=1.0),
         # )
-        transform = self.tf_buffer.transform(
-            goal_msg,
-            self.target_frame,
-            rclpy.duration.Duration(seconds=1.0)
-        )
-        # goal_transformed = do_transform_pose_stamped(goal_msg, transform)
-        # TODO: -------------- end ---------------
+        try:
+            transform = self.tf_buffer.transform(
+                goal_msg,
+                self.target_frame,
+                rclpy.duration.Duration(seconds=1.0)
+            )
+            # goal_transformed = do_transform_pose_stamped(goal_msg, transform)
+            # TODO: -------------- end ---------------
 
-        return transform
+            return transform
+        except:
+            print("Error looking up goal transform")
+            return None
 
     def get_gripper_pose_in_base_frame(self):
-        transform = self.tf_buffer.lookup_transform(
-            self.target_frame,
-            self.gripper_frame,
-            rclpy.time.Time(),
-            timeout=rclpy.duration.Duration(seconds=1.0),
-        )
+        try:
+            transform = self.tf_buffer.lookup_transform(
+                self.target_frame,
+                self.gripper_frame,
+                rclpy.time.Time(),
+                timeout=rclpy.duration.Duration(seconds=1.0),
+            )
+            return transform
+        except:
+            print("Error looking up gripper transform")
+            return None
         # xyz_out =[transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z ]
         # new_msg = detection_utils.get_pose_msg(transform.header.stamp, transform.header.frame_id, xyz_out)
 
@@ -75,7 +84,7 @@ class IKTargetFollowing(HelloNode):
         
         # TODO: -------------- end ---------------
 
-        return transform
+        # return transform
 
     def goal_callback(self, goal_msg):
         # print(msg)
