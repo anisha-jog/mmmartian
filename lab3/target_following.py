@@ -107,9 +107,9 @@ class IKTargetFollowing(HelloNode):
         ik.print_q(q_soln)
         if q_soln is not None:
             action = q_soln.copy()
-            # action[1] = action[1] - ik._base_rotation_accum # scale up arm lift since its a smaller range of motion
-            # action[2] = action[2] - ik._base_translation_accum
-            # ik.update_base_accum(q_soln[1], q_soln[2])
+            action[1] = action[1] - ik._base_rotation_accum # scale up arm lift since its a smaller range of motion
+            action[2] = action[2] - ik._base_translation_accum
+            ik.update_base_accum(q_soln[1], q_soln[2])
             ik.move_to_configuration(self, action)
         
 
