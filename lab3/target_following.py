@@ -109,7 +109,7 @@ class IKTargetFollowing(HelloNode):
             action = q_soln.copy()
             action[1] = action[1] - ik._base_rotation_accum # scale up arm lift since its a smaller range of motion
             action[2] = action[2] - ik._base_translation_accum
-            # ik.update_base_accum(q_soln[1], q_soln[2])
+            ik.update_base_accum(q_soln[1], q_soln[2])
             ik.move_to_configuration(self, action)
         
 
@@ -150,7 +150,7 @@ class IKTargetFollowing(HelloNode):
         self.callback_group = ReentrantCallbackGroup()
         self.joint_states_subscriber = self.create_subscription(JointState, '/stretch/joint_states', callback=self.joint_states_callback, qos_profile=1)
 
-        self.stow_the_robot()
+        # self.stow_the_robot()
         self.move_to_ready_pose()
         print("At Ready Pose")
 
