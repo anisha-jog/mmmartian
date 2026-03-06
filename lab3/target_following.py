@@ -44,16 +44,21 @@ class IKTargetFollowing(HelloNode):
         # TODO: ------------- start --------------
         # fill with your response
         #   transform the goal pose to the base frame
-        transform = self.tf_buffer.lookup_transform(
+        # transform = self.tf_buffer.lookup_transform(
+        #     self.target_frame,
+        #     goal_msg.header.frame_id,
+        #     rclpy.time.Time(),
+        #     timeout=rclpy.duration.Duration(seconds=1.0),
+        # )
+        transform = self.tf_buffer.transform(
+            goal_msg,
             self.target_frame,
-            goal_msg.header.frame_id,
-            rclpy.time.Time(),
-            timeout=rclpy.duration.Duration(seconds=1.0),
+            rclpy.duration.Duration(seconds=1.0)
         )
-        goal_transformed = do_transform_pose_stamped(goal_msg, transform)
+        # goal_transformed = do_transform_pose_stamped(goal_msg, transform)
         # TODO: -------------- end ---------------
 
-        return goal_transformed
+        return transform
 
     def get_gripper_pose_in_base_frame(self):
         transform = self.tf_buffer.lookup_transform(
@@ -62,15 +67,15 @@ class IKTargetFollowing(HelloNode):
             rclpy.time.Time(),
             timeout=rclpy.duration.Duration(seconds=1.0),
         )
-        xyz_out =[transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z ]
-        new_msg = detection_utils.get_pose_msg(transform.header.stamp, transform.header.frame_id, xyz_out)
+        # xyz_out =[transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z ]
+        # new_msg = detection_utils.get_pose_msg(transform.header.stamp, transform.header.frame_id, xyz_out)
 
         # gripper_transformed = do_transform_pose_stamped(new_msg, transform)
-        gripper_transformed = new_msg
+        # gripper_transformed = new_msg
         
         # TODO: -------------- end ---------------
 
-        return new_msg
+        return transform
 
     def goal_callback(self, goal_msg):
         # print(msg)
@@ -107,9 +112,9 @@ class IKTargetFollowing(HelloNode):
         ik.print_q(q_soln)
         if q_soln is not None:
             action = q_soln.copy()
-            action[1] = action[1] - ik._base_rotation_accum # scale up arm lift since its a smaller range of motion
-            action[2] = action[2] - ik._base_translation_accum
-            ik.update_base_accum(q_soln[1], q_soln[2])
+            # action[1] = action[1] - ik._base_rotation_accum # scale up arm lift since its a smaller range of motion
+            # action[2] = action[2] - ik._base_translation_accum
+            # ik.update_base_accum(q_soln[1], q_soln[2])
             ik.move_to_configuration(self, action)
         
 
@@ -124,10 +129,11 @@ class IKTargetFollowing(HelloNode):
         #   otherwise, the goal is close and we can move there directly
 
         waypoint_pos = goal_pos
-        dist = (sum(abs(goal_pos - gripper_pos)**2))**0.5
+        dist = np.linalg.norm(goal_pos - gripper_pos)
         if dist > self.delta:
             # goal is too far
-            waypoint_pos = gripper_pos + (goal_pos - gripper_pos) / dist * self.delta
+            magnitude = (goal_pos - gripper_pos) / dist
+            waypoint_pos = gripper_pos + (magnitude * self.delta)
         print(waypoint_pos)
         # TODO: -------------- end ---------------
 
