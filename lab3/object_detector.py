@@ -144,6 +144,7 @@ class YOLOEObjectDetector(Node):
         xyz = detection_utils.pixel_to_3d(xy_pix, z_depth, camera_info)
         timestamp = self.latest_color_cam_info.header.stamp
         frame_id = self.latest_color_cam_info.header.frame_id
+        print("frame id:", frame_id)
         self.goal_pose_msg = detection_utils.get_pose_msg(timestamp, frame_id, xyz)
         return self.goal_pose_msg
         # TODO: -------------- end ---------------
