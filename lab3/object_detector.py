@@ -139,7 +139,10 @@ class YOLOEObjectDetector(Node):
         xy_pix = detections[target_idx]["centroid"]
         x, y = xy_pix
         camera_info = self.latest_color_cam_info
-        z_depth = float(self.latest_depth[y, x])  
+        z_depth = float(self.latest_depth[y, x])
+        if z_depth == 0:
+            self.goal_pose_msg = None
+            return None
 
         xyz = detection_utils.pixel_to_3d(xy_pix, z_depth, camera_info)
         timestamp = self.latest_color_cam_info.header.stamp
