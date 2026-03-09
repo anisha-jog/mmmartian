@@ -145,7 +145,12 @@ class IKTargetFollowing(HelloNode):
 
 
     def move_to_ready_pose(self):
-        self.move_to_pose(ik.READY_POSE_P2, blocking=True)
+        # self.move_to_pose({'joint_lift': 0.8}, blocking=True)
+        # self.move_to_pose({'joint_arm_l0': 0.0, 'joint_wrist_yaw': 0.0, 'joint_wrist_pitch': -0.1}, blocking=True)
+        # self.move_to_pose({'gripper_aperture': 0.5}, blocking=True)
+        self.move_to_pose({'joint_head_pan':-1.6}, blocking=True)
+        # self.move_to_pose({'joint_head_tilt':-0.5}, blocking=True)
+        # self.move_to_pose(ik.READY_POSE_P2, blocking=True)
 
     def main(self):
         HelloNode.main(self, 'follow_target', 'follow_target', wait_for_first_pointcloud=False)
