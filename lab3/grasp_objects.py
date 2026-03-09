@@ -94,8 +94,8 @@ class IKTargetFollowing(HelloNode):
             goal_transformed = self.get_goal_pose_in_base_frame(goal_msg)
             gripper_transformed = self.get_gripper_pose_in_base_frame()
             goal_pos = ik.get_xyz_from_msg(goal_transformed)
-            goal_pos[0] -= 0.3
-            goal_pos[1] -= 0.2
+            # goal_pos[0] -= 0.3
+            # goal_pos[1] -= 0.2
             gripper_pos = ik.get_xyz_from_msg(gripper_transformed)
             print("Goal in base_link:", goal_pos)
             print("Gripper in base_link:", gripper_pos)
