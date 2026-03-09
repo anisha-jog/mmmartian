@@ -52,8 +52,8 @@ class YOLOEObjectDetector(Node):
     def image_callback(self, color_msg, depth_msg, color_cam_info_msg):
         # TODO: ------------- start --------------
         try:
-            self.latest_color = self.bridge.imgmsg_to_cv2(color_msg, desired_encoding='passthrough')
-            self.latest_depth = self.bridge.imgmsg_to_cv2(depth_msg, desired_encoding='passthrough')
+            self.latest_color = cv2.rotate(self.bridge.imgmsg_to_cv2(color_msg, desired_encoding='passthrough'), cv2.ROTATE_90_CLOCKWISE)
+            self.latest_depth = cv2.rotate(self.bridge.imgmsg_to_cv2(depth_msg, desired_encoding='passthrough'), cv2.ROTATE_90_CLOCKWISE)
             self.latest_color_cam_info = color_cam_info_msg
         except:
             print("Frames missing, skipping this callback")
