@@ -3,6 +3,7 @@
 #    (consistent detection, good depth values, etc.)
 queries:
   - purple cup
+  - yellow cup
   - coffee cup
   - orange
   - tissue box
