@@ -89,8 +89,6 @@ class YOLOEObjectDetector(Node):
         if xyz is None:
             self.goal_pose_msg = None
             return None
-        xyz[0] += 0.1
-        xyz[1] += 0.2
         timestamp = self.latest_color_cam_info.header.stamp
         frame_id = self.latest_color_cam_info.header.frame_id
         print("Goal in camera frame:", xyz)
