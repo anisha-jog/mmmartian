@@ -92,7 +92,7 @@ class YOLOEObjectDetector(Node):
         frame_id = self.latest_color_cam_info.header.frame_id
         print("Goal in camera frame:", xyz)
         print("frame id:", frame_id)
-        xyz[0] -= 0.5
+        xyz[0] -= 0.1
         self.goal_pose_msg = detection_utils.get_pose_msg(timestamp, frame_id, xyz)
         return self.goal_pose_msg
 
