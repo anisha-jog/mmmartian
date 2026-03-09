@@ -103,6 +103,7 @@ class IKTargetFollowing(HelloNode):
 
         grasp_orient = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2)
         q_init = ik.get_current_configuration(self.joint_state)
+        print("q_init:", q_init)
         q_soln = ik.get_grasp_goal(goal_pos, grasp_orient, q_init)
         ik.print_q(q_soln)
         if q_soln is None:
