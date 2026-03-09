@@ -51,8 +51,7 @@ class YOLOEObjectDetector(Node):
 
     def image_callback(self, color_msg, depth_msg, color_cam_info_msg):
         # TODO: ------------- start --------------
-        try: 
-            print(color_msg)
+        try:
             self.latest_color = self.bridge.imgmsg_to_cv2(color_msg, desired_encoding='passthrough')
             self.latest_depth = self.bridge.imgmsg_to_cv2(depth_msg, desired_encoding='passthrough')
             self.latest_color_cam_info = color_cam_info_msg
