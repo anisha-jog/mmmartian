@@ -7,7 +7,7 @@ from sensor_msgs.msg import Image, CameraInfo
 from geometry_msgs.msg import PoseStamped
 from cv_bridge import CvBridge, CvBridgeError
 from ultralytics import YOLO
-import detection_utils
+import detection_utils_copy as detection_utils
 import message_filters
 import numpy as np
 

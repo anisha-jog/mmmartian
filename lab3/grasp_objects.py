@@ -11,7 +11,7 @@ from tf2_geometry_msgs import TransformStamped, do_transform_pose_stamped
 from sensor_msgs.msg import JointState
 import ik_ros_utils as ik
 import ikpy
-import detection_utils
+import detection_utils_copy as detection_utils
 
 # Make sure to run:
 #   ros2 launch stretch_core stretch_driver.launch.py
