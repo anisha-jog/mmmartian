@@ -88,7 +88,7 @@ class YOLOEObjectDetector(Node):
         msk = detections[target_idx]["mask"]
         xyz, _ = detection_utils.mask_to_3d_centroid(self.latest_depth, cam_info, msk, fill_missing_depth=True)
         # xyz[0] += 0.2
-        xyz[1] -= 0.2
+        xyz[1] += 0.2
         if xyz is None:
             self.goal_pose_msg = None
             return None
