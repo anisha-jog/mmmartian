@@ -26,10 +26,9 @@ class YOLOEObjectDetector(Node):
         super().__init__('yoloe_object_detector')
         self.visualize = True
 
-        self.color_sub = message_filters.Subscriber(self, Image, '/camera/color/image_rect_raw')
+        self.color_sub = message_filters.Subscriber(self, Image, '/camera/color/image_raw')
         self.depth_sub = message_filters.Subscriber(self, Image, '/camera/aligned_depth_to_color/image_raw')
         self.color_cam_info_sub = message_filters.Subscriber(self, CameraInfo, '/camera/color/camera_info')
-        print(self.color_sub)
         self.latest_color = None
         self.latest_depth = None
         self.latest_color_cam_info = None
