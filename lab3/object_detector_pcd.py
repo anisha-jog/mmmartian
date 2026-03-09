@@ -83,15 +83,14 @@ class YOLOEObjectDetector(Node):
         if detections is None or len(detections) == 0:
             self.goal_pose_msg = None
             return None
-
         cam_info = self.latest_color_cam_info
         msk = detections[target_idx]["mask"]
         xyz, _ = detection_utils.mask_to_3d_centroid(self.latest_depth, cam_info, msk, fill_missing_depth=True)
-        xyz[0] += 0.1
-        xyz[1] += 0.2
         if xyz is None:
             self.goal_pose_msg = None
             return None
+        xyz[0] += 0.1
+        xyz[1] += 0.2
         timestamp = self.latest_color_cam_info.header.stamp
         frame_id = self.latest_color_cam_info.header.frame_id
         print("Goal in camera frame:", xyz)
