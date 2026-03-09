@@ -126,6 +126,7 @@ class YOLOEObjectDetector(Node):
 
     def get_goal_pose(self, detections, target_idx=0):
         if detections is None or len(detections) == 0:
+            print("No detections")
             self.goal_pose_msg = None
             return None
 
