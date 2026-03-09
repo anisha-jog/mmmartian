@@ -1,14 +1,13 @@
 # list of serveral objects to detect
 #    most useful when you're trying to determine what object will work best for tracking
 #    (consistent detection, good depth values, etc.)
-#    Part 2: added objects with varied geometry/physical properties (round, boxy, cylindrical, elongated)
 queries:
   - purple cup
   - coffee cup
-  - orange                    # small, round, rigid
-  - tissue box                # boxy, rectangular
-  - soda can                  # cylindrical, metal
-  - banana                    # elongated, curved
+  - orange
+  - tissue box
+  - soda can
+  - banana
   # # - red robot toy # small, unique object (hard to prompt), inconsistent detection
   # # - black water bottle # reflective metal surface, poor depth values
   # - black coffee mug

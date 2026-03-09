@@ -20,13 +20,13 @@ class IKTargetFollowing(HelloNode):
     def __init__(self):
         HelloNode.__init__(self)
 
-        self.delta = 0.03  # m, used only for waypoint when following; for grasp we move directly to goal
+        self.delta = 0.03
         self.target_frame = 'base_link'
         self.gripper_frame = 'link_grasp_center'
         self.tf_buffer = None
         self.tf_listener = None
         self.joint_states_lock = threading.Lock()
-        self._grasp_done = False  # one-shot: execute grasp sequence only once per run
+        self._grasp_done = False
     
     def joint_states_callback(self, msg):
         # unpacks joint state messages for what works with/is expected by ikpy
@@ -101,33 +101,22 @@ class IKTargetFollowing(HelloNode):
             print("Error getting transforms:", e)
             return
 
-        # Move directly to goal (grasp pose), not incremental waypoint
-        grasp_orient = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi / 2)  # gripper down for top-down grasp
+        grasp_orient = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi/2)
         q_init = ik.get_current_configuration(self.joint_state)
         q_soln = ik.get_grasp_goal(goal_pos, grasp_orient, q_init)
         ik.print_q(q_soln)
         if q_soln is None:
-            print("IK failed for goal, skipping grasp")
             return
         ik.move_to_configuration(self, q_soln.copy())
-
-        # Close gripper to grasp
         self.move_to_pose({'gripper_aperture': 0.0}, blocking=True)
-
-        # Lift object off table
         with self.joint_states_lock:
             lift = self.joint_state.get('joint_lift', 0.8)
-            arm = self.joint_state.get('joint_arm_l0', 0.0)  # total extension (q_arm = 4*q_arml)
+            arm = self.joint_state.get('joint_arm_l0', 0.0)
         lift_up = min(1.1, lift + 0.15)
         self.move_to_pose({'joint_lift': lift_up}, blocking=True)
-
-        # Retract arm toward base
         arm_retract = max(0.0, arm - 0.12)
         self.move_to_pose({'joint_arm': arm_retract}, blocking=True)
-
-        print("Grasp sequence done. Rerun script for another object.")
         self._grasp_done = True
-        
 
     def compute_waypoint_to_goal(self, goal_pos, gripper_pos):
 
@@ -155,7 +144,6 @@ class IKTargetFollowing(HelloNode):
 
 
     def move_to_ready_pose(self):
-        # Part 2: lift ~table height, wrist yaw normal to base, pitch slightly down, gripper open, head looking down arm
         self.move_to_pose(ik.READY_POSE_P2, blocking=True)
 
     def main(self):
@@ -163,10 +151,9 @@ class IKTargetFollowing(HelloNode):
         self.logger = self.get_logger()
         self.callback_group = ReentrantCallbackGroup()
         self.joint_states_subscriber = self.create_subscription(JointState, '/stretch/joint_states', callback=self.joint_states_callback, qos_profile=1)
-
         self.stow_the_robot()
         self.move_to_ready_pose()
-        print("At Ready Pose. Waiting for one goal from object_detector (first detected object). Then grasp, lift, retract. Rerun this script for each object.")
+        print("At Ready Pose")
 
 
         # TODO: ------------- start --------------
@@ -176,8 +163,6 @@ class IKTargetFollowing(HelloNode):
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
         self.goal_sub = self.create_subscription(PoseStamped, '/object_detector/goal_pose', self.goal_callback, 10)
         # TODO: -------------- end ---------------
-
-
 
 
 if __name__ == '__main__':
