@@ -138,6 +138,8 @@ class YOLOEObjectDetector(Node):
         #   then get the centroid of the resulting pointcloud to use as the goal pose (instead of the 2D centroid in part 1)
         xy_pix = detections[target_idx]["centroid"]
         x, y = xy_pix
+        print("X, Y in pixel coordinates:", xy_pix)
+        y -= 20
         camera_info = self.latest_color_cam_info
         z_depth = float(self.latest_depth[y, x])
         if z_depth == 0:
