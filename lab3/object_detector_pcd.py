@@ -28,16 +28,12 @@ class YOLOEObjectDetector(Node):
 
         # ----------- Camera Streaming Setup -----------
 
-        # subscribe to the robot's color and aligned depth camera image topics from the gripper camera
-        # using message_filters, instead of self.create_subscription() to allow us
-        #   to synchronize the two camera streams can use a single callback that triggers when both come in
-        # TODO: ------------- start --------------
-        # leave as is for part 1, 
-        # change for part 2 to use the head camera
-        self.color_sub = message_filters.Subscriber(self, Image, '/gripper_camera/color/image_rect_raw')
-        self.depth_sub = message_filters.Subscriber(self, Image, '/gripper_camera/aligned_depth_to_color/image_raw')
-        self.color_cam_info_sub = message_filters.Subscriber(self, CameraInfo, '/gripper_camera/color/camera_info')
-        # TODO: -------------- end ---------------
+        # subscribe to the robot's color and aligned depth camera image topics
+        # using message_filters to synchronize streams; single callback when all three arrive
+        # Part 1 (gripper): /gripper_camera/... ; Part 2 (head): /camera/...
+        self.color_sub = message_filters.Subscriber(self, Image, '/camera/color/image_rect_raw')
+        self.depth_sub = message_filters.Subscriber(self, Image, '/camera/aligned_depth_to_color/image_raw')
+        self.color_cam_info_sub = message_filters.Subscriber(self, CameraInfo, '/camera/color/camera_info')
         self.latest_color = None
         self.latest_depth = None
         self.latest_color_cam_info = None
@@ -106,9 +102,7 @@ class YOLOEObjectDetector(Node):
         # create visualizations from the detections
         if self.visualize:
             detection_utils.visualize_detections_masks(
-                # TODO: minor - change the part= arg when you edit your code for part 2! 
-                #   adjusts the color scaling of the depth image display to match the camera range
-                part=1, detections=detections, rgb_image=self.latest_color, depth_image=self.latest_depth)
+                part=2, detections=detections, rgb_image=self.latest_color, depth_image=self.latest_depth)
 
         # get the goal pose and publish it, if it exists
         self.get_goal_pose(detections)
@@ -129,29 +123,22 @@ class YOLOEObjectDetector(Node):
             self.goal_pose_msg = None
             return None
 
-        # TODO: ------------- start --------------
-        # in part 1, fill with your response
-        #   find the depth at the centroid and project it to 3D using detection_utils.pixel_to_3d()
-        #   convert that pose to a PoseStamped msg using detection_utils.get_pose_msg()
-        #   save that message to self.goal_pose_msg
-        # in part 2, edit the code you wrote for part 1 to now project all points in the mask to 3D,
-        #   then get the centroid of the resulting pointcloud to use as the goal pose (instead of the 2D centroid in part 1)
-        xy_pix = detections[target_idx]["centroid"]
-        x, y = xy_pix
         camera_info = self.latest_color_cam_info
-        z_depth = float(self.latest_depth[y, x])
-        if z_depth == 0:
+        mask_polygon = detections[target_idx]["mask"]
+        # Project all points in the mask to 3D, optionally fill missing depth in mask, then use centroid of point cloud
+        xyz, _ = detection_utils.mask_to_3d_centroid(
+            self.latest_depth, camera_info, mask_polygon, fill_missing_depth=True
+        )
+        if xyz is None:
             self.goal_pose_msg = None
             return None
 
-        xyz = detection_utils.pixel_to_3d(xy_pix, z_depth, camera_info)
         timestamp = self.latest_color_cam_info.header.stamp
         frame_id = self.latest_color_cam_info.header.frame_id
-        print("Goal in camera frame:", xyz)  # in pixel_to_3d result
+        print("Goal in camera frame (mask centroid):", xyz)
         print("frame id:", frame_id)
         self.goal_pose_msg = detection_utils.get_pose_msg(timestamp, frame_id, xyz)
         return self.goal_pose_msg
-        # TODO: -------------- end ---------------
 
 
 if __name__ == '__main__':

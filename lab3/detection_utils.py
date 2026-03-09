@@ -60,6 +60,51 @@ def parse_results(results):
     return detections
 
 
+def fill_depth_in_mask(depth_image, mask_polygon, inpaint_radius=5):
+    """
+    Fill missing (zero) depth values inside the object mask using inpainting.
+    Useful for reflective objects where depth is often missing near the centroid.
+    """
+    if depth_image is None or mask_polygon is None or len(mask_polygon) < 3:
+        return depth_image
+    depth = np.asarray(depth_image, dtype=np.uint16)
+    h, w = depth.shape
+    binary_mask = np.zeros((h, w), dtype=np.uint8)
+    cv2.fillPoly(binary_mask, [np.asarray(mask_polygon, dtype=np.int32)], 255)
+    to_inpaint = ((depth == 0) & (binary_mask > 0)).astype(np.uint8)
+    if to_inpaint.sum() == 0:
+        return depth
+    depth_filled = cv2.inpaint(depth.astype(np.float32), to_inpaint, inpaint_radius, cv2.INPAINT_NS)
+    return depth_filled.astype(np.uint16)
+
+
+def mask_to_3d_centroid(depth_image, camera_info, mask_polygon, fill_missing_depth=True):
+    """
+    Project all pixels in the object mask to 3D and return the centroid of the point cloud.
+    Optionally fill missing depth inside the mask (for reflective objects).
+    Returns (xyz, depth_used) or (None, depth_image) if no valid points.
+    """
+    if depth_image is None or camera_info is None or mask_polygon is None or len(mask_polygon) < 3:
+        return None, depth_image
+    h, w = depth_image.shape
+    binary_mask = np.zeros((h, w), dtype=np.uint8)
+    cv2.fillPoly(binary_mask, [np.asarray(mask_polygon, dtype=np.int32)], 1)
+    depth_used = fill_depth_in_mask(depth_image, mask_polygon) if fill_missing_depth else np.asarray(depth_image, dtype=np.uint16)
+    ys, xs = np.where((binary_mask > 0) & (depth_used > 0))
+    if len(xs) == 0:
+        return None, depth_used
+    z_mm = depth_used[ys, xs].astype(np.float64)
+    z_m = z_mm / 1000.0
+    camera_mat = np.reshape(camera_info.k, (3, 3))
+    fx, fy = camera_mat[0, 0], camera_mat[1, 1]
+    cx, cy = camera_mat[0, 2], camera_mat[1, 2]
+    x_cam = ((xs - cx) * z_m) / fx
+    y_cam = ((ys - cy) * z_m) / fy
+    xyz = np.stack([x_cam, y_cam, z_m], axis=1)
+    centroid = np.mean(xyz, axis=0)
+    return centroid, depth_used
+
+
 def pixel_to_3d(xy_pix, z_depth, camera_info):
 
     camera_mat = np.reshape(camera_info.k, (3, 3))
