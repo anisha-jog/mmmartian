@@ -52,8 +52,10 @@ class YOLOEObjectDetector(Node):
     def image_callback(self, color_msg, depth_msg, color_cam_info_msg):
         # TODO: ------------- start --------------
         try:
-            self.latest_color = cv2.rotate(self.bridge.imgmsg_to_cv2(color_msg, desired_encoding='passthrough'), cv2.ROTATE_90_CLOCKWISE)
-            self.latest_depth = cv2.rotate(self.bridge.imgmsg_to_cv2(depth_msg, desired_encoding='passthrough'), cv2.ROTATE_90_CLOCKWISE)
+            # self.latest_color = cv2.rotate(self.bridge.imgmsg_to_cv2(color_msg, desired_encoding='passthrough'), cv2.ROTATE_90_CLOCKWISE)
+            # self.latest_depth = cv2.rotate(self.bridge.imgmsg_to_cv2(depth_msg, desired_encoding='passthrough'), cv2.ROTATE_90_CLOCKWISE)
+            self.latest_color = cv2.rotate(self.bridge.imgmsg_to_cv2(color_msg, desired_encoding='passthrough'))
+            self.latest_depth = cv2.rotate(self.bridge.imgmsg_to_cv2(depth_msg, desired_encoding='passthrough'))
             self.latest_color_cam_info = color_cam_info_msg
         except:
             print("Frames missing, skipping this callback")
@@ -92,7 +94,6 @@ class YOLOEObjectDetector(Node):
         frame_id = self.latest_color_cam_info.header.frame_id
         print("Goal in camera frame:", xyz)
         print("frame id:", frame_id)
-        xyz[0] -= 0.25
         self.goal_pose_msg = detection_utils.get_pose_msg(timestamp, frame_id, xyz)
         return self.goal_pose_msg
 
