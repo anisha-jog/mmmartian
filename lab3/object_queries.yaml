@@ -2,8 +2,8 @@
 #    most useful when you're trying to determine what object will work best for tracking
 #    (consistent detection, good depth values, etc.)
 queries:
-  # - purple cup
-  # - yellow cup
+  - purple cup
+  - yellow cup
   - brown coffee mug
   # - orange
   # - tissue box
