@@ -141,6 +141,10 @@ class YOLOEObjectDetector(Node):
         camera_info = self.latest_color_cam_info
         z_depth = float(self.latest_depth[y, x])
         if z_depth == 0:
+            #This I added because sometimes the object is detected
+            # but due to lighting or other issues, the depth at the centroid is 0, 
+            # which causes pixel_to_3d to return inf values, which causes errors. 
+            #so this makes the robot work a bit better
             self.goal_pose_msg = None
             return None
 

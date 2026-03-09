@@ -3,8 +3,9 @@
 #    (consistent detection, good depth values, etc.)
 queries:
   - purple cup
-  # - yellow cup
-  # - brown coffee mug
+  - yellow cup
+  - brown coffee mug
+  - white water bottle
   # - orange
   # - tissue box
   # - soda can
@@ -13,7 +14,7 @@ queries:
   # # - black water bottle # reflective metal surface, poor depth values
   # - black coffee mug
   # - pink cat figure
-  - white water bottle
+  # - white water bottle
   # - yellow cone
   # - red cap
   # - red baseball cap
