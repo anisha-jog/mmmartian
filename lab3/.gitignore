@@ -3,3 +3,5 @@ mobileclip2_b.ts
 *.pt
 *.ts
 *.pdf
+__pycache__
+./__pycache__

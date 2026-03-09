@@ -3,11 +3,13 @@
 #    (consistent detection, good depth values, etc.)
 queries:
   - purple cup
-  - coffee cup
-  - orange
-  - tissue box
-  - soda can
-  - banana
+  # - yellow cup
+  # - brown coffee mug
+  - white water bottle
+  # - orange
+  # - tissue box
+  # - soda can
+  # - banana
   # # - red robot toy # small, unique object (hard to prompt), inconsistent detection
   # # - black water bottle # reflective metal surface, poor depth values
   # - black coffee mug
