@@ -4,25 +4,8 @@
 queries:
   # - purple cup
   # - yellow cup
-  # - brown coffee mug
-  # - white water bottle
-  # - blue bottle
-  # - blue water bottle
-  # - plastic bottle 
-  - blue ball
-  - tape roll
-  # - yellow traffic cone
-  # - yellow cone 
-  # - traffic cone
-  # - orange
-  # - tissue box
-  # - soda can
-  # - banana
-  # # - red robot toy # small, unique object (hard to prompt), inconsistent detection
-  # # - black water bottle # reflective metal surface, poor depth values
-  # - black coffee mug
-  # - pink cat figure
-  # - white water bottle
+  - black water bottle 
+
   # - yellow cone
   # - red cap
   # - red baseball cap
