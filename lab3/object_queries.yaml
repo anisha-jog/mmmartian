@@ -6,9 +6,11 @@ queries:
   # - yellow cup
   # - brown coffee mug
   # - white water bottle
-  - blue bottle
-  - blue water bottle
-  - plastic bottle 
+  # - blue bottle
+  # - blue water bottle
+  # - plastic bottle 
+  - blue ball
+  - tape roll
   # - yellow traffic cone
   # - yellow cone 
   # - traffic cone
