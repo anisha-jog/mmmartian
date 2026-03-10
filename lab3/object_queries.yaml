@@ -6,9 +6,11 @@ queries:
   # - yellow cup
   # - brown coffee mug
   # - white water bottle
-  - blue bottle
-  - blue water bottle
+  # - blue bottle
+  # - blue water bottle
   - yellow traffic cone
+  - yellow cone 
+  - traffic cone
   # - orange
   # - tissue box
   # - soda can
