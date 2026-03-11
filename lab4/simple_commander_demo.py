@@ -27,6 +27,8 @@ def main():
 
     # Security route, probably read in from a file for a real application
     # from either a map or drive and repeat.
+
+    # Would add here orientation coordinates after x and y
     security_route = [
         [0.0, 0.0],
         [1.057, 1.3551],
@@ -58,6 +60,8 @@ def main():
         for pt in security_route[1:]:
             pose.pose.position.x = pt[0]
             pose.pose.position.y = pt[1]
+            # set orientation here when we have it 
+            
             route_poses.append(deepcopy(pose))
         
         nav_start = navigator.get_clock().now()
