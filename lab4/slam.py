@@ -37,11 +37,11 @@ def main():
 
     # Would add here orientation coordinates after x and y
     security_route = [
-        [0.0, 0.0],
-        [1.057, 1.3551],
-        [1.5828, 5.0823],
-        [-0.5390, 5.6623],
-        [0.8975, 9.7033]]
+        [0.0, 0.0, 0.0, 1.0],
+        [1.057, 1.3551, 0.0, 1.0],
+        [1.5828, 5.0823, 0.0, 1.0],
+        [-0.5390, 5.6623, 0.0, 1.0],
+        [0.8975, 9.7033, 0.0, 1.0]]
 
     # Set our demo's initial pose
     initial_pose = PoseStamped()
@@ -67,7 +67,9 @@ def main():
         for pt in security_route[1:]:
             pose.pose.position.x = pt[0]
             pose.pose.position.y = pt[1]
-            # set orientation here when we have it 
+            # set orientation here when we have it
+            pose.pose.orientation.z = pt[2]
+            pose.pose.orientation.w = pt[3] 
             
             route_poses.append(deepcopy(pose))
         
