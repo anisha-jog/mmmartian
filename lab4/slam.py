@@ -19,8 +19,12 @@ mounted on the robot to relay the camera feed back to us that can be monitored
 using RViz.
 """
 
-# build a map: offline_mapping.launch.py
+# build a map: ros2 launch stretch_nav2 offline_mapping.launch.py teleop_type:=keyboard
+# -> to load existing map: append map:=path/to/file to above
+# save a map: ros2 run nav2_map_server map_saver_cli -f martian_map
 # map names: martian_map
+# pilot with xbox controller: stretch_xbox_controller_teleop.py
+# pilot with keyboard: stretch_free_robot_process.py
 # using head camera:
 #    ros2 launch stretch_core d435i_low_resolution.launch.py
 # using rviz:
