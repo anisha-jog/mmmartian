@@ -18,7 +18,8 @@ Basic security route patrol demo. In this demonstration, we use the D435i camera
 mounted on the robot to relay the camera feed back to us that can be monitored
 using RViz.
 """
-
+# a function to transform to quat
+# scipy.spatial.transform.Rotation.from_euler('xyz', [r, p, y]).as_quat()
 
 def main():
     rclpy.init()
@@ -61,7 +62,7 @@ def main():
             pose.pose.position.x = pt[0]
             pose.pose.position.y = pt[1]
             # set orientation here when we have it 
-            
+
             route_poses.append(deepcopy(pose))
         
         nav_start = navigator.get_clock().now()
