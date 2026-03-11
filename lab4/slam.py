@@ -26,6 +26,8 @@ using RViz.
 # using rviz:
 # ros2 run rviz2 rviz2 -d `ros2 pkg prefix --share stretch_calibration`/rviz/stretch_simple_test.rviz
 
+# a function to transform to quat
+# scipy.spatial.transform.Rotation.from_euler('xyz', [r, p, y]).as_quat()
 
 def main():
     rclpy.init()
