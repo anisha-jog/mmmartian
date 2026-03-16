@@ -12,6 +12,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.duration import Duration
 
+import scipy 
 
 """
 Basic security route patrol demo. In this demonstration, we use the D435i camera
@@ -42,11 +43,11 @@ def main():
     # from either a map or drive and repeat.
 
     # Would add here orientation coordinates after x and y
-    security_route = [[0, 0, 0, 1.0],
-    [0, 3.6, 0.0, 1.0],
-    [1.3, 4.6, 0.0, 1.0],
-    [0.6, 6.9, 0.0, 1.0],
-    [-1, 7.5, 0.0, 1.0],
+    security_route = [[0, 0, 1.0],
+    [0, 3.6, 1.0],
+    [1.3, 4.6, 1.0],
+    [0.6, 6.9, 1.0],
+    [-1, 7.5, 1.0],
     ]
     # Set our demo's initial pose
     initial_pose = PoseStamped()
@@ -68,14 +69,18 @@ def main():
         pose = PoseStamped()
         pose.header.frame_id = 'map'
         pose.header.stamp = navigator.get_clock().now().to_msg()
-        pose.pose.orientation.w = 1.0
+
         for pt in security_route[1:]:
+            # set orientation here when we have it
+            rotation = [0, 0, pt[2]]
+            quat = scipy.spatial.transform.Rotation.from_euler('xyz', rotation).as_quat()
             pose.pose.position.x = pt[0]
             pose.pose.position.y = pt[1]
-            # set orientation here when we have it
-            pose.pose.orientation.z = pt[2]
-            pose.pose.orientation.w = pt[3] 
-            
+            pose.pose.orientation.x = quat[0]
+            pose.pose.orientation.y = quat[1]
+            pose.pose.orientation.z = quat[2]
+            pose.pose.orientation.w = quat[3]
+
             route_poses.append(deepcopy(pose))
         
         nav_start = navigator.get_clock().now()
