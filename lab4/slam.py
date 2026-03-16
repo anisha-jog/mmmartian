@@ -21,7 +21,7 @@ using RViz.
 """
 
 # build a map: ros2 launch stretch_nav2 offline_mapping.launch.py teleop_type:=keyboard
-# -> to load existing map: append map:=path/to/file to above
+# to load existing map: ros2 launch stretch_nav2 navigation.launch.py map:=./maps/martian_map.yaml
 # save a map: ros2 run nav2_map_server map_saver_cli -f martian_map
 # map names: martian_map
 # pilot with xbox controller: stretch_xbox_controller_teleop.py
@@ -43,11 +43,8 @@ def main():
     # from either a map or drive and repeat.
 
     # Would add here orientation coordinates after x and y
-    security_route = [[0, 0, 1.0],
-    [0, 3.6, 1.0],
-    [1.3, 4.6, 1.0],
-    [0.6, 6.9, 1.0],
-    [-1, 7.5, 1.0],
+    security_route = [[-1.08, 1.03, 0],
+    [-0.298, 1.76, 1.57],
     ]
     # Set our demo's initial pose
     initial_pose = PoseStamped()
