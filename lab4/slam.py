@@ -44,6 +44,7 @@ def main():
 
     # Would add here orientation coordinates after x and y
     security_route = [[-0.1, 2.00, 3.14],
+                      [-0.1, 2.00, 3.14]
     # [-0.298, 1.76, 3.14],
     ]
     # Set our demo's initial pose
