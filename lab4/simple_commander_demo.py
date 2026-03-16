@@ -32,10 +32,9 @@ def main():
     # Would add here orientation coordinates after x and y
     security_route = [
         [0.0, 0.0],
-        [1.057, 1.3551],
-        [1.5828, 5.0823],
-        [-0.5390, 5.6623],
-        [0.8975, 9.7033]]
+        [-2.0, 1.24], 
+        [-2.27, 1.41]
+    ]
 
     # Set our demo's initial pose
     initial_pose = PoseStamped()
