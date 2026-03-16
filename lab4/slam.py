@@ -43,8 +43,8 @@ def main():
     # from either a map or drive and repeat.
 
     # Would add here orientation coordinates after x and y
-    security_route = [[-1.08, 1.03, 0],
-    [-0.298, 1.76, 1.57],
+    security_route = [[-0.1, 2.00, 3.14],
+    # [-0.298, 1.76, 3.14],
     ]
     # Set our demo's initial pose
     initial_pose = PoseStamped()
@@ -53,7 +53,7 @@ def main():
     initial_pose.pose.position.x = -1.11
     initial_pose.pose.position.y = 1.02
     yaw = 1.37
-    quat = scipy.spatial.transform.Rotation.from_euler('xyz', [0, 0, yaw]).as_quat()
+    quat = scipy.spatial.transform.Rotation.from_euler('xyz', [0, 0, 0]).as_quat()
     initial_pose.pose.orientation.x = quat[0]
     initial_pose.pose.orientation.y = quat[1]
     initial_pose.pose.orientation.z = quat[2]
