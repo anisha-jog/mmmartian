@@ -42,8 +42,6 @@ def main():
     initial_pose.header.stamp = navigator.get_clock().now().to_msg()
     initial_pose.pose.position.x = -0.08
     initial_pose.pose.position.y = 2.058
-    initial_pose.pose.orientation.x = 0.961
-    initial_pose.pose.orientation.y = -0.275
     initial_pose.pose.orientation.z = 0.0
     initial_pose.pose.orientation.w = 0.0
     navigator.setInitialPose(initial_pose)
