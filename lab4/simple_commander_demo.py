@@ -18,18 +18,6 @@ Basic security route patrol demo. In this demonstration, we use the D435i camera
 mounted on the robot to relay the camera feed back to us that can be monitored
 using RViz.
 """
-
-# build a map: ros2 launch stretch_nav2 offline_mapping.launch.py teleop_type:=keyboard
-# -> to load existing map: append map:=path/to/file to above
-# save a map: ros2 run nav2_map_server map_saver_cli -f martian_map
-# map names: martian_map
-# pilot with xbox controller: stretch_xbox_controller_teleop.py
-# pilot with keyboard: stretch_free_robot_process.py
-# using head camera:
-#    ros2 launch stretch_core d435i_low_resolution.launch.py
-# using rviz:
-# ros2 run rviz2 rviz2 -d `ros2 pkg prefix --share stretch_calibration`/rviz/stretch_simple_test.rviz
-
 # a function to transform to quat
 # scipy.spatial.transform.Rotation.from_euler('xyz', [r, p, y]).as_quat()
 
@@ -42,12 +30,13 @@ def main():
     # from either a map or drive and repeat.
 
     # Would add here orientation coordinates after x and y
-    security_route = [[0, 0, 0, 1.0],
-    [0, 3.6, 0.0, 1.0],
-    [1.3, 4.6, 0.0, 1.0],
-    [0.6, 6.9, 0.0, 1.0],
-    [-1, 7.5, 0.0, 1.0],
-    ]
+    security_route = [
+        [0.0, 0.0],
+        [1.057, 1.3551],
+        [1.5828, 5.0823],
+        [-0.5390, 5.6623],
+        [0.8975, 9.7033]]
+
     # Set our demo's initial pose
     initial_pose = PoseStamped()
     initial_pose.header.frame_id = 'map'
@@ -72,10 +61,8 @@ def main():
         for pt in security_route[1:]:
             pose.pose.position.x = pt[0]
             pose.pose.position.y = pt[1]
-            # set orientation here when we have it
-            pose.pose.orientation.z = pt[2]
-            pose.pose.orientation.w = pt[3] 
-            
+            # set orientation here when we have it 
+
             route_poses.append(deepcopy(pose))
         
         nav_start = navigator.get_clock().now()
