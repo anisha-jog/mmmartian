@@ -50,10 +50,14 @@ def main():
     initial_pose = PoseStamped()
     initial_pose.header.frame_id = 'map'
     initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-    initial_pose.pose.position.x = 0.0
-    initial_pose.pose.position.y = 0.0
-    initial_pose.pose.orientation.z = 0.0
-    initial_pose.pose.orientation.w = 1.0
+    initial_pose.pose.position.x = -1.11
+    initial_pose.pose.position.y = 1.02
+    yaw = 1.37
+    quat = scipy.spatial.transform.Rotation.from_euler('xyz', [0, 0, yaw]).as_quat()
+    initial_pose.pose.orientation.x = quat[0]
+    initial_pose.pose.orientation.y = quat[1]
+    initial_pose.pose.orientation.z = quat[2]
+    initial_pose.pose.orientation.w = quat[3]
     navigator.setInitialPose(initial_pose)
     
     # Wait for navigation to fully activate
