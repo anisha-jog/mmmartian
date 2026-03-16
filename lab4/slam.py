@@ -44,7 +44,7 @@ def main():
 
     # Would add here orientation coordinates after x and y
     security_route = [[-0.791, 0.347, 0],
-                      [-2, 1.24, 0], 
+                      [-2.0, 1.24, 0], 
                       [-2.27, 1.41, 0]
     # [-0.298, 1.76, 3.14],
     ]
