@@ -43,14 +43,14 @@ def main():
     # from either a map or drive and repeat.
 
     # Would add here orientation coordinates after x and y
-    security_route = [[-1.85, -1.34, 0.502, 0.864 ],
-                      [0.233, -0.03, 0.512, 0.858 ], 
+    security_route = [[-2.23, -1.34, 0.502, 0.864 ],
+                      [0.0, -1.624, -0.279, 0.96 ], 
     ]
     # Set our demo's initial pose
     initial_pose = PoseStamped()
     initial_pose.header.frame_id = 'map'
     initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-    initial_pose.pose.position.x = -1.85
+    initial_pose.pose.position.x = -2.23
     initial_pose.pose.position.y = -1.34
     initial_pose.pose.orientation.z = 0.502
     initial_pose.pose.orientation.w = 0.864
@@ -71,13 +71,12 @@ def main():
         for pt in security_route[1:]:
             # set orientation here when we have it
             rotation = [0, 0, pt[2]]
-            quat = scipy.spatial.transform.Rotation.from_euler('xyz', rotation).as_quat()
             pose.pose.position.x = pt[0]
             pose.pose.position.y = pt[1]
-            pose.pose.orientation.x = quat[0]
-            pose.pose.orientation.y = quat[1]
-            pose.pose.orientation.z = quat[2]
-            pose.pose.orientation.w = quat[3]
+            pose.pose.orientation.x = 0.0
+            pose.pose.orientation.y = 0.0
+            pose.pose.orientation.z = pt[2]
+            pose.pose.orientation.w = pt[3]
 
             route_poses.append(deepcopy(pose))
         
