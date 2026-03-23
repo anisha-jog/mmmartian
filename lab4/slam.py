@@ -51,12 +51,15 @@ class CameraRecorder(Node):
     def __init__(self, output_path):
         super().__init__('camera_recorder')
         self.bridge = CvBridge()
+        self._frame_count = 0
         self._writer = cv2.VideoWriter(
             output_path,
-            cv2.VideoWriter_fourcc(*'mp4v'),
+            cv2.VideoWriter_fourcc(*'MJPG'),
             self.FPS,
             self.FRAME_SIZE,
         )
+        if not self._writer.isOpened():
+            self.get_logger().error('VideoWriter failed to open — check codec/path')
         self.create_subscription(Image, self.CAMERA_TOPIC, self._image_callback, 10)
         self.get_logger().info(f'Recording head camera to {output_path}')
 
@@ -65,12 +68,15 @@ class CameraRecorder(Node):
             frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
             frame = cv2.resize(frame, self.FRAME_SIZE)
             self._writer.write(frame)
+            self._frame_count += 1
+            if self._frame_count % 50 == 0:
+                self.get_logger().info(f'Recorded {self._frame_count} frames')
         except Exception as e:
             self.get_logger().warn(f'Frame drop: {e}')
 
     def stop(self):
         self._writer.release()
-        self.get_logger().info('Camera recording saved.')
+        self.get_logger().info(f'Camera recording saved — {self._frame_count} frames total.')
 
 
 def main():
@@ -80,7 +86,7 @@ def main():
 
     # Start head camera recorder in a background thread
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    recorder = CameraRecorder(output_path=f'patrol_{timestamp}.mp4')
+    recorder = CameraRecorder(output_path=f'patrol_{timestamp}.avi')
     recorder_executor = SingleThreadedExecutor()
     recorder_executor.add_node(recorder)
     recorder_thread = threading.Thread(target=recorder_executor.spin, daemon=True)
