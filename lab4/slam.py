@@ -46,14 +46,14 @@ class CameraRecorder(Node):
 
     CAMERA_TOPIC = '/camera/color/image_rect_raw'
     FPS = 15.0
-    FRAME_SIZE = (640, 480)  # matches d435i_low_resolution
+    FRAME_SIZE = (640, 480)  # matches d435i_low_resolution resolution
 
     def __init__(self, output_path):
         super().__init__('camera_recorder')
         self.bridge = CvBridge()
         self._writer = cv2.VideoWriter(
             output_path,
-            cv2.VideoWriter_fourcc(*'XVID'),
+            cv2.VideoWriter_fourcc(*'mp4v'),
             self.FPS,
             self.FRAME_SIZE,
         )
@@ -80,7 +80,7 @@ def main():
 
     # Start head camera recorder in a background thread
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    recorder = CameraRecorder(output_path=f'patrol_{timestamp}.avi')
+    recorder = CameraRecorder(output_path=f'patrol_{timestamp}.mp4')
     recorder_executor = SingleThreadedExecutor()
     recorder_executor.add_node(recorder)
     recorder_thread = threading.Thread(target=recorder_executor.spin, daemon=True)
