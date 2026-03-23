@@ -52,10 +52,10 @@ def main():
     initial_pose = PoseStamped()
     initial_pose.header.frame_id = 'map'
     initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-    initial_pose.pose.position.x = -2.025
-    initial_pose.pose.position.y = 0.782
-    initial_pose.pose.orientation.z = 0.893
-    initial_pose.pose.orientation.w = -0.449
+    initial_pose.pose.position.x = 1.319
+    initial_pose.pose.position.y = 4.06
+    initial_pose.pose.orientation.z = 0.242
+    initial_pose.pose.orientation.w = 0.97011
 
     navigator.setInitialPose(initial_pose)
     
