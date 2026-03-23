@@ -15,6 +15,7 @@ from cv_bridge import CvBridge
 import rclpy
 from rclpy.node import Node
 from rclpy.duration import Duration
+from rclpy.executors import SingleThreadedExecutor
 
 import cv2
 import scipy
@@ -80,7 +81,9 @@ def main():
     # Start head camera recorder in a background thread
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     recorder = CameraRecorder(output_path=f'patrol_{timestamp}.avi')
-    recorder_thread = threading.Thread(target=rclpy.spin, args=(recorder,), daemon=True)
+    recorder_executor = SingleThreadedExecutor()
+    recorder_executor.add_node(recorder)
+    recorder_thread = threading.Thread(target=recorder_executor.spin, daemon=True)
     recorder_thread.start()
 
     # Security route, probably read in from a file for a real application
