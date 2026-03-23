@@ -43,19 +43,19 @@ def main():
     # from either a map or drive and repeat.
 
     # Would add here orientation coordinates after x and y
-    security_route = [[1.423, 3.700, 0.362, 0.931 ],
-                      [2.285, 4.490, 0.363, 0.931 ],
-                      [3.330, 5.756, 0.900, 0.43], 
-                      [1.947, 7.78, -0.412, 0.911]
+    security_route = [[0.640, 3.40, 0.308,  0.951 ],
+                      [1.670, 3.88, 0.363, 0.931 ],
+                    #   [3.330, 5.756, 0.900, 0.43], 
+                    #   [1.947, 7.78, -0.412, 0.911]
     ]
     # Set our demo's initial pose
     initial_pose = PoseStamped()
     initial_pose.header.frame_id = 'map'
     initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-    initial_pose.pose.position.x = 1.319
-    initial_pose.pose.position.y = 4.06
-    initial_pose.pose.orientation.z = 0.242
-    initial_pose.pose.orientation.w = 0.97011
+    initial_pose.pose.position.x = 0.640
+    initial_pose.pose.position.y = 3.40
+    initial_pose.pose.orientation.z = 0.308
+    initial_pose.pose.orientation.w = 0.951
 
     navigator.setInitialPose(initial_pose)
     
