@@ -1,18 +1,23 @@
 #! /usr/bin/env python3
 
-# Adapted from the simple commander demo examples on 
+# Adapted from the simple commander demo examples on
 # https://github.com/ros-planning/navigation2/blob/galactic/nav2_simple_commander/nav2_simple_commander/demo_security.py
 
 from copy import deepcopy
+import threading
+import datetime
 
 from geometry_msgs.msg import PoseStamped
+from sensor_msgs.msg import Image
 from stretch_nav2.robot_navigator import BasicNavigator, TaskResult
+from cv_bridge import CvBridge
 
 import rclpy
 from rclpy.node import Node
 from rclpy.duration import Duration
 
-import scipy 
+import cv2
+import scipy
 
 """
 Basic security route patrol demo. In this demonstration, we use the D435i camera
@@ -34,10 +39,49 @@ using RViz.
 # a function to transform to quat
 # scipy.spatial.transform.Rotation.from_euler('xyz', [r, p, y]).as_quat()
 
+
+class CameraRecorder(Node):
+    """Subscribes to the D435i head camera and writes frames to a video file."""
+
+    CAMERA_TOPIC = '/camera/color/image_rect_raw'
+    FPS = 15.0
+    FRAME_SIZE = (640, 480)  # matches d435i_low_resolution
+
+    def __init__(self, output_path):
+        super().__init__('camera_recorder')
+        self.bridge = CvBridge()
+        self._writer = cv2.VideoWriter(
+            output_path,
+            cv2.VideoWriter_fourcc(*'XVID'),
+            self.FPS,
+            self.FRAME_SIZE,
+        )
+        self.create_subscription(Image, self.CAMERA_TOPIC, self._image_callback, 10)
+        self.get_logger().info(f'Recording head camera to {output_path}')
+
+    def _image_callback(self, msg):
+        try:
+            frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            frame = cv2.resize(frame, self.FRAME_SIZE)
+            self._writer.write(frame)
+        except Exception as e:
+            self.get_logger().warn(f'Frame drop: {e}')
+
+    def stop(self):
+        self._writer.release()
+        self.get_logger().info('Camera recording saved.')
+
+
 def main():
     rclpy.init()
 
     navigator = BasicNavigator()
+
+    # Start head camera recorder in a background thread
+    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    recorder = CameraRecorder(output_path=f'patrol_{timestamp}.avi')
+    recorder_thread = threading.Thread(target=rclpy.spin, args=(recorder,), daemon=True)
+    recorder_thread.start()
 
     # Security route, probably read in from a file for a real application
     # from either a map or drive and repeat.
@@ -46,6 +90,7 @@ def main():
     security_route = [[-6.677, 0.056, 0.21, 0.977],
                       [-6.022, -1.43, -0.51, -1.43 ],
                       [-4.13, 0.077, 0.204, 0.978], 
+                      [-2.76, 0.730, 0.277, 0.690]
     ]
     # Set our demo's initial pose
     initial_pose = PoseStamped()
@@ -107,10 +152,12 @@ def main():
             navigator.get_logger().info('Route complete! Restarting...')
         elif result == TaskResult.CANCELED:
             navigator.get_logger().info('Security route was canceled, exiting.')
+            recorder.stop()
             rclpy.shutdown()
         elif result == TaskResult.FAILED:
             navigator.get_logger().info('Security route failed! Restarting from other side...')
 
+    recorder.stop()
     rclpy.shutdown()
 
 
