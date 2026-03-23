@@ -43,9 +43,10 @@ def main():
     # from either a map or drive and repeat.
 
     # Would add here orientation coordinates after x and y
-    security_route = [[-2.025, 0.782, 0.893, -0.449 ],
-                      [-0.167, 2.282, 0.469, 0.883 ],
-                      [1.777, 4.419, 0.956, 0.290], 
+    security_route = [[1.423, 3.700, 0.362, 0.931 ],
+                      [2.285, 4.490, 0.363, 0.931 ],
+                      [3.330, 5.756, 0.900, 0.43], 
+                      [1.947, 7.78, -0.412, 0.911]
     ]
     # Set our demo's initial pose
     initial_pose = PoseStamped()
