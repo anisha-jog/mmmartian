@@ -13,7 +13,7 @@ import cv2
 
 class CameraStream(Node):
 
-    CAMERA_TOPIC = '/camera/color/image_rect_raw'
+    CAMERA_TOPIC = '/camera/color/image_raw'
 
     def __init__(self):
         super().__init__('camera_stream')

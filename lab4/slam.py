@@ -44,7 +44,7 @@ using RViz.
 class CameraRecorder(Node):
     """Subscribes to the D435i head camera and writes frames to a video file."""
 
-    CAMERA_TOPIC = '/camera/color/image_rect_raw'
+    CAMERA_TOPIC = '/camera/color/image_raw'
     FPS = 15.0
     FRAME_SIZE = (640, 480)  # matches d435i_low_resolution resolution
 
