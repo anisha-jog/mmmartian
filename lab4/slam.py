@@ -20,11 +20,6 @@ from rclpy.executors import SingleThreadedExecutor
 import cv2
 import scipy
 
-"""
-Basic security route patrol demo. In this demonstration, we use the D435i camera
-mounted on the robot to relay the camera feed back to us that can be monitored
-using RViz.
-"""
 
 # build a map: ros2 launch stretch_nav2 offline_mapping.launch.py teleop_type:=keyboard
 # to load existing map: ros2 launch stretch_nav2 navigation.launch.py map:=./maps/martian_map.yaml
@@ -42,8 +37,7 @@ using RViz.
 
 
 class CameraRecorder(Node):
-    """Subscribes to the D435i head camera and writes frames to a video file."""
-
+    #to record the head camera footage
     CAMERA_TOPIC = '/camera/color/image_raw'
     FPS = 15.0
     FRAME_SIZE = (640, 480)  # matches d435i_low_resolution resolution
@@ -105,10 +99,10 @@ def main():
     initial_pose = PoseStamped()
     initial_pose.header.frame_id = 'map'
     initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-    initial_pose.pose.position.x = -6.677
-    initial_pose.pose.position.y = 0.056
-    initial_pose.pose.orientation.z = 0.21
-    initial_pose.pose.orientation.w = 0.977
+    initial_pose.pose.position.x = -6.41
+    initial_pose.pose.position.y = 0.052
+    initial_pose.pose.orientation.z = 0.183
+    initial_pose.pose.orientation.w = 0.891
 
     navigator.setInitialPose(initial_pose)
     
