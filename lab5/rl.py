@@ -108,8 +108,8 @@ def run_experiment():
             ExperimentConfig(
                 persistence_enabled=True,
                 persistence_base_dir='log',
-                watch=True,
-                watch_render=1 / 35,
+                watch=False,
+                watch_render=0,
                 watch_num_episodes=100,
             ),
             OnPolicyTrainingConfig(
