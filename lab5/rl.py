@@ -7,15 +7,21 @@ import gymnasium as gym
 # pip3 install gymnasium tianshou rliable
 # pip3 install -U arch
 
+#find in https://github.com/Zackory/mengine/tree/main
+
 class TouchEnv(gym.Env):
     def __init__(self, render_mode=None, **kwargs):
         self.env = m.Env(gravity=[0, 0, -1], render=render_mode=='human')
-        self.observation_space = gym.spaces.Box(low=-10.0, high=10.0, shape=(3+3+3+5,)) # TODO: Update this based on the dimensionality of your observation vector
+        self.observation_space = gym.spaces.Box(low=-10.0, high=10.0, shape=(14,))  # ee(3) + object(3) + rel(3) + joints(5)
         self.action_space = gym.spaces.Box(low=-1.0, high=1.0, shape=(7,))
 
     def _get_obs(self):
         # TODO: ------------- start --------------
-        return None
+        ee_pos, _ = self.robot.get_link_pos_orient(self.robot.end_effector)
+        obj_pos, _ = self.object.get_base_pos_orient()
+        rel = obj_pos - ee_pos
+        joints5 = self.robot.get_joint_angles(self.robot.controllable_joints)[:5]
+        return np.concatenate([ee_pos, obj_pos, rel, joints5]).astype(np.float32)
         # TODO: -------------- end ---------------
 
     def _get_info(self):
@@ -66,8 +72,13 @@ class TouchEnv(gym.Env):
         m.step_simulation(steps=10, realtime=self.env.render)
 
         # TODO: ------------- start --------------
-        # TODO: Create a reward function that encourages the end effector to move towards the object on the table
-        reward = 0
+        ee_pos, _ = self.robot.get_link_pos_orient(self.robot.end_effector)
+        obj_pos, _ = self.object.get_base_pos_orient()
+        dist = np.linalg.norm(ee_pos - obj_pos)
+        reward = -float(dist)
+        contacts = self.robot.get_contact_points(bodyB=self.object)
+        if contacts is not None and len(contacts) > 0:
+            reward += 1.0
         # TODO: -------------- end ---------------
 
         observation = self._get_obs()
