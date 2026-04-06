@@ -40,10 +40,15 @@ def collect_demos(n_demos=1000):
 
             # TODO: ------------- start --------------
             # Append obs,action to X,y; step venv forward
+            X.append(obs)
+            y.append(action)
+            obs, reward, terminated, truncated, info = venv.step(action)
             # TODO: -------------- end ---------------
 
     # TODO: ------------- start --------------
     # Save all demos to .pkl file
+    with open('demos.pkl', 'wb') as file:
+        pickle.dump([X, y], file)
     # TODO: -------------- end ---------------
 
 if __name__ == '__main__':
