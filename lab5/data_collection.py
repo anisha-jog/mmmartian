@@ -43,7 +43,7 @@ def collect_demos(n_demos=1000):
             # Append obs,action to X,y; step venv forward
             X.append(obs)
             y.append(action)
-            action = np.array(action)
+            action = np.array(action.cpu())
             obs, reward, terminated, truncated, info = venv.step(action)
             # TODO: -------------- end ---------------
 
