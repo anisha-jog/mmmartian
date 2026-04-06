@@ -61,7 +61,7 @@ class TouchEnv(gym.Env):
     def step(self, action):
         # action is delta joint angle change
         scale = 0.025
-        action = np.array(action)
+        action = np.array(action.cpu())
         scaled_action = np.concatenate([action[:2]*0.5,         # Base movements
                                         [action[2]*scale],      # Lift joint
                                         [action[3]/4.0*scale]*4,# Arm extension joints
