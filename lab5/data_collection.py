@@ -49,7 +49,7 @@ def collect_demos(n_demos=1000):
 
     # TODO: ------------- start --------------
     # Save all demos to .pkl file
-    with open('demos.pkl', 'wb') as file:
+    with open('demos2.pkl', 'wb') as file:
         pickle.dump([X, y], file)
     # TODO: -------------- end ---------------
 
