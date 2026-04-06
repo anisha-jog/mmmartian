@@ -11,6 +11,7 @@ from tianshou.env import DummyVectorEnv
 def imitate(lr=0.001, epochs=500):
     with open('demos2.pkl', 'rb') as file:
         X, y = pickle.load(file)
+        print(X, y)
 
     # train a small neural network to predict actions from observations using PyTorch
     # Create the same network architecture that PPO used for a policy,
