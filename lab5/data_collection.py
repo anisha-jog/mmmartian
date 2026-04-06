@@ -1,7 +1,7 @@
 import os
 import torch
 import pickle
-import tqdm
+from tqdm import tqdm
 import numpy as np
 import gymnasium as gym
 from rl import TouchEnv
