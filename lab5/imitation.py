@@ -76,7 +76,11 @@ def imitate(lr=0.001, epochs=500, batch_size=256, demos_path=None):
     policy.cpu()
     policy.eval()
     out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "imitation_policy.pt")
-    torch.save(policy, out_path)
+    # Save state_dict only so eval_il can load without __main__.ImitationPolicy pickle issues.
+    torch.save(
+        {"state_dict": policy.state_dict(), "obs_dim": obs_dim, "act_dim": act_dim},
+        out_path,
+    )
 
 
 if __name__ == "__main__":
