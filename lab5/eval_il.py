@@ -8,11 +8,14 @@ from imitation import ImitationPolicy
 # Setup Env
 env = gym.make('TouchEnv', render_mode='human')
 
-# Load Policy (weights saved from imitation.py; avoids pickle looking up __main__.ImitationPolicy)
+# Load Policy: new format is dict {state_dict, obs_dim, act_dim}; old format is torch.save(module)
 _base = os.path.dirname(os.path.abspath(__file__))
 _ckpt = torch.load(os.path.join(_base, "imitation_policy.pt"), weights_only=False)
-policy = ImitationPolicy(_ckpt["obs_dim"], _ckpt["act_dim"])
-policy.load_state_dict(_ckpt["state_dict"])
+if isinstance(_ckpt, dict) and "state_dict" in _ckpt:
+    policy = ImitationPolicy(_ckpt["obs_dim"], _ckpt["act_dim"])
+    policy.load_state_dict(_ckpt["state_dict"])
+else:
+    policy = _ckpt
 policy.eval()
 
 obs, info = env.reset(seed=np.random.randint(9000000))
