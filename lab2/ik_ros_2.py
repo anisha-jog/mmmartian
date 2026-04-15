@@ -1,5 +1,6 @@
 import csv
 import os
+import time
 import urchin as urdfpy
 import numpy as np
 import ikpy.chain
@@ -170,7 +171,7 @@ STRETCH_Z_REF = 0.5               # Fixed reference height for Stretch z (m)
 ARM_EXTEND_OFFSET = 0.29
 Z_OFFSET_CM = 0.42                # Extra z offset in mapping (m)
 #DELTA_TABLE = 0.26                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
-DELTA_TABLE = 0.25                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
+#DELTA_TABLE = 0.25                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
 
 # CSV / execute_panda_pose_action xyz interpretation:
 # - True (default): x,y,z are Panda/LIBERO frame (m); panda_to_stretch_position() subtracts PANDA_*_CENTER and maps to Stretch.
@@ -239,6 +240,7 @@ print("z_top = %.4f m (Stretch EE max height); homing to (0, 0, z_top)..." % Z_T
 move_to_grasp_goal([0.0, 0.0, Z_TOP], np.eye(3), add_table_delta=False)
 robot.wait_command()
 print("Homed.")
+time.sleep(2)
 
 if ACT_DIRECTLY:
     if os.path.isfile(ACTION_CSV_PATH):
@@ -257,7 +259,7 @@ if ACT_DIRECTLY:
         try:
             execute_panda_pose_action(x_p, y_p, z_p, qx, qy, qz, qw, xyz_scale=1.0)
             robot.wait_command()
-            time.sleep(1)
+            time.sleep(2)
         except Exception as e:
             print("Execution error at row %d:" % (i + 1), e)
 else:
@@ -274,6 +276,8 @@ else:
                 continue
             x_p, y_p, z_p, qx, qy, qz, qw = vals
             execute_panda_pose_action(x_p, y_p, z_p, qx, qy, qz, qw, xyz_scale=0.1)
+            robot.wait_command()
+            time.sleep(2)
         except ValueError as e:
             print("Parse error; enter 7 space-separated numbers.", e)
         except Exception as e:
