@@ -1,6 +1,7 @@
 import os
 import torch
 import pickle
+from tqdm import tqdm
 import numpy as np
 import gymnasium as gym
 from rl import TouchEnv
@@ -28,7 +29,7 @@ def collect_demos(n_demos=1000):
 
     X = []
     y = []
-    for i in range(n_demos):
+    for i in tqdm(range(n_demos)):
         obs, info = venv.reset(seed=np.random.randint(1000000))
 
         terminated = False
@@ -40,10 +41,16 @@ def collect_demos(n_demos=1000):
 
             # TODO: ------------- start --------------
             # Append obs,action to X,y; step venv forward
+            X.append(obs)
+            y.append(action)
+            action = np.array(action.cpu())
+            obs, reward, terminated, truncated, info = venv.step(action)
             # TODO: -------------- end ---------------
 
     # TODO: ------------- start --------------
     # Save all demos to .pkl file
+    with open('demos2.pkl', 'wb') as file:
+        pickle.dump([X, y], file)
     # TODO: -------------- end ---------------
 
 if __name__ == '__main__':

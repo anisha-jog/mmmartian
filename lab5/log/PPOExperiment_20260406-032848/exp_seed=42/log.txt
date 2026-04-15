@@ -1,0 +1,38 @@
+ERROR 2026-04-06 03:31:29,515 sensai.util.logging:__exit__:410 - Exception within FileLoggerContext
+Traceback (most recent call last):
+  File "/home/zoom/16702mm/env/lib/python3.11/site-packages/tianshou/highlevel/experiment.py", line 455, in run
+    trainer_result = world.trainer.run()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/home/zoom/16702mm/env/lib/python3.11/site-packages/tianshou/trainer.py", line 775, in run
+    self.execute_epoch()
+  File "/home/zoom/16702mm/env/lib/python3.11/site-packages/tianshou/trainer.py", line 588, in execute_epoch
+    training_step_result = self._training_step()
+                           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zoom/16702mm/env/lib/python3.11/site-packages/tianshou/trainer.py", line 915, in _training_step
+    collect_stats = self._collect_training_data()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zoom/16702mm/env/lib/python3.11/site-packages/tianshou/trainer.py", line 944, in _collect_training_data
+    collect_stats = self.params.training_collector.collect(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zoom/16702mm/env/lib/python3.11/site-packages/tianshou/data/collector.py", line 504, in collect
+    collect_stats = self._collect(
+                    ^^^^^^^^^^^^^^
+  File "/home/zoom/16702mm/env/lib/python3.11/site-packages/tianshou/data/collector.py", line 878, in _collect
+    obs_next_RO, rew_R, terminated_R, truncated_R, info_R = self.env.step(
+                                                            ^^^^^^^^^^^^^^
+  File "/home/zoom/16702mm/env/lib/python3.11/site-packages/tianshou/env/venvs.py", line 285, in step
+    env_return = self.workers[j].recv()
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zoom/16702mm/env/lib/python3.11/site-packages/tianshou/env/worker/subproc.py", line 225, in recv
+    result = self.parent_remote.recv()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/multiprocessing/connection.py", line 254, in recv
+    buf = self._recv_bytes()
+          ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/multiprocessing/connection.py", line 418, in _recv_bytes
+    buf = self._recv(4)
+          ^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/multiprocessing/connection.py", line 383, in _recv
+    chunk = read(handle, remaining)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
