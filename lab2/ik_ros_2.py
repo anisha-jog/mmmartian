@@ -172,6 +172,11 @@ Z_OFFSET_CM = 0.42                # Extra z offset in mapping (m)
 #DELTA_TABLE = 0.26                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
 DELTA_TABLE = 0.0                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
 
+# CSV / execute_panda_pose_action xyz interpretation:
+# - True (default): x,y,z are Panda/LIBERO frame (m); panda_to_stretch_position() subtracts PANDA_*_CENTER and maps to Stretch.
+# - False: x,y,z are already absolute end-effector position in Stretch base_link (m); no center/offset remap (quaternion unchanged).
+ACTION_XYZ_IS_STRETCH_BASE = False
+
 # If True: run all rows from ACTION_CSV_PATH (or ACTION_ROWS) once, then exit. If False: interactive input loop.
 ACT_DIRECTLY = True
 ACTION_CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ik_ros_2_actions.csv")
@@ -216,7 +221,10 @@ def load_actions_from_csv(path):
 def execute_panda_pose_action(x_p, y_p, z_p, qx, qy, qz, qw, *, xyz_scale):
     """Map Panda pose to Stretch and execute. xyz_scale=0.1 for interactive x10 typing; 1.0 for table values in meters."""
     x_p, y_p, z_p = xyz_scale * x_p, xyz_scale * y_p, xyz_scale * z_p
-    target_point = list(panda_to_stretch_position(x_p, y_p, z_p))
+    if ACTION_XYZ_IS_STRETCH_BASE:
+        target_point = [float(x_p), float(y_p), float(z_p)]
+    else:
+        target_point = list(panda_to_stretch_position(x_p, y_p, z_p))
     target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
     move_to_grasp_goal(target_point, target_orientation, add_table_delta=True)
 
