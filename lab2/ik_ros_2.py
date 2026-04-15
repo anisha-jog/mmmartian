@@ -1,6 +1,6 @@
 import csv
-import os
-import time
+from pathlib import Path
+
 import urchin as urdfpy
 import numpy as np
 import ikpy.chain
@@ -9,12 +9,12 @@ import importlib.resources as importlib_resources
 from scipy.spatial.transform import Rotation
 # NOTE: `python3 -m pip install --upgrade ikpy graphviz urchin networkx scipy`
 
-# ---------- Stretch Python API (no ROS) ----------
+# ---------- Stretch Python API（不用 ROS）----------
 robot = stretch_body.robot.Robot()
 robot.startup()
 if not robot.is_calibrated():
     robot.home()
-# Stow to a safe tucked pose first
+# 先 stow 到安全收拢姿态
 robot.stow()
 robot.push_command()
 robot.wait_command()
@@ -57,24 +57,7 @@ for j in modified_urdf._joints:
 new_urdf_path = "/tmp/iktutorial/stretch.urdf"
 modified_urdf.save(new_urdf_path)
 
-# IK tuning (applied right after chain load)
-# Virtual prismatic joint_base_translation is only for modeling; letting IK optimize it makes the
-# base lunge forward/back between similar Cartesian targets. Lock it so only lift/arm/wrist move.
-IK_LOCK_VIRTUAL_BASE_X = True
-# Penalize joint change from initial_position (0 = off). Reduces IK “branch flips” between steps.
-IK_REGULARIZATION_PARAMETER = 0.03
-
 chain = ikpy.chain.Chain.from_urdf_file(new_urdf_path)
-if IK_LOCK_VIRTUAL_BASE_X:
-    _names = [link.name for link in chain.links]
-    if "joint_base_translation" in _names:
-        _i = _names.index("joint_base_translation")
-        _mask = np.array(chain.active_links_mask, copy=True)
-        _mask[_i] = False
-        chain.active_links_mask = _mask
-        print("* IK: joint_base_translation locked (base x not driven by IK). Set IK_LOCK_VIRTUAL_BASE_X=False if unreachable.")
-    else:
-        print("* IK: no joint_base_translation in chain; link names:", _names)
 for link in chain.links:
     print(f"* Link Name: {link.name}, Type: {link.joint_type}")
 
@@ -88,7 +71,7 @@ def get_current_configuration():
         bounds = chain.links[index].bounds
         return min(max(value, bounds[0]), bounds[1])
 
-    q_base = bound_range('joint_base_translation', robot.base.status['x'])   # Base x for IK; executed as delta
+    q_base = bound_range('joint_base_translation', robot.base.status['x'])   # 底盘 x 供 IK；执行时转为增量
     q_lift = bound_range('joint_lift', robot.lift.status['pos'])
     q_arml = bound_range('joint_arm_l0', robot.arm.status['pos'] / 4.0)
     q_yaw = bound_range('joint_wrist_yaw', robot.end_of_arm.status['wrist_yaw']['pos'])
@@ -98,7 +81,7 @@ def get_current_configuration():
 
 
 def move_to_configuration(q):
-    # Absolute targets: base uses translate_by(delta) only, so delta_x = desired_x - current_x
+    # 仅保留绝对值逻辑：Stretch 底盘只有 translate_by(delta)，用 目标x - 当前x 得到增量
     desired_base_x = q[1]
     current_base_x = robot.base.status['x']
     delta_x = desired_base_x - current_base_x
@@ -116,19 +99,8 @@ def move_to_configuration(q):
     robot.push_command()
 
 
-def _gripper_down_right_rotation():
-    """EE frame used for initial homing only (matches previous hard-coded IK target)."""
-    _inv_sqrt2 = 1.0 / np.sqrt(2.0)
-    approach = np.array([0.0, _inv_sqrt2, -_inv_sqrt2])
-    forward = np.array([1.0, 0.0, 0.0])
-    right = np.cross(approach, forward)
-    right = right / np.linalg.norm(right)
-    forward = np.cross(right, approach)
-    return np.column_stack((approach, right, forward)).astype(np.float64)
-
-
 def _clamp_to_chain_bounds(q):
-    """Clamp joint values to each link's bounds in the chain."""
+    """将关节角限制在 chain 各关节限位内。"""
     q = np.array(q, dtype=np.float64)
     for i in range(min(len(q), len(chain.links))):
         lo, hi = chain.links[i].bounds
@@ -136,32 +108,30 @@ def _clamp_to_chain_bounds(q):
     return q
 
 
-def move_to_grasp_goal(target_point, target_orientation_matrix, add_table_delta=True):
-    """target_point: (x,y,z) in Stretch base_link. target_orientation_matrix: 3x3 EE rotation (absolute)."""
-    tp = np.asarray(target_point, dtype=np.float64).copy()
-    if add_table_delta:
-        tp[2] += DELTA_TABLE
-    target_point = tp
+def move_to_grasp_goal(target_point, target_orientation_matrix):
+    """target_point: (x,y,z)。姿态固定为夹爪朝下，用完整 3x3 矩阵 + orientation_mode='all'。"""
     q_init = get_current_configuration()
-    R = np.asarray(target_orientation_matrix, dtype=np.float64).reshape(3, 3)
-    _ik_kw = {}
-    if IK_REGULARIZATION_PARAMETER and IK_REGULARIZATION_PARAMETER > 0.0:
-        _ik_kw["regularization_parameter"] = float(IK_REGULARIZATION_PARAMETER)
-    q_soln = chain.inverse_kinematics(
-        target_point, R, orientation_mode="all", initial_position=q_init, **_ik_kw
-    )
+    # 夹爪朝下且朝右：base 中 Y 左、Z 上，故“下右”为 (0, 1, -1) 单位化；末端接近轴取为该方向
+    _inv_sqrt2 = 1.0 / np.sqrt(2.0)
+    approach = np.array([0.0, _inv_sqrt2, -_inv_sqrt2])   # 下右
+    forward = np.array([1.0, 0.0, 0.0])                    # 前
+    right = np.cross(approach, forward)
+    right = right / np.linalg.norm(right)
+    forward = np.cross(right, approach)
+    gripper_down_rotation = np.column_stack((approach, right, forward)).astype(np.float64)
+    q_soln = chain.inverse_kinematics(target_point, gripper_down_rotation, orientation_mode='all', initial_position=q_init)
     print('Solution:', q_soln)
     q_use = _clamp_to_chain_bounds(q_soln)
     err = np.linalg.norm(chain.forward_kinematics(q_use)[:3, 3] - np.array(target_point))
-    ERR_LIMIT = 0.5   # Accept solution if within 50 cm after clamping
-    print("Position error after clamp: %.4f m (limit %.1f m)" % (err, ERR_LIMIT))
+    ERR_LIMIT = 0.5   # 50 cm 内按可行解执行
+    print("钳制后位置误差 %.4f m（阈值 %.1f m）" % (err, ERR_LIMIT))
     if err > ERR_LIMIT:
-        print("IKPy did not find a valid solution (still > 50 cm after clamping)")
-        print("Hint: to move down from the top use negative z (offset from top), e.g. z=-0.05 is 5 cm lower; positive z is higher and may be unreachable.")
+        print("IKPy did not find a valid solution（钳制后仍超 50 cm）")
+        print("提示：从顶端降下来请用负的 z（相对顶端偏移），例如 z=-0.05 表示降 5 cm；z 为正表示比顶端还高，可能不可达。")
         return None
     if np.any(np.abs(np.array(q_use) - np.array(q_soln)) > 1e-6):
-        print("Executing after clamping to joint limits.")
-    print("Executing motion...")
+        print("已按关节限位钳制后执行。")
+    print("执行动作中...")
     move_to_configuration(q=q_use)
     return q_use
 
@@ -172,7 +142,7 @@ def get_current_grasp_pose():
 
 
 def pose_4x4_to_8(pose_4x4):
-    """Convert 4x4 pose to 8-vector: x, y, z, qx, qy, qz, qw, 1."""
+    """将 4x4 位姿矩阵转为 8 维向量：x, y, z, qx, qy, qz, qw, 1。"""
     pose_4x4 = np.asarray(pose_4x4)
     x, y, z = pose_4x4[0, 3], pose_4x4[1, 3], pose_4x4[2, 3]
     R = pose_4x4[:3, :3]
@@ -181,138 +151,75 @@ def pose_4x4_to_8(pose_4x4):
     return [x, y, z, qx, qy, qz, qw, 1.0]
 
 
-# ---------- Panda (Franka 7-DoF) / LIBERO -> Stretch mapping ----------
-# Franka Panda: base origin, X forward Y left Z up; nominal workspace center [0.515, 0, 0.226] m
-# LIBERO action: 7D (x,y,z, qx,qy,qz,qw) or (x,y,z, r,p,y, gripper), meters
-# Stretch: same convention; scale and offset map into Stretch reach
-PANDA_X_CENTER = 0.515   # Panda nominal workspace center x (m)
+def load_actions_from_csv(csv_path):
+    """读取 ik_ros_2_actions.csv：每行 7 个数 x y z qx qy qz qw（米 / xyzw）。"""
+    path = Path(csv_path)
+    actions = []
+    with path.open(newline='', encoding='utf-8') as f:
+        sample = f.readline()
+        f.seek(0)
+        delim = '\t' if sample.count('\t') >= sample.count(',') else ','
+        reader = csv.reader(f, delimiter=delim)
+        next(reader, None)  # header
+        for row in reader:
+            if not row or all(not (c or '').strip() for c in row):
+                continue
+            if len(row) < 7:
+                continue
+            nums = [float((row[i] or '0').strip()) for i in range(7)]
+            actions.append(nums)
+    return actions
+
+
+# ---------- Panda (Franka Emika 7-DoF) / LIBERO → Stretch 参数转换 ----------
+# Franka Panda: base 原点，X 前 Y 左 Z 上；名义 workspace 中心 [0.515, 0, 0.226] m，约 0.4^3 盒
+# LIBERO 动作：7 维 (x,y,z, qx,qy,qz,qw) 或 (x,y,z, roll,pitch,yaw, gripper)，单位米
+# Stretch: 同 convention，但臂长/行程不同，用线性缩放+偏移映射到 Stretch 可达范围
+PANDA_X_CENTER = 0.515   # Panda 名义 workspace 中心 x (m)
 PANDA_Y_CENTER = 0.0
-PANDA_Z_CENTER = 0.226   # Typical table height
-STRETCH_X_CENTER = 0.25  # Comfortable arm center in front of Stretch
+PANDA_Z_CENTER = 0.226   # 桌面高度典型值
+STRETCH_X_CENTER = 0.25  # Stretch 前方手臂舒适中心 x
 STRETCH_Y_CENTER = 0.0
-PANDA_TO_STRETCH_SCALE_X = 0.8
+PANDA_TO_STRETCH_SCALE_X = 0.8   # Panda 方向 x 缩放
 PANDA_TO_STRETCH_SCALE_Y = 0.8
-PANDA_TO_STRETCH_SCALE_Z = 1.0
-STRETCH_Z_REF = 0.5               # Fixed reference height for Stretch z (m)
+PANDA_TO_STRETCH_SCALE_Z = 1.0   # Panda z 相对桌面 → Stretch z 缩放
+STRETCH_Z_REF = 0.5               # Stretch 目标 z 的固定参考高度 (m)，不再用 top
 ARM_EXTEND_OFFSET = 0.29
-Z_OFFSET_CM = 0.42                # Extra z offset in mapping (m)
-#DELTA_TABLE = 0.26                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
-DELTA_TABLE = 0                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
-
-# CSV / execute_panda_pose_action xyz interpretation:
-# - True (default): x,y,z are Panda/LIBERO frame (m); panda_to_stretch_position() subtracts PANDA_*_CENTER and maps to Stretch.
-# - False: x,y,z are already absolute end-effector position in Stretch base_link (m); no center/offset remap (quaternion unchanged).
-ACTION_XYZ_IS_STRETCH_BASE = False
-
-# If True: run all rows from ACTION_CSV_PATH (or ACTION_ROWS) once, then exit. If False: interactive input loop.
-ACT_DIRECTLY = True
-ACTION_CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ik_ros_2_actions.csv")
-# Fallback when CSV is missing: list of [x, y, z, qx, qy, qz, qw] in Panda/LIBERO meters (same as spreadsheet columns).
-ACTION_ROWS = []
+Z_OFFSET_CM = 0.42                # 所有目标 z 加高
 
 
 def panda_to_stretch_position(x_panda, y_panda, z_panda):
-    """Map Panda/LIBERO end-effector position (m) to Stretch base_link target (x,y,z)."""
+    """将 Panda/LIBERO 空间末端位置 (米) 转为 Stretch base_link 下目标 (x,y,z)。不再用 top_z。"""
     x_s = (x_panda - PANDA_X_CENTER) * PANDA_TO_STRETCH_SCALE_X + STRETCH_X_CENTER + ARM_EXTEND_OFFSET
     y_s = (y_panda - PANDA_Y_CENTER) * PANDA_TO_STRETCH_SCALE_Y + STRETCH_Y_CENTER - ARM_EXTEND_OFFSET
     z_s = STRETCH_Z_REF + (z_panda - PANDA_Z_CENTER) * PANDA_TO_STRETCH_SCALE_Z + Z_OFFSET_CM
     return (x_s, y_s, z_s)
 
-
-def load_actions_from_csv(path):
-    """Load 7 floats per row (x,y,z,qx,qy,qz,qw). Skips header / bad lines.
-
-    Excel paste often uses TABs between columns; csv.reader only splits on commas,
-    so tabbed rows become one cell and were silently dropped (IndexError).
-    """
-    rows = []
-    with open(path, newline="", encoding="utf-8-sig") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            if "\t" in line:
-                parts = [p.strip() for p in line.split("\t") if p.strip()]
-            else:
-                parts = [p.strip() for p in next(csv.reader([line])) if p.strip()]
-            if len(parts) < 7:
-                continue
-            try:
-                vals = [float(parts[i]) for i in range(7)]
-            except ValueError:
-                continue
-            rows.append(vals)
-    return rows
-
-
-def execute_panda_pose_action(x_p, y_p, z_p, qx, qy, qz, qw, *, xyz_scale):
-    """Map Panda pose to Stretch and execute. xyz_scale=0.1 for interactive x10 typing; 1.0 for table values in meters."""
-    x_p, y_p, z_p = xyz_scale * x_p, xyz_scale * y_p, xyz_scale * z_p
-    if ACTION_XYZ_IS_STRETCH_BASE:
-        target_point = [float(x_p), float(y_p), float(z_p)]
-    else:
-        target_point = list(panda_to_stretch_position(x_p, y_p, z_p))
-    quat = np.array([qx, qy, qz, qw], dtype=np.float64)
-    n = np.linalg.norm(quat)
-    if n > 1e-9:
-        quat = quat / n
-    target_orientation = Rotation.from_quat(quat).as_matrix()
-    print(
-        "  target xyz (after map, m): %.4f %.4f %.4f | ACTION_XYZ_IS_STRETCH_BASE=%s"
-        % (target_point[0], target_point[1], target_point[2], ACTION_XYZ_IS_STRETCH_BASE)
-    )
-    move_to_grasp_goal(target_point, target_orientation, add_table_delta=True)
-
-
-# ---------- Startup: z_top = max EE height (FK at lift hard limit); home once to (0, 0, z_top) ----------
+# ---------- 启动：z_top = Stretch 末端可达最高点（lift 上限时正解 z），只复位一次到 (0, 0, z_top) ----------
 _lift_lo, _lift_hi = robot.lift.soft_motion_limits['hard']
 _q_max = get_current_configuration()
-# Index 3 is joint_lift (same order as get_current_configuration)
+# 配置里第 4 个为 joint_lift（与 get_current_configuration 顺序一致）
 _q_max[3] = _lift_hi
 Z_TOP = float(chain.forward_kinematics(np.array(_q_max, dtype=np.float64))[2, 3])
-print("z_top = %.4f m (Stretch EE max height); homing to (0, 0, z_top)..." % Z_TOP)
-move_to_grasp_goal([0.0, 0.0, Z_TOP], _gripper_down_right_rotation(), add_table_delta=False)
+print("z_top = %.4f m（Stretch 末端最高点）；复位到 (0, 0, z_top)...")
+move_to_grasp_goal([0.0, 0.0, Z_TOP], np.eye(3))
 robot.wait_command()
-print("Homed. ACTION_XYZ_IS_STRETCH_BASE=%s — if motion is huge, try True when CSV xyz are already Stretch base_link (m)." % ACTION_XYZ_IS_STRETCH_BASE)
-time.sleep(2)
+print("已复位，从 ik_ros_2_actions.csv 顺序执行 action。")
 
-if ACT_DIRECTLY:
-    if os.path.isfile(ACTION_CSV_PATH):
-        direct_rows = load_actions_from_csv(ACTION_CSV_PATH)
-    else:
-        direct_rows = [list(r) for r in ACTION_ROWS]
-    if not direct_rows:
-        raise SystemExit(
-            "ACT_DIRECTLY=True but no actions: export your table to %s (7 numeric columns per row) "
-            "or set ACTION_ROWS in ik_ros_2.py." % ACTION_CSV_PATH
-        )
-    print("Running %d direct actions (table xyz in meters, z + %.3f m in move_to_grasp_goal)..." % (len(direct_rows), DELTA_TABLE))
-    for i, row in enumerate(direct_rows):
-        x_p, y_p, z_p, qx, qy, qz, qw = row
-        print("Direct step %d/%d:" % (i + 1, len(direct_rows)), row)
-        try:
-            execute_panda_pose_action(x_p, y_p, z_p, qx, qy, qz, qw, xyz_scale=1.0)
-            robot.wait_command()
-            time.sleep(2)
-        except Exception as e:
-            print("Execution error at row %d:" % (i + 1), e)
-else:
-    print("Each round: current pose is printed, then enter action: x y z qx qy qz qw (Panda/LIBERO, meters). Ctrl+C to exit.")
-    while True:
-        pose_4x4 = get_current_grasp_pose()
-        pose_8 = pose_4x4_to_8(pose_4x4)
-        print("Current pose (8):", ",".join("%g" % v for v in pose_8))
-        s = input("action > ").strip()
-        try:
-            vals = [float(x) for x in s.split()]
-            if len(vals) != 7:
-                print("Need exactly 7 numbers (x y z qx qy qz qw); try again.")
-                continue
-            x_p, y_p, z_p, qx, qy, qz, qw = vals
-            execute_panda_pose_action(x_p, y_p, z_p, qx, qy, qz, qw, xyz_scale=0.1)
-            robot.wait_command()
-            time.sleep(2)
-        except ValueError as e:
-            print("Parse error; enter 7 space-separated numbers.", e)
-        except Exception as e:
-            print("Execution error:", e)
+# ---------- 从 CSV 读取 Panda 空间 x y z qx qy qz qw 并顺序执行 ----------
+_actions_csv = Path(__file__).resolve().parent / "ik_ros_2_actions.csv"
+_actions = load_actions_from_csv(_actions_csv)
+print("共 %d 条 action，来源: %s" % (len(_actions), _actions_csv))
+for i, vals in enumerate(_actions, start=1):
+    pose_4x4 = get_current_grasp_pose()
+    pose_8 = pose_4x4_to_8(pose_4x4)
+    print("第 %d/%d 步 — 当前位姿 (8 位): %s" % (i, len(_actions), ",".join("%g" % v for v in pose_8)))
+    try:
+        x_p, y_p, z_p, qx, qy, qz, qw = vals
+        # CSV 已为米与四元数，不再做 ×0.1（交互输入曾用十分度）
+        target_point = list(panda_to_stretch_position(x_p, y_p, z_p))
+        target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
+        move_to_grasp_goal(target_point, target_orientation)
+        robot.wait_command()
+    except Exception as e:
+        print("第 %d 步执行出错: %s" % (i, e))
