@@ -90,27 +90,36 @@ def main():
     # from either a map or drive and repeat.
 
     # Would add here orientation coordinates after x and y
-    security_route = [[-6.677, 0.056, 0.21, 0.977],
-                      [-6.022, -1.43, -0.51, -1.43 ],
-                      [-4.13, 0.077, 0.204, 0.978], 
-                      [-2.76, 0.730, 0.277, 0.690]
-    ]
+    living_room_pt = [-6.2514, -0.85, 0.19, 0.98]
+    kitchen_pt = [-1.06, 1.45, 0.904, 0.426]
+    hallway_pt = [-3.33, 0.303, 0.2, 0.978]
+
+    locations = {
+        'living_room': living_room_pt,
+        'kitchen': kitchen_pt,
+        'hallway': hallway_pt
+        }
+    
+    security_route = [living_room_pt, kitchen_pt, hallway_pt] 
+    # from the llm query but should be sth like this 
+
+
     # Set our demo's initial pose
     initial_pose = PoseStamped()
     initial_pose.header.frame_id = 'map'
     initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-    initial_pose.pose.position.x = -6.41
-    initial_pose.pose.position.y = 0.052
-    initial_pose.pose.orientation.z = 0.183
-    initial_pose.pose.orientation.w = 0.891
+    initial_pose.pose.position.x = -6.2514
+    initial_pose.pose.position.y = -0.85
+    initial_pose.pose.orientation.z = 0.19
+    initial_pose.pose.orientation.w = 0.98
 
     navigator.setInitialPose(initial_pose)
     
     # Wait for navigation to fully activate
     navigator.waitUntilNav2Active()
-
+    last_cycle = False
     # Do security route until dead
-    while rclpy.ok():
+    while not last_cycle and rclpy.ok():
         # Send our route
         route_poses = []
         pose = PoseStamped()
@@ -129,6 +138,7 @@ def main():
 
             route_poses.append(deepcopy(pose))
         
+        last_cycle = True
         nav_start = navigator.get_clock().now()
         navigator.followWaypoints(route_poses)
 
