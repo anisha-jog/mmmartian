@@ -169,7 +169,8 @@ PANDA_TO_STRETCH_SCALE_Z = 1.0
 STRETCH_Z_REF = 0.5               # Fixed reference height for Stretch z (m)
 ARM_EXTEND_OFFSET = 0.29
 Z_OFFSET_CM = 0.42                # Extra z offset in mapping (m)
-DELTA_TABLE = 0.26                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
+#DELTA_TABLE = 0.26                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
+DELTA_TABLE = 0.0                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
 
 # If True: run all rows from ACTION_CSV_PATH (or ACTION_ROWS) once, then exit. If False: interactive input loop.
 ACT_DIRECTLY = True
