@@ -170,7 +170,7 @@ STRETCH_Z_REF = 0.5               # Fixed reference height for Stretch z (m)
 ARM_EXTEND_OFFSET = 0.29
 Z_OFFSET_CM = 0.42                # Extra z offset in mapping (m)
 #DELTA_TABLE = 0.26                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
-DELTA_TABLE = 0.0                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
+DELTA_TABLE = 0.25                # Added to goal z (m) in move_to_grasp_goal when add_table_delta=True
 
 # CSV / execute_panda_pose_action xyz interpretation:
 # - True (default): x,y,z are Panda/LIBERO frame (m); panda_to_stretch_position() subtracts PANDA_*_CENTER and maps to Stretch.
@@ -257,6 +257,7 @@ if ACT_DIRECTLY:
         try:
             execute_panda_pose_action(x_p, y_p, z_p, qx, qy, qz, qw, xyz_scale=1.0)
             robot.wait_command()
+            time.sleep(1)
         except Exception as e:
             print("Execution error at row %d:" % (i + 1), e)
 else:
