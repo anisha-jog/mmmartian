@@ -187,15 +187,26 @@ def panda_to_stretch_position(x_panda, y_panda, z_panda):
 
 
 def load_actions_from_csv(path):
-    """Load 7 floats per row (x,y,z,qx,qy,qz,qw). Skips non-numeric header lines."""
+    """Load 7 floats per row (x,y,z,qx,qy,qz,qw). Skips header / bad lines.
+
+    Excel paste often uses TABs between columns; csv.reader only splits on commas,
+    so tabbed rows become one cell and were silently dropped (IndexError).
+    """
     rows = []
     with open(path, newline="", encoding="utf-8-sig") as f:
-        for row in csv.reader(f):
-            if not row or not any(c.strip() for c in row):
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            if "\t" in line:
+                parts = [p.strip() for p in line.split("\t") if p.strip()]
+            else:
+                parts = [p.strip() for p in next(csv.reader([line])) if p.strip()]
+            if len(parts) < 7:
                 continue
             try:
-                vals = [float(row[i]) for i in range(7)]
-            except (ValueError, IndexError):
+                vals = [float(parts[i]) for i in range(7)]
+            except ValueError:
                 continue
             rows.append(vals)
     return rows
