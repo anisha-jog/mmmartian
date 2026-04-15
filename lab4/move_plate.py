@@ -117,9 +117,9 @@ def main():
     
     # Wait for navigation to fully activate
     navigator.waitUntilNav2Active()
-
+    last_cycle = False
     # Do security route until dead
-    while rclpy.ok():
+    while not last_cycle and rclpy.ok():
         # Send our route
         route_poses = []
         pose = PoseStamped()
@@ -138,6 +138,7 @@ def main():
 
             route_poses.append(deepcopy(pose))
         
+        last_cycle = True
         nav_start = navigator.get_clock().now()
         navigator.followWaypoints(route_poses)
 
