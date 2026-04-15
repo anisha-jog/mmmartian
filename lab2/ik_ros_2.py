@@ -57,7 +57,24 @@ for j in modified_urdf._joints:
 new_urdf_path = "/tmp/iktutorial/stretch.urdf"
 modified_urdf.save(new_urdf_path)
 
+# IK tuning (applied right after chain load)
+# Virtual prismatic joint_base_translation is only for modeling; letting IK optimize it makes the
+# base lunge forward/back between similar Cartesian targets. Lock it so only lift/arm/wrist move.
+IK_LOCK_VIRTUAL_BASE_X = True
+# Penalize joint change from initial_position (0 = off). Reduces IK “branch flips” between steps.
+IK_REGULARIZATION_PARAMETER = 0.03
+
 chain = ikpy.chain.Chain.from_urdf_file(new_urdf_path)
+if IK_LOCK_VIRTUAL_BASE_X:
+    _names = [link.name for link in chain.links]
+    if "joint_base_translation" in _names:
+        _i = _names.index("joint_base_translation")
+        _mask = np.array(chain.active_links_mask, copy=True)
+        _mask[_i] = False
+        chain.active_links_mask = _mask
+        print("* IK: joint_base_translation locked (base x not driven by IK). Set IK_LOCK_VIRTUAL_BASE_X=False if unreachable.")
+    else:
+        print("* IK: no joint_base_translation in chain; link names:", _names)
 for link in chain.links:
     print(f"* Link Name: {link.name}, Type: {link.joint_type}")
 
@@ -99,6 +116,17 @@ def move_to_configuration(q):
     robot.push_command()
 
 
+def _gripper_down_right_rotation():
+    """EE frame used for initial homing only (matches previous hard-coded IK target)."""
+    _inv_sqrt2 = 1.0 / np.sqrt(2.0)
+    approach = np.array([0.0, _inv_sqrt2, -_inv_sqrt2])
+    forward = np.array([1.0, 0.0, 0.0])
+    right = np.cross(approach, forward)
+    right = right / np.linalg.norm(right)
+    forward = np.cross(right, approach)
+    return np.column_stack((approach, right, forward)).astype(np.float64)
+
+
 def _clamp_to_chain_bounds(q):
     """Clamp joint values to each link's bounds in the chain."""
     q = np.array(q, dtype=np.float64)
@@ -109,21 +137,19 @@ def _clamp_to_chain_bounds(q):
 
 
 def move_to_grasp_goal(target_point, target_orientation_matrix, add_table_delta=True):
-    """target_point: (x,y,z). Gripper pose is fixed (down); uses full 3x3 + orientation_mode='all'."""
+    """target_point: (x,y,z) in Stretch base_link. target_orientation_matrix: 3x3 EE rotation (absolute)."""
     tp = np.asarray(target_point, dtype=np.float64).copy()
     if add_table_delta:
         tp[2] += DELTA_TABLE
     target_point = tp
     q_init = get_current_configuration()
-    # Gripper down and to the right: in base frame Y left, Z up, so "down-right" is (0, 1, -1) normalized
-    _inv_sqrt2 = 1.0 / np.sqrt(2.0)
-    approach = np.array([0.0, _inv_sqrt2, -_inv_sqrt2])   # down-right
-    forward = np.array([1.0, 0.0, 0.0])                    # forward
-    right = np.cross(approach, forward)
-    right = right / np.linalg.norm(right)
-    forward = np.cross(right, approach)
-    gripper_down_rotation = np.column_stack((approach, right, forward)).astype(np.float64)
-    q_soln = chain.inverse_kinematics(target_point, gripper_down_rotation, orientation_mode='all', initial_position=q_init)
+    R = np.asarray(target_orientation_matrix, dtype=np.float64).reshape(3, 3)
+    _ik_kw = {}
+    if IK_REGULARIZATION_PARAMETER and IK_REGULARIZATION_PARAMETER > 0.0:
+        _ik_kw["regularization_parameter"] = float(IK_REGULARIZATION_PARAMETER)
+    q_soln = chain.inverse_kinematics(
+        target_point, R, orientation_mode="all", initial_position=q_init, **_ik_kw
+    )
     print('Solution:', q_soln)
     q_use = _clamp_to_chain_bounds(q_soln)
     err = np.linalg.norm(chain.forward_kinematics(q_use)[:3, 3] - np.array(target_point))
@@ -226,7 +252,15 @@ def execute_panda_pose_action(x_p, y_p, z_p, qx, qy, qz, qw, *, xyz_scale):
         target_point = [float(x_p), float(y_p), float(z_p)]
     else:
         target_point = list(panda_to_stretch_position(x_p, y_p, z_p))
-    target_orientation = Rotation.from_quat([qx, qy, qz, qw]).as_matrix()
+    quat = np.array([qx, qy, qz, qw], dtype=np.float64)
+    n = np.linalg.norm(quat)
+    if n > 1e-9:
+        quat = quat / n
+    target_orientation = Rotation.from_quat(quat).as_matrix()
+    print(
+        "  target xyz (after map, m): %.4f %.4f %.4f | ACTION_XYZ_IS_STRETCH_BASE=%s"
+        % (target_point[0], target_point[1], target_point[2], ACTION_XYZ_IS_STRETCH_BASE)
+    )
     move_to_grasp_goal(target_point, target_orientation, add_table_delta=True)
 
 
@@ -237,9 +271,9 @@ _q_max = get_current_configuration()
 _q_max[3] = _lift_hi
 Z_TOP = float(chain.forward_kinematics(np.array(_q_max, dtype=np.float64))[2, 3])
 print("z_top = %.4f m (Stretch EE max height); homing to (0, 0, z_top)..." % Z_TOP)
-move_to_grasp_goal([0.0, 0.0, Z_TOP], np.eye(3), add_table_delta=False)
+move_to_grasp_goal([0.0, 0.0, Z_TOP], _gripper_down_right_rotation(), add_table_delta=False)
 robot.wait_command()
-print("Homed.")
+print("Homed. ACTION_XYZ_IS_STRETCH_BASE=%s — if motion is huge, try True when CSV xyz are already Stretch base_link (m)." % ACTION_XYZ_IS_STRETCH_BASE)
 time.sleep(2)
 
 if ACT_DIRECTLY:
