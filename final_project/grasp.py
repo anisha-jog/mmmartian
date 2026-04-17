@@ -39,6 +39,8 @@ class GraspNode(HelloNode):
         self.bridge = CvBridge()
         self.latest_head_frame = None
 
+        self._logger = self.get_logger()
+
     # ------------------------------------------------------------------ #
     #  Joint state tracking (unchanged from lab3)                          #
     # ------------------------------------------------------------------ #
