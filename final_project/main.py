@@ -29,6 +29,8 @@ from grasp import GraspNode
 #    ros2 launch stretch_core d435i_low_resolution.launch.py
 # using in-gripper camera:
 #    ros2 launch stretch_core d405_basic.launch.py
+# build a map: ros2 launch stretch_nav2 offline_mapping.launch.py teleop_type:=keyboard
+# save a map: ros2 run nav2_map_server map_saver_cli -f martian_map
 
 
 TASK = "Put the dishes in the sink."
@@ -50,7 +52,7 @@ def main():
 
 
     # For now, hardcode the expected route for the task above
-    route = ["KITCHEN"]
+    route = ["HALLWAY", "KITCHEN"]
     print(f"Route: {route}")
 
     # --- Step 2: Navigate to locations ---
