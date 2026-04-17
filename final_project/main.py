@@ -108,10 +108,10 @@ def main():
 
     # --- Step 4 & 5: Grasp + verify loop ---
     grasp_node = GraspNode()
-    grasp_node.main()
+    # grasp_node.main()
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
     grasp_thread.start()
-    grasp_node._initialized.wait()  # block until HelloNode.main() has finished and trajectory_client is ready
+    # grasp_node._initialized.wait()  # block until HelloNode.main() has finished and trajectory_client is ready
 
     grasp_success = False
     for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
