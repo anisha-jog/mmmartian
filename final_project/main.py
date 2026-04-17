@@ -94,8 +94,6 @@ def main():
     detector = ColorSegmentationDetector()
     print("Waiting for object detection...")
 
-    return
-
     elapsed = 0.0
     while detector.latest_goal_pose is None and elapsed < DETECT_TIMEOUT:
         rclpy.spin_once(detector, timeout_sec=0.1)
@@ -108,6 +106,8 @@ def main():
         rclpy.shutdown()
         return
     print(f"Object detected: {goal_pose.pose.position}")
+
+    return
 
     # --- Step 4 & 5: Grasp + verify loop ---
     grasp_node = GraspNode()
