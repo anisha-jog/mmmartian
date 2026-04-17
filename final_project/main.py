@@ -54,19 +54,7 @@ def main():
     # Call LLM and get response
     client = gemini_init()
     route_response = prompt_gemini(client, "loc", task=TASK)
-    route = route_response.text
-
-    all_text = []
-    # Iterate through all parts of the response
-    for part in route_response.candidates[0].content.parts:
-        # Check if the part has the 'text' attribute
-        if part.text:
-            all_text.append(part.text)
-
-    # Join all the text pieces together
-    final_text = "".join(all_text)
-    print(final_text)
-    route = final_text
+    route = [route_response.text]
     
     if route not in get_locations():
         print("Gemini response is not in the correct format. Proceeding with default location.")
