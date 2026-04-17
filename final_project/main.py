@@ -108,6 +108,7 @@ def main():
 
     # --- Step 4 & 5: Grasp + verify loop ---
     grasp_node = GraspNode()
+    grasp_node.main()
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
     grasp_thread.start()
     grasp_node._initialized.wait()  # block until HelloNode.main() has finished and trajectory_client is ready
