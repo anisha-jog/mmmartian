@@ -25,7 +25,7 @@ class GraspNode(HelloNode):
     """Listens for a goal pose and attempts a grasp using IK."""
 
     def __init__(self):
-        super().__init__('grasp_node')
+        super().__init__()
         self.delta = 0.03
         self.target_frame = 'base_link'
         self.gripper_frame = 'link_grasp_center'
@@ -38,8 +38,6 @@ class GraspNode(HelloNode):
         # Latest head camera frame for grasp verification
         self.bridge = CvBridge()
         self.latest_head_frame = None
-
-        self._logger = self.get_logger()
 
     # ------------------------------------------------------------------ #
     #  Joint state tracking (unchanged from lab3)                          #
