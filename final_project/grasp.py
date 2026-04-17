@@ -6,7 +6,7 @@
 # After grasp, signals main.py via a shared flag so grasp verification can run.
 
 import sys
-sys.path.insert(0, '/home/tiffany/mmmartian/lab3')
+sys.path.insert(0, '/homffany/mmmartian/lab3')
 
 import rclpy
 from rclpy.callback_groups import ReentrantCallbackGroup
