@@ -140,8 +140,6 @@ def main():
     grasp_success = False
     for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
         print(f"Grasp attempt {attempt}/{MAX_GRASP_ATTEMPTS}")
-        rclpy.shutdown()
-        print("rclpy shut down")
         grasp_node.reset_for_retry()
         print("grasp reset")
         grasp_node.goal_callback(goal_pose)
