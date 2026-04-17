@@ -9,6 +9,7 @@ Given the following list of locations and a task, provide the location(s) from t
 - KITCHEN
 - HALLWAY
 - LIVING ROOM
+Your response should only contain the list entry and no additional words (e.g. "KITCHEN").
 The robot is currently not in any of the locations on the list. The task is this:
 """
 
