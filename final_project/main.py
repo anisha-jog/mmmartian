@@ -23,6 +23,8 @@ from grasp import GraspNode
 
 # launch ROS:
 #    ros2 launch stretch_core stretch_driver.launch.py
+# load existing map (launches ROS automatically):
+#    ros2 launch stretch_nav2 navigation.launch.py map:=./maps/martian_ai_space.yaml
 # using head camera:
 #    ros2 launch stretch_core d435i_low_resolution.launch.py
 # using in-gripper camera:
