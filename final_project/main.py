@@ -136,6 +136,8 @@ def main():
         grasp_node.reset_for_retry()
         print("grasp reset")
         grasp_node.goal_callback(goal_pose)
+        print("grasp attempted")
+        print(grasp_node._grasp_done)
 
         if not grasp_node._grasp_done:
             print("Grasp did not complete, retrying.")
