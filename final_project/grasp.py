@@ -35,6 +35,7 @@ class GraspNode(HelloNode, Node):
         self.joint_states_lock = threading.Lock()
         self.joint_state = {}
         self._grasp_done = False
+        self._initialized = threading.Event()
 
         # Latest head camera frame for grasp verification
         self.bridge = CvBridge()
@@ -161,6 +162,7 @@ class GraspNode(HelloNode, Node):
 
         self.move_to_pose(ik.READY_POSE_P2, blocking=True)
         print("At ready pose.")
+        self._initialized.set()
 
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
