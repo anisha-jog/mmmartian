@@ -109,7 +109,6 @@ def main():
 
     # --- Step 4 & 5: Grasp + verify loop ---
     grasp_node = GraspNode()
-    grasp_node.init_node()
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
     grasp_thread.start()
     time.sleep(2.0)  # wait for grasp node to reach ready pose
