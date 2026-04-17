@@ -25,8 +25,7 @@ class GraspNode(HelloNode, Node):
     """Listens for a goal pose and attempts a grasp using IK."""
 
     def __init__(self):
-        Node.__init__(self, 'grasp_node')
-        HelloNode.__init__(self)
+        HelloNode.__init__(self)  # HelloNode.main() calls rclpy.init() + Node.__init__ itself
         self.delta = 0.03
         self.target_frame = 'base_link'
         self.gripper_frame = 'link_grasp_center'

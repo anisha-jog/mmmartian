@@ -99,19 +99,18 @@ def main():
         elapsed += 0.1
     goal_pose = detector.latest_goal_pose
     detector.destroy_node()
+    rclpy.shutdown()  # close first context so HelloNode.main() can call rclpy.init() cleanly
 
     if goal_pose is None:
         print("Object not detected within timeout, aborting.")
-        rclpy.shutdown()
         return
     print(f"Object detected: {goal_pose.pose.position}")
 
     # --- Step 4 & 5: Grasp + verify loop ---
     grasp_node = GraspNode()
-    # grasp_node.main()
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
     grasp_thread.start()
-    # grasp_node._initialized.wait()  # block until HelloNode.main() has finished and trajectory_client is ready
+    grasp_node._initialized.wait()  # block until HelloNode.main() finishes and trajectory_client is ready
 
     grasp_success = False
     for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
