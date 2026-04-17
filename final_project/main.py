@@ -120,7 +120,7 @@ def main():
         elapsed += 0.1
     goal_pose = detector.latest_goal_pose
     detector.destroy_node()
-    rclpy.shutdown()  # close first context so HelloNode.main() can call rclpy.init() cleanly
+    # rclpy.shutdown()  # close first context so HelloNode.main() can call rclpy.init() cleanly
 
     if goal_pose is None:
         print("Object not detected within timeout, aborting.")
@@ -140,6 +140,8 @@ def main():
     grasp_success = False
     for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
         print(f"Grasp attempt {attempt}/{MAX_GRASP_ATTEMPTS}")
+        rclpy.shutdown()
+        print("rclpy shut down")
         grasp_node.reset_for_retry()
         print("grasp reset")
         grasp_node.goal_callback(goal_pose)
