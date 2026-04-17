@@ -64,8 +64,14 @@ class GraspNode(HelloNode, Node):
 
     def get_goal_pose_in_base_frame(self, goal_msg):
         try:
+            # Stamp with time=0 so TF2 uses the latest available transform
+            # rather than extrapolating back to the original detection timestamp.
+            stamped = PoseStamped()
+            stamped.header.frame_id = goal_msg.header.frame_id
+            stamped.header.stamp = rclpy.time.Time().to_msg()
+            stamped.pose = goal_msg.pose
             return self.tf_buffer.transform(
-                goal_msg, self.target_frame,
+                stamped, self.target_frame,
                 rclpy.duration.Duration(seconds=1.0)
             )
         except Exception as e:
