@@ -70,21 +70,27 @@ def main():
     robot = stretch_body.robot.Robot()
     robot.startup()
 
-    # # --- Step 1: LLM route extraction ---
-    # # Call LLM and get response
-    client = gemini_init()
-    # route_response = prompt_gemini(client, "loc", task=TASK)
+    gemini_mode = False
 
-    # route = None
-    # if route_response is None:
-    #     print("No route selected. Proceeding with default location.")
-    #     route = ["KITCHEN"]
-    # else:
-    #     route = route_response.text
-    
-    #     if route not in get_locations():
-    #         print("Gemini response is not in the correct format. Proceeding with default location.")
-    #         route = "KITCHEN"
+    # --- Step 1: LLM route extraction ---
+    client = None
+    if gemini_mode:
+        # Call LLM and get response
+        client = gemini_init()
+        route_response = prompt_gemini(client, "loc", task=TASK)
+
+        route = None
+        if route_response is None:
+            print("No route selected. Proceeding with default location.")
+            route = ["KITCHEN"]
+        else:
+            route = route_response.text
+        
+            if route not in get_locations():
+                print("Gemini response is not in the correct format. Proceeding with default location.")
+                route = "KITCHEN"
+    else:
+        route = "KITCHEN"
 
     # # For now, hardcode the expected route for the task above
     # # route = ["HALLWAY", "KITCHEN"]
@@ -155,7 +161,7 @@ def main():
         head_frame = grasp_node.get_head_frame()
         if head_frame is None:
             print("No head camera frame available for grasp check.")
-        else:
+        elif gemini_mode:
             print("Asking Gemini if the object has been gripped...")
             grip_response = prompt_gemini(client, "grip", img=head_frame)
             grasp_success = True if grip_response == "YES" else False
@@ -188,7 +194,7 @@ def main():
     # open the gripper and release object over the drop location
     robot.end_of_arm.move_to('stretch_gripper', np.radians(100))
     robot.push_command()
-    robot.wait_command()
+    # robot.wait_command()
 
     rclpy.shutdown()
 
