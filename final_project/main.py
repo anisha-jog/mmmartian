@@ -50,43 +50,43 @@ def main():
     robot = stretch_body.robot.Robot()
     robot.startup()
 
-    # # --- Step 1: LLM route extraction ---
-    # # Call LLM and get response
-    # client = gemini_init()
-    # route_response = prompt_gemini(client, "loc", task=TASK)
+    # --- Step 1: LLM route extraction ---
+    # Call LLM and get response
+    client = gemini_init()
+    route_response = prompt_gemini(client, "loc", task=TASK)
 
-    # route = None
-    # if route_response is None:
-    #     print("No route selected. Proceeding with default location.")
-    #     route = ["KITCHEN"]
-    # else:
-    #     route = route_response.text
+    route = None
+    if route_response is None:
+        print("No route selected. Proceeding with default location.")
+        route = ["KITCHEN"]
+    else:
+        route = route_response.text
     
-    #     if route not in get_locations():
-    #         print("Gemini response is not in the correct format. Proceeding with default location.")
-    #         route = "KITCHEN"
+        if route not in get_locations():
+            print("Gemini response is not in the correct format. Proceeding with default location.")
+            route = "KITCHEN"
 
-    # # For now, hardcode the expected route for the task above
-    # # route = ["HALLWAY", "KITCHEN"]
-    # # print(f"Route: {route}")
+    # For now, hardcode the expected route for the task above
+    # route = ["HALLWAY", "KITCHEN"]
+    # print(f"Route: {route}")
 
-    # # --- Step 2: Navigate to locations ---
-    # success = navigate_to_locations([route])
-    # if not success:
-    #     print("Navigation failed, aborting.")
-    #     return
-    # print("Navigating / navigated to the kitchen!!")
+    # --- Step 2: Navigate to locations ---
+    success = navigate_to_locations([route])
+    if not success:
+        print("Navigation failed, aborting.")
+        return
+    print("Navigating / navigated to the kitchen!!")
 
-    # # --- Step 3: Detect object (sequential — spin until we get a pose) ---
+    # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
-    # print("Rotating head camera")
-    # # rotate head and camera
-    # robot.head.move_by('head_pan', np.radians(-90))
-    # robot.head.move_by('head_tilt', np.radians(-45))
-    # robot.push_command()
-    # # robot.wait_command()
+    print("Rotating head camera")
+    # rotate head and camera
+    robot.head.move_by('head_pan', np.radians(-90))
+    robot.head.move_by('head_tilt', np.radians(-45))
+    robot.push_command()
+    # robot.wait_command()
 
-    # print("Head camera rotated")
+    print("Head camera rotated")
     
     rclpy.init()
 
@@ -113,12 +113,11 @@ def main():
     grasp_thread.start()
     time.sleep(2.0)  # wait for grasp node to reach ready pose
 
-    return
-
     grasp_success = False
     for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
         print(f"Grasp attempt {attempt}/{MAX_GRASP_ATTEMPTS}")
         grasp_node.reset_for_retry()
+        print("grasp reset")
         grasp_node.goal_callback(goal_pose)
 
         if not grasp_node._grasp_done:

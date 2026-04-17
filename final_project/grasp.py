@@ -131,6 +131,7 @@ class GraspNode(HelloNode):
     def reset_for_retry(self):
         """Reset state so a new grasp attempt can be made."""
         self._grasp_done = False
+        print("moving grasp to retry")
         self.move_to_pose(ik.READY_POSE_P2, blocking=True)
 
     # ------------------------------------------------------------------ #
