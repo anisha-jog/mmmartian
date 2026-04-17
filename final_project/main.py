@@ -80,10 +80,10 @@ def main():
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
     print("Rotating head camera")
-    # # rotate head and camera
-    # robot.head.move_by('head_pan', np.radians(30))
-    # robot.head.move_by('head_tilt', np.radians(30))
-    # robot.push_command()
+    # rotate head and camera
+    robot.head.move_by('head_pan', np.radians(30))
+    robot.head.move_by('head_tilt', np.radians(30))
+    robot.push_command()
     # robot.wait_command()
 
     print("Head camera rotated")
