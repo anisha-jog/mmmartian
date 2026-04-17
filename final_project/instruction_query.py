@@ -29,10 +29,13 @@ def gemini_init():
 
 def prompt_gemini(client, mode, task="", img=None):
     prompt = None
-    if mode is "loc":
+    if mode == "loc":
         prompt = LOC_PROMPT + task
-    elif mode is "grip":
+    elif mode == "grip":
         prompt = [GRIP_PROMPT, img]
+    else:
+        print("Unrecognized mode. Aborting request.")
+        return
 
     print(prompt)
     print("=====================")

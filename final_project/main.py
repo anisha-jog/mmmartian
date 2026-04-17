@@ -21,6 +21,13 @@ from navigation import navigate_to_locations
 from color_segmentation import ColorSegmentationDetector
 from grasp import GraspNode
 
+# launch ROS:
+#    ros2 launch stretch_core stretch_driver.launch.py
+# using head camera:
+#    ros2 launch stretch_core d435i_low_resolution.launch.py
+# using in-gripper camera:
+#    ros2 launch stretch_core d405_basic.launch.py
+
 
 TASK = "Put the dishes in the sink."
 MAX_GRASP_ATTEMPTS = 3
@@ -92,7 +99,7 @@ def main():
         else:
             print("Asking Gemini if the object has been gripped...")
             grip_response = prompt_gemini(client, "grip", img=head_frame)
-            grasp_success = True if grip_response is "YES" else False
+            grasp_success = True if grip_response == "YES" else False
 
         # test
         grasp_success = True
