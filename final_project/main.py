@@ -54,18 +54,24 @@ def main():
     # Call LLM and get response
     client = gemini_init()
     route_response = prompt_gemini(client, "loc", task=TASK)
-    route = [route_response.text]
-    
-    if route not in get_locations():
-        print("Gemini response is not in the correct format. Proceeding with default location.")
+
+    route = None
+    if route_response is None:
+        print("No route selected. Proceeding with default location.")
         route = ["KITCHEN"]
+    else:
+        route = route_response.text
+    
+        if route not in get_locations():
+            print("Gemini response is not in the correct format. Proceeding with default location.")
+            route = "KITCHEN"
 
     # For now, hardcode the expected route for the task above
     # route = ["HALLWAY", "KITCHEN"]
     # print(f"Route: {route}")
 
     # --- Step 2: Navigate to locations ---
-    success = navigate_to_locations(route)
+    success = navigate_to_locations([route])
     if not success:
         print("Navigation failed, aborting.")
         return
