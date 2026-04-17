@@ -78,6 +78,13 @@ def main():
     print("Navigating / navigated to the kitchen!!")
 
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
+
+    # rotate head and camera
+    robot.head.move_by('head_pan', np.radians(30))
+    robot.head.move_by('head_tilt', np.radians(30))
+    robot.push_command()
+    robot.wait_command()
+    
     rclpy.init()
 
     detector = ColorSegmentationDetector()
@@ -110,12 +117,6 @@ def main():
         if not grasp_node._grasp_done:
             print("Grasp did not complete, retrying.")
             continue
-
-        # rotate head and camera
-        robot.head.move_by('head_pan', np.radians(30))
-        robot.head.move_by('head_tilt', np.radians(30))
-        robot.push_command()
-        robot.wait_command()
 
         # --- Step 5: VLM grasp check ---
         head_frame = grasp_node.get_head_frame()
