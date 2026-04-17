@@ -19,6 +19,7 @@ from sensor_msgs.msg import JointState, Image
 from cv_bridge import CvBridge
 import ik_ros_utils as ik
 import ikpy
+from color_segmentation import segment_by_color
 
 
 class GraspNode(HelloNode, Node):
@@ -39,6 +40,7 @@ class GraspNode(HelloNode, Node):
         # Latest head camera frame for grasp verification
         self.bridge = CvBridge()
         self.latest_head_frame = None
+        self.latest_centroid = None  # (x, y) pixel from color segmentation
 
     # ------------------------------------------------------------------ #
     #  Joint state tracking (unchanged from lab3)                          #
@@ -87,7 +89,10 @@ class GraspNode(HelloNode, Node):
 
     def _head_camera_callback(self, msg):
         try:
-            self.latest_head_frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            self.latest_head_frame = frame
+            centroid, _ = segment_by_color(frame)
+            self.latest_centroid = centroid  # (x, y) or None
         except Exception as e:
             self.get_logger().warn(f'Head camera frame error: {e}')
 

@@ -47,12 +47,19 @@ def run_grasp_node(grasp_node):
 
 
 def stream_head_camera(grasp_node, stop_event):
-    """Display head camera frames in a cv2 window until stop_event is set."""
+    """Display head camera frames with segmentation centroid overlay until stop_event is set."""
     cv2.namedWindow('Head Camera', cv2.WINDOW_NORMAL)
     while not stop_event.is_set():
         frame = grasp_node.get_head_frame()
         if frame is not None:
-            cv2.imshow('Head Camera', frame)
+            display = frame.copy()
+            centroid = grasp_node.latest_centroid
+            if centroid is not None:
+                cx, cy = centroid
+                cv2.circle(display, (cx, cy), 8, (0, 255, 0), -1)
+                cv2.drawMarker(display, (cx, cy), (0, 255, 0),
+                               cv2.MARKER_CROSS, 20, 2)
+            cv2.imshow('Head Camera', display)
         if cv2.waitKey(30) & 0xFF == ord('q'):
             stop_event.set()
             break
