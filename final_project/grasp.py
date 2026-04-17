@@ -68,8 +68,8 @@ class GraspNode(HelloNode, Node):
                 goal_msg, self.target_frame,
                 rclpy.duration.Duration(seconds=1.0)
             )
-        except Exception:
-            print("Error transforming goal pose")
+        except Exception as e:
+            print("Error transforming goal pose:", e)
             return None
 
     def get_gripper_pose_in_base_frame(self):
