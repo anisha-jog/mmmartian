@@ -120,7 +120,7 @@ def main():
         elapsed += 0.1
     goal_pose = detector.latest_goal_pose
     detector.destroy_node()
-    # rclpy.shutdown()  # close first context so HelloNode.main() can call rclpy.init() cleanly
+    rclpy.shutdown()  # close first context so HelloNode.main() can call rclpy.init() cleanly
 
     if goal_pose is None:
         print("Object not detected within timeout, aborting.")
