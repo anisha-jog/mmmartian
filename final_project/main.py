@@ -17,9 +17,12 @@ import time
 import rclpy
 
 from instruction_query import gemini_init, prompt_gemini
-from navigation import navigate_to_locations
+from navigation import navigate_to_locations, get_locations
 from color_segmentation import ColorSegmentationDetector
 from grasp import GraspNode
+
+import stretch_body.robot
+import numpy as np
 
 # launch ROS:
 #    ros2 launch stretch_core stretch_driver.launch.py
@@ -44,16 +47,21 @@ def run_grasp_node(grasp_node):
 
 
 def main():
-    # --- Step 1: LLM route extraction ---
-    # TODO: Call LLM and get response 
-    client = gemini_init()
-    route_response = prompt_gemini(client, "loc", task=TASK)
-    # TODO: parse route_response.text into an ordered list of location names
+    robot = stretch_body.robot.Robot()
+    robot.startup()
 
+    # --- Step 1: LLM route extraction ---
+    # Call LLM and get response
+    client = gemini_init()
+    route = prompt_gemini(client, "loc", task=TASK)
+    
+    if route not in get_locations():
+        print("Gemini response is not in the correct format. Proceeding with default location.")
+        route = ["KITCHEN"]
 
     # For now, hardcode the expected route for the task above
-    route = ["HALLWAY", "KITCHEN"]
-    print(f"Route: {route}")
+    # route = ["HALLWAY", "KITCHEN"]
+    # print(f"Route: {route}")
 
     # --- Step 2: Navigate to locations ---
     success = navigate_to_locations(route)
@@ -96,6 +104,12 @@ def main():
             print("Grasp did not complete, retrying.")
             continue
 
+        # rotate head and camera
+        robot.head.move_by('head_pan', np.radians(30))
+        robot.head.move_by('head_tilt', np.radians(30))
+        robot.push_command()
+        robot.wait_command()
+
         # --- Step 5: VLM grasp check ---
         head_frame = grasp_node.get_head_frame()
         if head_frame is None:
@@ -107,6 +121,7 @@ def main():
 
         # test
         grasp_success = True
+        
         if grasp_success:
             print("Grasp verified! Proceeding to drop.")
             break
@@ -120,7 +135,19 @@ def main():
     # --- Step 6: Drop object at destination (stub) ---
     # grasp_node.move_to_drop_location()
     # grasp_node.release_object()
-    print("TODO: implement drop-off step.")
+
+    # move to drop location
+    deposit_pt = ["SINK"]
+    success_2 = navigate_to_locations(deposit_pt)
+    if not success_2:
+        print("Navigation failed, aborting.")
+        return
+    print("Navigating / navigated to the sink!!")
+
+    # open the gripper and release object over the drop location
+    robot.end_of_arm.move_to('stretch_gripper', np.radians(100))
+    robot.push_command()
+    robot.wait_command()
 
     rclpy.shutdown()
 
