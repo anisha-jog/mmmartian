@@ -18,7 +18,7 @@ You are a Stretch 3 robot that is trying to grab an object. Given this image tak
 Give your answer as YES or NO.
 """
 
-img = cv2.imread('grip.png')
+GRIP_IMG = cv2.imread('grip.png')
 
 def gemini_init():
     # read your key from a text file. don't commit this! the repo is public.
@@ -28,7 +28,13 @@ def gemini_init():
     # Initialize Gemini API
     return genai.Client(api_key=API_KEY)
 
-def prompt_gemini(client, prompt):
+def prompt_gemini(client, mode):
+    prompt = None
+    if mode is "loc":
+        prompt = LOC_PROMPT
+    elif mode is "grip":
+        prompt = [GRIP_PROMPT, GRIP_IMG]
+
     print(prompt)
     print("=====================")
 
