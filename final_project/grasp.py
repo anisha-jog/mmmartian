@@ -129,7 +129,12 @@ class GraspNode(HelloNode, Node):
         if q_soln is None:
             return
 
+        print("Moving to grasp pose")
         ik.move_to_configuration(self, q_soln.copy())
+
+        print("move to config called", q_soln.copy())
+
+        print("Closing gripper")
         self.move_to_pose({'gripper_aperture': 0.0}, blocking=True)
 
         with self.joint_states_lock:
