@@ -72,7 +72,7 @@ def main():
 
     # # --- Step 1: LLM route extraction ---
     # # Call LLM and get response
-    # client = gemini_init()
+    client = gemini_init()
     # route_response = prompt_gemini(client, "loc", task=TASK)
 
     # route = None
