@@ -53,7 +53,8 @@ def main():
     # --- Step 1: LLM route extraction ---
     # Call LLM and get response
     client = gemini_init()
-    route = prompt_gemini(client, "loc", task=TASK)
+    route_response = prompt_gemini(client, "loc", task=TASK)
+    route = route_response.text
     
     if route not in get_locations():
         print("Gemini response is not in the correct format. Proceeding with default location.")
@@ -121,7 +122,7 @@ def main():
 
         # test
         grasp_success = True
-        
+
         if grasp_success:
             print("Grasp verified! Proceeding to drop.")
             break
