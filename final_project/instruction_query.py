@@ -1,15 +1,9 @@
 from google import genai
-import io
-import os
-import sys
+import cv2
 
 API_KEY = "[YOUR KEY]"
 
-# read your key from a text file. don't commit this! the repo is public.
-with open("api_key.txt", "r") as file:
-    API_KEY = file.read()
-
-PROMPT = """
+LOC_PROMPT = """
 You are a robot meant to help with household tasks.
 Given the following list of locations and a task, provide the location(s) from this list that the robot should move to in order to complete the task:
 - KITCHEN
@@ -19,30 +13,42 @@ The robot is currently not in any of the locations on the list. The task is this
 "Put the dishes in the sink."
 """
 
-# module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../tests'))
-# sys.path.insert(0, module_dir)
+GRIP_PROMPT = """
+You are a Stretch 3 robot that is trying to grab an object. Given this image taken from a camera mounted on the gripper, determine whether or not the gripper has successfully grasped the object.
+Give your answer as YES or NO.
+"""
 
-# Initialize Gemini API
-client = genai.Client(api_key=API_KEY)
+img = cv2.imread('grip.png')
 
-print(PROMPT)
-print("=====================")
+def gemini_init():
+    # read your key from a text file. don't commit this! the repo is public.
+    with open("api_key.txt", "r") as file:
+        API_KEY = file.read()
 
-print("Sending to Gemini... this may take a moment.")
-try:
-    # Send the prompt and the image to the model
-    response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=PROMPT
-    )
+    # Initialize Gemini API
+    return genai.Client(api_key=API_KEY)
 
-    print("------------------------------------------------")
+def prompt_gemini(client, prompt):
+    print(prompt)
+    print("=====================")
 
-    # Try to print text for debugging
+    print("Sending to Gemini... this may take a moment.")
     try:
-        print(f"   Response text: {response.text}")
-    except Exception:
-        pass # No text part
+        # Send the prompt and the image to the model
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
 
-except Exception as e:
-    print(f"An error occurred with the Gemini API: {e}")
+        print("------------------------------------------------")
+
+        # Try to print text for debugging
+        try:
+            print(f"   Response text: {response.text}")
+        except Exception:
+            pass # No text part
+
+        return response
+
+    except Exception as e:
+        print(f"An error occurred with the Gemini API: {e}")
