@@ -25,7 +25,7 @@ class GraspNode(HelloNode):
     """Listens for a goal pose and attempts a grasp using IK."""
 
     def __init__(self):
-        super().__init__()
+        super().__init__('grasp_node')
         self.delta = 0.03
         self.target_frame = 'base_link'
         self.gripper_frame = 'link_grasp_center'
