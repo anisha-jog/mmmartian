@@ -107,13 +107,13 @@ def main():
         return
     print(f"Object detected: {goal_pose.pose.position}")
 
-    return
-
     # --- Step 4 & 5: Grasp + verify loop ---
     grasp_node = GraspNode()
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
     grasp_thread.start()
     time.sleep(2.0)  # wait for grasp node to reach ready pose
+
+    return
 
     grasp_success = False
     for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
