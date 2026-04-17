@@ -113,3 +113,6 @@ def navigate_to_locations(location_names: list[str], timeout_s: float = 600.0):
     else:
         print("Navigation failed.")
         return False
+
+def get_locations():
+    return LOCATIONS.keys()

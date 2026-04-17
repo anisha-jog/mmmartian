@@ -12,7 +12,7 @@ import rclpy
 from rclpy.callback_groups import ReentrantCallbackGroup
 import numpy as np
 from geometry_msgs.msg import PoseStamped
-from hello_helpers.hello_misc import HelloNode
+from hello_helpers.hello_misc import HelloNode, Node
 import threading
 import tf2_ros
 from sensor_msgs.msg import JointState, Image
@@ -21,10 +21,11 @@ import ik_ros_utils as ik
 import ikpy
 
 
-class GraspNode(HelloNode):
+class GraspNode(HelloNode, Node):
     """Listens for a goal pose and attempts a grasp using IK."""
 
     def __init__(self):
+        Node.__init__(self, 'grasp_node')
         HelloNode.__init__(self)
         self.delta = 0.03
         self.target_frame = 'base_link'
@@ -131,6 +132,7 @@ class GraspNode(HelloNode):
     def reset_for_retry(self):
         """Reset state so a new grasp attempt can be made."""
         self._grasp_done = False
+        print("moving grasp to retry")
         self.move_to_pose(ik.READY_POSE_P2, blocking=True)
 
     # ------------------------------------------------------------------ #
