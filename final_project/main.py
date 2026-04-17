@@ -139,6 +139,8 @@ def main():
     camera_thread.start()
 
     grasp_success = False
+    grasp_node.reset_for_retry()
+    
     for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
         print(f"Grasp attempt {attempt}/{MAX_GRASP_ATTEMPTS}")
         grasp_node.reset_for_retry()

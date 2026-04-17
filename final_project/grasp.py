@@ -135,13 +135,17 @@ class GraspNode(HelloNode, Node):
         print("move to config called", q_soln.copy())
 
         print("Closing gripper")
-        self.move_to_pose({'gripper_aperture': 0.0}, blocking=True)
+        self.move_to_pose({'gripper_aperture': -0.2}, blocking=True)
+        print("Gripper closed")
 
         with self.joint_states_lock:
             lift = self.joint_state.get('joint_lift', 0.8)
             arm = self.joint_state.get('joint_arm_l0', 0.0)
+        print(f"Lifting: {lift:.3f} -> {min(1.1, lift + 0.15):.3f}")
         self.move_to_pose({'joint_lift': min(1.1, lift + 0.15)}, blocking=True)
+        print(f"Retracting arm: {arm:.3f} -> {max(0.0, arm - 0.12):.3f}")
         self.move_to_pose({'joint_arm': max(0.0, arm - 0.12)}, blocking=True)
+        print("Grasp sequence complete")
 
         self._grasp_done = True
 
