@@ -55,6 +55,8 @@ def main():
     client = gemini_init()
     route_response = prompt_gemini(client, "loc", task=TASK)
     route = route_response.text
+
+    print(route)
     
     if route not in get_locations():
         print("Gemini response is not in the correct format. Proceeding with default location.")
