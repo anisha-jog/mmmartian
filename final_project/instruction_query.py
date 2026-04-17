@@ -10,15 +10,14 @@ Given the following list of locations and a task, provide the location(s) from t
 - HALLWAY
 - LIVING ROOM
 The robot is currently not in any of the locations on the list. The task is this:
-"Put the dishes in the sink."
 """
 
 GRIP_PROMPT = """
-You are a Stretch 3 robot that is trying to grab an object. Given this image taken from a camera mounted on the gripper, determine whether or not the gripper has successfully grasped the object.
+You are a Stretch 3 robot that is trying to grab an object. Given this image taken from a camera mounted on the head of the robot, determine whether or not the robot's gripper has successfully grasped the object.
 Give your answer as YES or NO.
 """
 
-GRIP_IMG = cv2.imread('grip.png')
+# GRIP_IMG = cv2.imread('grip.png')
 
 def gemini_init():
     # read your key from a text file. don't commit this! the repo is public.
@@ -28,12 +27,12 @@ def gemini_init():
     # Initialize Gemini API
     return genai.Client(api_key=API_KEY)
 
-def prompt_gemini(client, mode):
+def prompt_gemini(client, mode, task="", img=None):
     prompt = None
     if mode is "loc":
-        prompt = LOC_PROMPT
+        prompt = LOC_PROMPT + task
     elif mode is "grip":
-        prompt = [GRIP_PROMPT, GRIP_IMG]
+        prompt = [GRIP_PROMPT, img]
 
     print(prompt)
     print("=====================")

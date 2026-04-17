@@ -35,8 +35,8 @@ def run_grasp_node(grasp_node):
 def main():
     # --- Step 1: LLM route extraction ---
     # TODO: Call LLM and get response 
-    # client = gemini_init()
-    # route_response = prompt_gemini(client, "loc")
+    client = gemini_init()
+    route_response = prompt_gemini(client, "loc", task=TASK)
     # TODO: parse route_response.text into an ordered list of location names
 
 
@@ -75,6 +75,7 @@ def main():
     grasp_thread.start()
     time.sleep(2.0)  # wait for grasp node to reach ready pose
 
+    grasp_success = False
     for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
         print(f"Grasp attempt {attempt}/{MAX_GRASP_ATTEMPTS}")
         grasp_node.reset_for_retry()
@@ -88,15 +89,13 @@ def main():
         head_frame = grasp_node.get_head_frame()
         if head_frame is None:
             print("No head camera frame available for grasp check.")
-            grasp_success = False
         else:
-            # grasp_response = prompt_gemini(client, "grip")
-            # TODO:  check_grasp(client, head_frame)
-        
-            # grasp_success = "YES" or sth similar or has Yes in the string
+            print("Asking Gemini if the object has been gripped...")
+            grip_response = prompt_gemini(client, "grip", img=head_frame)
+            grasp_success = True if grip_response is "YES" else False
 
-            grasp_success = True # TODO: just run it once for now for testing 
-
+        # test
+        grasp_success = True
         if grasp_success:
             print("Grasp verified! Proceeding to drop.")
             break
