@@ -13,6 +13,7 @@
 
 import threading
 
+import cv2
 import rclpy
 
 from instruction_query import gemini_init, prompt_gemini
@@ -43,6 +44,19 @@ DETECT_TIMEOUT = 30.0  # seconds to wait for a valid detection
 def run_grasp_node(grasp_node):
     grasp_node.main()
     grasp_node.new_thread.join()
+
+
+def stream_head_camera(grasp_node, stop_event):
+    """Display head camera frames in a cv2 window until stop_event is set."""
+    cv2.namedWindow('Head Camera', cv2.WINDOW_NORMAL)
+    while not stop_event.is_set():
+        frame = grasp_node.get_head_frame()
+        if frame is not None:
+            cv2.imshow('Head Camera', frame)
+        if cv2.waitKey(30) & 0xFF == ord('q'):
+            stop_event.set()
+            break
+    cv2.destroyAllWindows()
 
 
 def main():
@@ -111,6 +125,10 @@ def main():
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
     grasp_thread.start()
     grasp_node._initialized.wait()  # block until HelloNode.main() finishes and trajectory_client is ready
+
+    camera_stop = threading.Event()
+    camera_thread = threading.Thread(target=stream_head_camera, args=(grasp_node, camera_stop), daemon=True)
+    camera_thread.start()
 
     grasp_success = False
     for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):

@@ -28,7 +28,7 @@ class GraspNode(HelloNode, Node):
         HelloNode.__init__(self)  # HelloNode.main() calls rclpy.init() + Node.__init__ itself
         self.delta = 0.03
         self.target_frame = 'base_link'
-        self.gripper_frame = 'link_grasp_center'
+        self.gripper_frame = 'link_head_nav_cam'
         self.tf_buffer = None
         self.tf_listener = None
         self.joint_states_lock = threading.Lock()
