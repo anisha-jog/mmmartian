@@ -77,24 +77,25 @@ def main():
     #     return
     # print("Navigating / navigated to the kitchen!!")
 
-    # --- Step 3: Detect object (sequential — spin until we get a pose) ---
+    # # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
-    print("Rotating head camera")
-    # rotate head and camera
-    robot.head.move_by('head_pan', np.radians(-90))
-    robot.head.move_by('head_tilt', np.radians(-45))
-    robot.push_command()
-    # robot.wait_command()
+    # print("Rotating head camera")
+    # # rotate head and camera
+    # robot.head.move_by('head_pan', np.radians(-90))
+    # robot.head.move_by('head_tilt', np.radians(-45))
+    # robot.push_command()
+    # # robot.wait_command()
 
-    print("Head camera rotated")
-
-    return
+    # print("Head camera rotated")
     
     rclpy.init()
 
     print("Starting color segmentation")
     detector = ColorSegmentationDetector()
     print("Waiting for object detection...")
+
+    return
+
     elapsed = 0.0
     while detector.latest_goal_pose is None and elapsed < DETECT_TIMEOUT:
         rclpy.spin_once(detector, timeout_sec=0.1)
