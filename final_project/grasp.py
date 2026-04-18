@@ -20,6 +20,7 @@ from cv_bridge import CvBridge
 import ik_ros_utils as ik
 import ikpy
 from color_segmentation import segment_by_color
+import time
 
 
 class GraspNode(HelloNode, Node):
@@ -167,6 +168,12 @@ class GraspNode(HelloNode, Node):
             arm = self.joint_state.get('joint_arm_l0', 0.0)
         print(f"Extending arm: {arm:.3f} -> {min(110.0, arm + 0.5):.3f}")
         self.move_to_pose({'joint_arm': min(110.0, arm + 0.5)}, blocking=True)
+
+        print("switching to position mode")
+        self.switch_to_position_mode()
+        print("sleeping")
+        time.sleep(2.0)
+
         print("Opening gripper")
         self.move_to_pose({'gripper_aperture': np.radians(100)}, blocking=True)
 
