@@ -163,13 +163,13 @@ def main():
             continue
 
         # --- Step 5: VLM grasp check ---
-        # head_frame = grasp_node.get_head_frame()
-        # if head_frame is None:
-        #     print("No head camera frame available for grasp check.")
-        # elif gemini_mode:
-        #     print("Asking Gemini if the object has been gripped...")
-        #     grip_response = prompt_gemini(client, "grip", img=head_frame)
-        #     grasp_success = True if grip_response == "YES" else False
+        head_frame = grasp_node.get_head_frame()
+        if head_frame is None:
+            print("No head camera frame available for grasp check.")
+        elif gemini_mode:
+            print("Asking Gemini if the object has been gripped...")
+            grip_response = prompt_gemini(client, "grip", img=head_frame)
+            grasp_success = True if grip_response == "YES" else False
 
         # test
         grasp_success = True
@@ -198,11 +198,14 @@ def main():
     print("Navigating / navigated to the sink!!")
 
     # open the gripper and release object over the drop location
+    # extend arm
+    robot.arm.move_to(0.5)
+    robot.push_command()
     robot.end_of_arm.move_to('stretch_gripper', np.radians(100))
     robot.push_command()
     # robot.wait_command()
 
-    rclpy.shutdown()
+    # rclpy.shutdown()
 
 
 if __name__ == '__main__':
