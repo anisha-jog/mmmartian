@@ -195,11 +195,14 @@ def main():
     print("Navigating / navigated to the sink!!")
 
     # open the gripper and release object over the drop location
+    # extend arm
+    robot.arm.move_to(0.5)
+    robot.push_command()
     robot.end_of_arm.move_to('stretch_gripper', np.radians(100))
     robot.push_command()
     # robot.wait_command()
 
-    rclpy.shutdown()
+    # rclpy.shutdown()
 
 
 if __name__ == '__main__':
