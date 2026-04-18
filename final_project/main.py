@@ -70,7 +70,6 @@ def stream_head_camera(grasp_node, stop_event):
 def main():
     robot = stretch_body.robot.Robot()
     robot.startup()
-    robot.home()
 
     gemini_mode = False
 
@@ -99,7 +98,6 @@ def main():
     # # print(f"Route: {route}")
 
     # # --- Step 2: Navigate to locations ---
-    # rclpy.init()
     # success = navigate_to_locations([route])
     # if not success:
     #     print("Navigation failed, aborting.")
@@ -111,7 +109,7 @@ def main():
     print("Rotating head camera")
     # rotate head and camera
     robot.head.move_by('head_pan', np.radians(-90))
-    robot.head.move_by('head_tilt', np.radians(-45))
+    robot.head.move_by('head_tilt', np.radians(-75))
     robot.push_command()
 
     print("Head camera rotated")
@@ -135,7 +133,7 @@ def main():
         return
     print(f"Object detected: {goal_pose.pose.position}")
 
-    # # --- Step 4 & 5: Grasp + verify loop ---
+    # --- Step 4 & 5: Grasp + verify loop ---
     grasp_node = GraspNode()
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
     grasp_thread.start()
@@ -163,13 +161,13 @@ def main():
             continue
 
         # --- Step 5: VLM grasp check ---
-        # head_frame = grasp_node.get_head_frame()
-        # if head_frame is None:
-        #     print("No head camera frame available for grasp check.")
-        # elif gemini_mode:
-        #     print("Asking Gemini if the object has been gripped...")
-        #     grip_response = prompt_gemini(client, "grip", img=head_frame)
-        #     grasp_success = True if grip_response == "YES" else False
+        head_frame = grasp_node.get_head_frame()
+        if head_frame is None:
+            print("No head camera frame available for grasp check.")
+        elif gemini_mode:
+            print("Asking Gemini if the object has been gripped...")
+            grip_response = prompt_gemini(client, "grip", img=head_frame)
+            grasp_success = True if grip_response == "YES" else False
 
         # test
         grasp_success = True
@@ -190,7 +188,6 @@ def main():
 
     # move to drop location
     deposit_pt = ["SINK"]
-    grasp_node.switch_to_navigation_mode()
     success_2 = navigate_to_locations(deposit_pt)
     if not success_2:
         print("Navigation failed, aborting.")

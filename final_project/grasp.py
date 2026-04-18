@@ -110,6 +110,7 @@ class GraspNode(HelloNode, Node):
     #  Grasp execution (adapted from lab3)                                 #
     # ------------------------------------------------------------------ #
 
+
     def goal_callback(self, goal_msg):
         if self._grasp_done:
             return
