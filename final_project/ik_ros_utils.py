@@ -174,7 +174,7 @@ def move_to_configuration(node, q):
     #   your implementation from lab 2 - unpack the q solution to appropriate ros2 joints and command the robot joints to move accordingly
     q_base_rotation = q[1]
     q_base = q[2] + 0.1
-    q_lift = q[4] + 0.045  # add a small offset to ensure we lift above the table
+    q_lift = q[4] + 0.04  # add a small offset to ensure we lift above the table
     q_arm = q[6] + q[7] + q[8] + q[9]
     q_yaw = q[10]
     q_pitch = q[12]

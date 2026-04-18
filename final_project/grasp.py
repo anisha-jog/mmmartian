@@ -170,6 +170,9 @@ class GraspNode(HelloNode, Node):
         self.move_to_pose({'joint_arm': min(110.0, arm + 0.5)}, blocking=True)
 
         print("switching to position mode")
+        print("sleeping")
+        time.sleep(2.0)
+        print("position")
         self.switch_to_position_mode()
         print("sleeping")
         time.sleep(2.0)
