@@ -160,9 +160,14 @@ class GraspNode(HelloNode, Node):
     #  Downstream tasks (stubs)                                            #
     # ------------------------------------------------------------------ #
 
-    def move_to_drop_location(self):
+    def extend_and_drop(self):
         """TODO: Navigate arm/base to sink drop position."""
-        raise NotImplementedError
+        with self.joint_states_lock:
+            arm = self.joint_state.get('joint_arm_l0', 0.0)
+        print(f"Extending arm: {arm:.3f} -> {min(110.0, arm + 0.5):.3f}")
+        self.move_to_pose({'joint_arm': min(110.0, arm + 0.5)}, blocking=True)
+        print("Opening gripper")
+        self.move_to_pose({'gripper_aperture': np.radians(100)}, blocking=True)
 
     def release_object(self):
         """TODO: Open gripper to release the grasped object."""
