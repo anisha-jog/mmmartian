@@ -196,11 +196,14 @@ def main():
 
     # open the gripper and release object over the drop location
     # extend arm
-    robot.arm.move_to(0.5)
-    robot.push_command()
-    robot.end_of_arm.move_to('stretch_gripper', np.radians(100))
-    robot.push_command()
+    # robot.arm.move_to(0.5)
+    # robot.push_command()
+    # robot.end_of_arm.move_to('stretch_gripper', np.radians(100))
+    # robot.push_command()
     # robot.wait_command()
+
+    grasp_node.switch_to_position_mode()
+    grasp_node.extend_and_drop()
 
     # rclpy.shutdown()
 
