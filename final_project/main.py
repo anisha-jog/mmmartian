@@ -203,6 +203,9 @@ def main():
     # robot.wait_command()
 
     grasp_node.switch_to_position_mode()
+    time.sleep(2.0)
+    print("Switched mode and slept, Extending arm and dropping object")
+
     grasp_node.extend_and_drop()
 
     # rclpy.shutdown()
