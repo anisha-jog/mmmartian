@@ -178,7 +178,7 @@ class GraspNode(HelloNode, Node):
         # time.sleep(2.0)
 
         print("Opening gripper")
-        self.move_to_pose({'gripper_aperture': np.radians(100)}, blocking=True)
+        self.move_to_pose({'gripper_aperture': np.radians(100)}, blocking=False)
 
     def release_object(self):
         """TODO: Open gripper to release the grasped object."""
