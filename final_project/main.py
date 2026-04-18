@@ -70,6 +70,7 @@ def stream_head_camera(grasp_node, stop_event):
 def main():
     robot = stretch_body.robot.Robot()
     robot.startup()
+    robot.home()
 
     gemini_mode = False
 
