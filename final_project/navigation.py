@@ -63,7 +63,7 @@ def _make_pose(navigator, pt):
 
 def navigate_to_locations(location_names: list[str], timeout_s: float = 600.0):
 
-    rclpy.init()
+    # rclpy.init()
     navigator = BasicNavigator()
 
     # Set initial pose

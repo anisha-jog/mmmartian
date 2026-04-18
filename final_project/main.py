@@ -98,6 +98,7 @@ def main():
     # # print(f"Route: {route}")
 
     # # --- Step 2: Navigate to locations ---
+    # rclpy.init()
     # success = navigate_to_locations([route])
     # if not success:
     #     print("Navigation failed, aborting.")
