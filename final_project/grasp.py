@@ -165,6 +165,9 @@ class GraspNode(HelloNode, Node):
     def extend_and_drop(self):
         """TODO: Navigate arm/base to sink drop position."""
         print("switching to position mode")
+        print("sleeping")
+        time.sleep(2.0)
+        print("position")
         self.switch_to_position_mode()
         print("sleeping")
         time.sleep(2.0)
