@@ -173,8 +173,6 @@ class GraspNode(HelloNode, Node):
 
     def main(self):
         HelloNode.main(self, 'grasp_node', 'grasp_node', wait_for_first_pointcloud=False)
-        # trajectory_client is now set up — signal main.py it's safe to proceed
-        self._initialized.set()
         self.callback_group = ReentrantCallbackGroup()
         self.create_subscription(
             JointState, '/stretch/joint_states', self.joint_states_callback, 1)
@@ -185,6 +183,9 @@ class GraspNode(HelloNode, Node):
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
         self.create_subscription(
             PoseStamped, '/object_detector/goal_pose', self.goal_callback, 10)
+
+        # Signal only after subscriptions and TF are fully set up
+        self._initialized.set()
 
 
 if __name__ == '__main__':
