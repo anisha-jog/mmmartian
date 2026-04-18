@@ -29,7 +29,7 @@ class GraspNode(HelloNode, Node):
         HelloNode.__init__(self)  # HelloNode.main() calls rclpy.init() + Node.__init__ itself
         self.delta = 0.03
         self.target_frame = 'base_link'
-        self.gripper_frame = 'link_head_nav_cam'
+        self.gripper_frame = 'link_grasp_center'
         self.tf_buffer = None
         self.tf_listener = None
         self.joint_states_lock = threading.Lock()
@@ -121,6 +121,7 @@ class GraspNode(HelloNode, Node):
 
         goal_pos = ik.get_xyz_from_msg(goal_transformed)
         goal_pos[1] -= 0.10  # approach offset
+        goal_pos[2] = min(goal_pos[2], 1.0) 
         gripper_pos = ik.get_xyz_from_msg(gripper_transformed)
 
         grasp_orient = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi / 2)
