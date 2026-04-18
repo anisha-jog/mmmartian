@@ -104,20 +104,6 @@ def main():
     #     return
     # print("Navigating / navigated to the kitchen!!")
 
-   
-
-    # --- Step 4 & 5: Grasp + verify loop ---
-    grasp_node = GraspNode()
-    grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
-    grasp_thread.start()
-    grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
-    grasp_node.switch_to_position_mode()
-    time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
-
-    camera_stop = threading.Event()
-    camera_thread = threading.Thread(target=stream_head_camera, args=(grasp_node, camera_stop), daemon=True)
-    camera_thread.start()
-
     # # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
     print("Rotating head camera")
@@ -146,6 +132,18 @@ def main():
         print("Object not detected within timeout, aborting.")
         return
     print(f"Object detected: {goal_pose.pose.position}")
+
+    # --- Step 4 & 5: Grasp + verify loop ---
+    grasp_node = GraspNode()
+    grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
+    grasp_thread.start()
+    grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
+    grasp_node.switch_to_position_mode()
+    time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
+
+    camera_stop = threading.Event()
+    camera_thread = threading.Thread(target=stream_head_camera, args=(grasp_node, camera_stop), daemon=True)
+    camera_thread.start()
 
     grasp_success = False
     grasp_node.reset_for_retry()
