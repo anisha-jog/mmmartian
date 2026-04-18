@@ -187,6 +187,7 @@ def main():
     # grasp_node.release_object()
 
     # move to drop location
+    grasp_node.switch_to_navigation_mode()
     deposit_pt = ["SINK"]
     success_2 = navigate_to_locations(deposit_pt)
     if not success_2:
