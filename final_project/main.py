@@ -201,7 +201,7 @@ def main():
     robot.push_command()
     # robot.wait_command()
 
-    rclpy.shutdown()
+    # rclpy.shutdown()
 
 
 if __name__ == '__main__':
