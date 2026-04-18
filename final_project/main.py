@@ -107,32 +107,32 @@ def main():
 
     # # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
-    # print("Rotating head camera")
-    # # rotate head and camera
-    # robot.head.move_by('head_pan', np.radians(-90))
-    # robot.head.move_by('head_tilt', np.radians(-75))
-    # robot.push_command()
+    print("Rotating head camera")
+    # rotate head and camera
+    robot.head.move_by('head_pan', np.radians(-90))
+    robot.head.move_by('head_tilt', np.radians(-75))
+    robot.push_command()
 
-    # print("Head camera rotated")
+    print("Head camera rotated")
     
-    # rclpy.init()
+    rclpy.init()
 
-    # print("Starting color segmentation")
-    # detector = ColorSegmentationDetector()
-    # print("Waiting for object detection...")
+    print("Starting color segmentation")
+    detector = ColorSegmentationDetector()
+    print("Waiting for object detection...")
 
-    # elapsed = 0.0
-    # while detector.latest_goal_pose is None and elapsed < DETECT_TIMEOUT:
-    #     rclpy.spin_once(detector, timeout_sec=0.1)
-    #     elapsed += 0.1
-    # goal_pose = detector.latest_goal_pose
-    # detector.destroy_node()
-    # rclpy.shutdown()  # close first context so HelloNode.main() can call rclpy.init() cleanly
+    elapsed = 0.0
+    while detector.latest_goal_pose is None and elapsed < DETECT_TIMEOUT:
+        rclpy.spin_once(detector, timeout_sec=0.1)
+        elapsed += 0.1
+    goal_pose = detector.latest_goal_pose
+    detector.destroy_node()
+    rclpy.shutdown()  # close first context so HelloNode.main() can call rclpy.init() cleanly
 
-    # if goal_pose is None:
-    #     print("Object not detected within timeout, aborting.")
-    #     return
-    # print(f"Object detected: {goal_pose.pose.position}")
+    if goal_pose is None:
+        print("Object not detected within timeout, aborting.")
+        return
+    print(f"Object detected: {goal_pose.pose.position}")
 
     # # --- Step 4 & 5: Grasp + verify loop ---
     grasp_node = GraspNode()
@@ -142,46 +142,46 @@ def main():
     grasp_node.switch_to_position_mode()
     time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
 
-    # camera_stop = threading.Event()
-    # camera_thread = threading.Thread(target=stream_head_camera, args=(grasp_node, camera_stop), daemon=True)
-    # camera_thread.start()
+    camera_stop = threading.Event()
+    camera_thread = threading.Thread(target=stream_head_camera, args=(grasp_node, camera_stop), daemon=True)
+    camera_thread.start()
 
     grasp_success = False
-    # grasp_node.reset_for_retry()
+    grasp_node.reset_for_retry()
     
-    # for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
-    #     print(f"Grasp attempt {attempt}/{MAX_GRASP_ATTEMPTS}")
-    #     grasp_node.reset_for_retry()
-    #     print("grasp reset")
-    #     grasp_node.goal_callback(goal_pose)
-    #     print("grasp attempted")
-    #     print(grasp_node._grasp_done)
+    for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
+        print(f"Grasp attempt {attempt}/{MAX_GRASP_ATTEMPTS}")
+        grasp_node.reset_for_retry()
+        print("grasp reset")
+        grasp_node.goal_callback(goal_pose)
+        print("grasp attempted")
+        print(grasp_node._grasp_done)
 
-    #     if not grasp_node._grasp_done:
-    #         print("Grasp did not complete, retrying.")
-    #         continue
+        if not grasp_node._grasp_done:
+            print("Grasp did not complete, retrying.")
+            continue
 
-    #     # --- Step 5: VLM grasp check ---
-    #     # head_frame = grasp_node.get_head_frame()
-    #     # if head_frame is None:
-    #     #     print("No head camera frame available for grasp check.")
-    #     # elif gemini_mode:
-    #     #     print("Asking Gemini if the object has been gripped...")
-    #     #     grip_response = prompt_gemini(client, "grip", img=head_frame)
-    #     #     grasp_success = True if grip_response == "YES" else False
+        # --- Step 5: VLM grasp check ---
+        # head_frame = grasp_node.get_head_frame()
+        # if head_frame is None:
+        #     print("No head camera frame available for grasp check.")
+        # elif gemini_mode:
+        #     print("Asking Gemini if the object has been gripped...")
+        #     grip_response = prompt_gemini(client, "grip", img=head_frame)
+        #     grasp_success = True if grip_response == "YES" else False
 
-    #     # test
-    #     grasp_success = True
+        # test
+        grasp_success = True
 
-    #     if grasp_success:
-    #         print("Grasp verified! Proceeding to drop.")
-    #         break
-    #     else:
-    #         print("Grasp failed, retrying.")
-    # else:
-    #     print("Max grasp attempts reached, aborting.")
-    #     rclpy.shutdown()
-    #     return
+        if grasp_success:
+            print("Grasp verified! Proceeding to drop.")
+            break
+        else:
+            print("Grasp failed, retrying.")
+    else:
+        print("Max grasp attempts reached, aborting.")
+        rclpy.shutdown()
+        return
 
     # --- Step 6: Drop object at destination (stub) ---
     # grasp_node.move_to_drop_location()
@@ -201,7 +201,7 @@ def main():
     robot.push_command()
     # robot.wait_command()
 
-    # rclpy.shutdown()
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':
