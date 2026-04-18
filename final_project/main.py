@@ -147,41 +147,41 @@ def main():
     camera_thread.start()
 
     grasp_success = False
-    grasp_node.reset_for_retry()
+    # grasp_node.reset_for_retry()
     
-    for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
-        print(f"Grasp attempt {attempt}/{MAX_GRASP_ATTEMPTS}")
-        grasp_node.reset_for_retry()
-        print("grasp reset")
-        grasp_node.goal_callback(goal_pose)
-        print("grasp attempted")
-        print(grasp_node._grasp_done)
+    # for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
+    #     print(f"Grasp attempt {attempt}/{MAX_GRASP_ATTEMPTS}")
+    #     grasp_node.reset_for_retry()
+    #     print("grasp reset")
+    #     grasp_node.goal_callback(goal_pose)
+    #     print("grasp attempted")
+    #     print(grasp_node._grasp_done)
 
-        if not grasp_node._grasp_done:
-            print("Grasp did not complete, retrying.")
-            continue
+    #     if not grasp_node._grasp_done:
+    #         print("Grasp did not complete, retrying.")
+    #         continue
 
-        # --- Step 5: VLM grasp check ---
-        head_frame = grasp_node.get_head_frame()
-        if head_frame is None:
-            print("No head camera frame available for grasp check.")
-        elif gemini_mode:
-            print("Asking Gemini if the object has been gripped...")
-            grip_response = prompt_gemini(client, "grip", img=head_frame)
-            grasp_success = True if grip_response == "YES" else False
+    #     # --- Step 5: VLM grasp check ---
+    #     # head_frame = grasp_node.get_head_frame()
+    #     # if head_frame is None:
+    #     #     print("No head camera frame available for grasp check.")
+    #     # elif gemini_mode:
+    #     #     print("Asking Gemini if the object has been gripped...")
+    #     #     grip_response = prompt_gemini(client, "grip", img=head_frame)
+    #     #     grasp_success = True if grip_response == "YES" else False
 
-        # test
-        grasp_success = True
+    #     # test
+    #     grasp_success = True
 
-        if grasp_success:
-            print("Grasp verified! Proceeding to drop.")
-            break
-        else:
-            print("Grasp failed, retrying.")
-    else:
-        print("Max grasp attempts reached, aborting.")
-        rclpy.shutdown()
-        return
+    #     if grasp_success:
+    #         print("Grasp verified! Proceeding to drop.")
+    #         break
+    #     else:
+    #         print("Grasp failed, retrying.")
+    # else:
+    #     print("Max grasp attempts reached, aborting.")
+    #     rclpy.shutdown()
+    #     return
 
     # --- Step 6: Drop object at destination (stub) ---
     # grasp_node.move_to_drop_location()
@@ -189,6 +189,7 @@ def main():
 
     # move to drop location
     deposit_pt = ["SINK"]
+    grasp_node.switch_to_navigation_mode()
     success_2 = navigate_to_locations(deposit_pt)
     if not success_2:
         print("Navigation failed, aborting.")
