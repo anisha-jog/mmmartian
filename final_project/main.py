@@ -202,7 +202,7 @@ def main():
     # robot.end_of_arm.move_to('stretch_gripper', np.radians(100))
     # robot.push_command()
     # robot.wait_command()
-    print("Switched mode and slept, Extending arm and dropping object")
+    print("Extending arm and dropping object")
 
     grasp_node.extend_and_drop()
 
