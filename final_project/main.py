@@ -70,7 +70,6 @@ def stream_head_camera(grasp_node, stop_event):
 def main():
     robot = stretch_body.robot.Robot()
     robot.startup()
-    robot.home()
 
     gemini_mode = False
 
@@ -205,6 +204,7 @@ def main():
     # robot.push_command()
     # robot.wait_command()
 
+    grasp_node.switch_to_position_mode()
     grasp_node.extend_and_drop()
 
     # rclpy.shutdown()
