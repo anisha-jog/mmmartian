@@ -164,15 +164,16 @@ class GraspNode(HelloNode, Node):
 
     def extend_and_drop(self):
         """TODO: Navigate arm/base to sink drop position."""
-        with self.joint_states_lock:
-            arm = self.joint_state.get('joint_arm_l0', 0.0)
-        print(f"Extending arm: {arm:.3f} -> {min(110.0, arm + 0.5):.3f}")
-        self.move_to_pose({'joint_arm': min(110.0, arm + 0.5)}, blocking=True)
-
         print("switching to position mode")
         self.switch_to_position_mode()
         print("sleeping")
         time.sleep(2.0)
+
+        with self.joint_states_lock:
+            arm = self.joint_state.get('joint_arm_l0', 0.0)
+        target_arm = min(0.50, arm + 0.5)
+        print(f"Extending arm: {arm:.3f} -> {target_arm:.3f}")
+        self.move_to_pose({'joint_arm': target_arm}, blocking=True)
 
         print("Opening gripper")
         self.move_to_pose({'gripper_aperture': np.radians(100)}, blocking=True)
