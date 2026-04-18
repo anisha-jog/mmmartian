@@ -1,3 +1,5 @@
+from time import time
+
 import urchin as urdfpy
 import importlib.resources as importlib_resources
 import numpy as np
@@ -180,6 +182,7 @@ def move_to_configuration(node, q):
     node.move_to_pose({'rotate_mobile_base': q_base_rotation}, blocking=True)
     node.move_to_pose({'translate_mobile_base': q_base}, blocking=True)
     node.move_to_pose({'joint_lift': q_lift}, blocking=True)
+    time.sleep(2)  # small delay to ensure lift is in position before moving arm
     node.move_to_pose({'joint_arm': q_arm}, blocking=True)
     node.move_to_pose({'joint_wrist_yaw': q_yaw}, blocking=True)
     node.move_to_pose({'joint_wrist_pitch': q_pitch}, blocking=True)
