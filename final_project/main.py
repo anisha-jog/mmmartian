@@ -107,34 +107,34 @@ def main():
 
     # # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
-    print("Rotating head camera")
-    # rotate head and camera
-    robot.head.move_by('head_pan', np.radians(-90))
-    robot.head.move_by('head_tilt', np.radians(-75))
-    robot.push_command()
+    # print("Rotating head camera")
+    # # rotate head and camera
+    # robot.head.move_by('head_pan', np.radians(-90))
+    # robot.head.move_by('head_tilt', np.radians(-75))
+    # robot.push_command()
 
-    print("Head camera rotated")
+    # print("Head camera rotated")
     
-    rclpy.init()
+    # rclpy.init()
 
-    print("Starting color segmentation")
-    detector = ColorSegmentationDetector()
-    print("Waiting for object detection...")
+    # print("Starting color segmentation")
+    # detector = ColorSegmentationDetector()
+    # print("Waiting for object detection...")
 
-    elapsed = 0.0
-    while detector.latest_goal_pose is None and elapsed < DETECT_TIMEOUT:
-        rclpy.spin_once(detector, timeout_sec=0.1)
-        elapsed += 0.1
-    goal_pose = detector.latest_goal_pose
-    detector.destroy_node()
-    rclpy.shutdown()  # close first context so HelloNode.main() can call rclpy.init() cleanly
+    # elapsed = 0.0
+    # while detector.latest_goal_pose is None and elapsed < DETECT_TIMEOUT:
+    #     rclpy.spin_once(detector, timeout_sec=0.1)
+    #     elapsed += 0.1
+    # goal_pose = detector.latest_goal_pose
+    # detector.destroy_node()
+    # rclpy.shutdown()  # close first context so HelloNode.main() can call rclpy.init() cleanly
 
-    if goal_pose is None:
-        print("Object not detected within timeout, aborting.")
-        return
-    print(f"Object detected: {goal_pose.pose.position}")
+    # if goal_pose is None:
+    #     print("Object not detected within timeout, aborting.")
+    #     return
+    # print(f"Object detected: {goal_pose.pose.position}")
 
-    # --- Step 4 & 5: Grasp + verify loop ---
+    # # --- Step 4 & 5: Grasp + verify loop ---
     grasp_node = GraspNode()
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
     grasp_thread.start()
@@ -142,9 +142,9 @@ def main():
     grasp_node.switch_to_position_mode()
     time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
 
-    camera_stop = threading.Event()
-    camera_thread = threading.Thread(target=stream_head_camera, args=(grasp_node, camera_stop), daemon=True)
-    camera_thread.start()
+    # camera_stop = threading.Event()
+    # camera_thread = threading.Thread(target=stream_head_camera, args=(grasp_node, camera_stop), daemon=True)
+    # camera_thread.start()
 
     grasp_success = False
     # grasp_node.reset_for_retry()
