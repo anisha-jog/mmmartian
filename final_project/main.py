@@ -110,7 +110,7 @@ def main():
     print("Rotating head camera")
     # rotate head and camera
     robot.head.move_by('head_pan', np.radians(-90))
-    robot.head.move_by('head_tilt', np.radians(-75))
+    robot.head.move_by('head_tilt', np.radians(-45))
     robot.push_command()
 
     print("Head camera rotated")
