@@ -187,6 +187,8 @@ def main():
     # grasp_node.move_to_drop_location()
     # grasp_node.release_object()
 
+    rclpy.init()
+
     # move to drop location
     deposit_pt = ["SINK"]
     grasp_node.switch_to_navigation_mode()
