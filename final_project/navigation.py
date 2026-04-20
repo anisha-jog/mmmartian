@@ -21,12 +21,21 @@ import cv2
 
 
 # [x, y, orientation_z, orientation_w]
+# LOCATIONS = {
+#     'LIVING_ROOM': [-6.2514, -0.85,  0.19,  0.98],
+#     'KITCHEN':     [-1.06,    1.45,  0.904, 0.426],
+#     'HALLWAY':     [-3.33,    0.303, 0.2,   0.978],
+#     'SINK':        [-0.89,    1.14,  0.285, 0.959], 
+#     'COUCH':       [-2.48,     1.65,   -0.71,   0.69],
+# }
+
+# for the new map (living room is by the couch)
 LOCATIONS = {
-    'LIVING_ROOM': [-6.2514, -0.85,  0.19,  0.98],
-    'KITCHEN':     [-1.06,    1.45,  0.904, 0.426],
-    'HALLWAY':     [-3.33,    0.303, 0.2,   0.978],
-    'SINK':        [-0.89,    1.14,  0.285, 0.959], 
-    'COUCH':       [-2.48,     1.65,   -0.71,   0.69],
+    'LIVING_ROOM': [0.987, -1.925,  0.845,  0.935],
+    'KITCHEN':     [0.105,    0.337,  0.968, -0.251],
+    'HALLWAY':     [1.836,    -4.207, 0.841,   0.542],
+    'SINK':        [0.741,    0.539,  0.826, 0.564], 
+    'COUCH':       [0.575,     -1.966,   -0.52,   0.854],
 }
 
 INITIAL_POSE = LOCATIONS['LIVING_ROOM']

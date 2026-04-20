@@ -34,7 +34,7 @@ import numpy as np
 # using in-gripper camera:
 #    ros2 launch stretch_core d405_basic.launch.py
 # build a map: ros2 launch stretch_nav2 offline_mapping.launch.py teleop_type:=keyboard
-# save a map: ros2 run nav2_map_server map_saver_cli -f martian_map
+# save a map: ros2 run nav2_map_server map_saver_cli -f martian_map_new
 
 
 TASK = "Put the dishes in the sink."
@@ -115,6 +115,7 @@ def main():
     # rotate head and camera
     print("Rotating head camera")
     grasp_node.rotate_camera(-90, 45)
+    time.sleep(2.0) # let the camera actually rotate before detection starts
     print("Head camera rotated")
     
     # rclpy.init()
