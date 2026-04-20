@@ -103,25 +103,20 @@ def main():
         print("Gemini mode is disabled. Proceeding with default location.")
 
     # # --- Step 2: Navigate to locations ---
-    grasp_node.switch_to_navigation_mode()
-    success = navigate_to_locations(route)
-    if not success:
-        print("Navigation failed, aborting.")
-        return
-    print("Navigated to the task location!!")
+    # grasp_node.switch_to_navigation_mode()
+    # success = navigate_to_locations(route)
+    # if not success:
+    #     print("Navigation failed, aborting.")
+    #     return
+    # print("Navigated to the task location!!")
+    
 
-    # rclpy.shutdown()  # close first context so GraspNode (inherits HelloNode) can call rclpy.init() cleanly
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
-
     # rotate head and camera
     print("Rotating head camera")
     grasp_node.rotate_camera(-90, -45)
     time.sleep(2.0) # let the camera actually rotate before detection starts
     print("Head camera rotated")
-
-    return
-    
-    # rclpy.init()
 
     print("Starting color segmentation")
     detector = ColorSegmentationDetector()
