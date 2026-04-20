@@ -161,6 +161,7 @@ def get_current_configuration(joint_state):
             return value
         index = names.index(name)
         bounds = chain.links[index].bounds
+        print(name, bounds)
         return min(max(value, bounds[0]), bounds[1])
 
     q_base_rotation = 0.0
