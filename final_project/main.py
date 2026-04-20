@@ -114,7 +114,7 @@ def main():
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
     # rotate head and camera
     print("Rotating head camera")
-    grasp_node.rotate_camera(-90, -45)
+    grasp_node.rotate_camera(-90, -35)
     time.sleep(2.0) # let the camera actually rotate before detection starts
     print("Head camera rotated")
 
