@@ -159,6 +159,7 @@ class GraspNode(HelloNode, Node):
         self._grasp_done = False
         print("moving grasp to retry")
         self.move_to_pose(ik.READY_POSE_P2, blocking=True)
+        self.move_to_pose({'joint_gripper_finger_right': np.radians(100)}, blocking=True)
 
     # ------------------------------------------------------------------ #
     #  Downstream tasks (stubs)                                            #
@@ -185,8 +186,6 @@ class GraspNode(HelloNode, Node):
 
     def start_position(self):
         self.stow_the_robot()
-        self.move_to_pose({'joint_lift': 0.5}, blocking=True)
-        self.move_to_pose({'joint_gripper_finger_right': np.radians(100)}, blocking=True)
 
     # ------------------------------------------------------------------ #
     #  Node lifecycle                                                      #
