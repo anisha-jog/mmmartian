@@ -13,6 +13,15 @@ Your response should only contain the list entry and no additional words (e.g. "
 The robot is currently not in any of the locations on the list. The task is this:
 """
 
+SEC_LOC_PROMPT = """
+You are a robot meant to help with household tasks.
+You were given a previous task that you have partially completed. Now, you are in the correct location and holding an object to put in one of the following locations:
+- SINK
+- COUCH
+Given your previous task and current location, provide the location from this list where you should move to place the object. Your response should only contain the list entry and no additional words (e.g. "SINK").
+The task and current location are:
+"""
+
 GRIP_PROMPT = """
 You are a Stretch 3 robot that is trying to grab an object. Given this image taken from a camera mounted on the head of the robot, determine whether or not the robot's gripper has successfully grasped the object.
 Give your answer as YES or NO.
@@ -28,12 +37,14 @@ def gemini_init():
     # Initialize Gemini API
     return genai.Client(api_key=API_KEY)
 
-def prompt_gemini(client, mode, task="", img=None):
+def prompt_gemini(client, mode, task="", img=None, loc=""):
     prompt = None
     if mode == "loc":
         prompt = LOC_PROMPT + task
     elif mode == "grip":
         prompt = [GRIP_PROMPT, img]
+    elif mode == "renav":
+        prompt = SEC_LOC_PROMPT + task + "\n" + loc
     else:
         print("Unrecognized mode. Aborting request.")
         return

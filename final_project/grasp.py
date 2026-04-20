@@ -51,7 +51,8 @@ class GraspNode(HelloNode, Node):
         with self.joint_states_lock:
             joint_names = [
                 'joint_lift', 'joint_arm_l0',
-                'joint_wrist_yaw', 'joint_wrist_pitch', 'joint_wrist_roll'
+                'joint_wrist_yaw', 'joint_wrist_pitch', 'joint_wrist_roll',
+                'head_pan', 'head_tilt'
             ]
             self.joint_state = {}
             for name in joint_names:
@@ -167,22 +168,19 @@ class GraspNode(HelloNode, Node):
         with self.joint_states_lock:
             arm = self.joint_state.get('joint_arm_l0', 0.0)
         print(f"Extending arm: {arm:.3f} -> {min(1.0, arm + 0.5):.3f}")
-        self.move_to_pose({'joint_arm': min(1.0, arm + 0.5)}, blocking=True)
-
-        # print("switching to position mode")
-        # print("sleeping")
-        # time.sleep(2.0)
-        # print("position")
-        # self.switch_to_position_mode()
-        # print("sleeping")
-        # time.sleep(2.0)
-
+        self.move_to_pose({'joint_arm': min(1.0, arm + 0.5)}, blocking=True) # this may hang
         print("Opening gripper")
         self.move_to_pose({'gripper_aperture': np.radians(100)}, blocking=False)
 
-    def release_object(self):
-        """TODO: Open gripper to release the grasped object."""
-        raise NotImplementedError
+    def rotate_camera(self, pan_deg, tilt_deg):
+        """TODO: Navigate arm/base to sink drop position."""
+        with self.joint_states_lock:
+            head_pan = self.joint_state.get('head_pan', 0.0)
+            head_tilt = self.joint_state.get('head_tilt', 0.0)
+        print(f"Rotating camera: {head_pan:.3f} -> {np.radians(pan_deg):.3f}")
+        self.move_to_pose({'head_pan': np.radians(pan_deg)}, blocking=True)
+        print(f"Rotating camera: {head_tilt:.3f} -> {np.radians(tilt_deg):.3f}")
+        self.move_to_pose({'head_tilt': np.radians(tilt_deg)}, blocking=True)
 
     # ------------------------------------------------------------------ #
     #  Node lifecycle                                                      #

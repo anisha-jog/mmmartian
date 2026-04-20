@@ -87,38 +87,37 @@ def main():
             print("No route selected. Proceeding with default location.")
             route = ["KITCHEN"]
         else:
-            route = route_response.text
+            route = [route_response.text]
         
             if route not in get_locations():
                 print("Gemini response is not in the correct format. Proceeding with default location.")
-                route = "KITCHEN"
+                route = ["KITCHEN"]
     else:
-        route = "KITCHEN"
-
-    # For now, hardcode the expected route for the task above
-    route = ["KITCHEN"]
-    # print(f"Route: {route}")
+        route = ["KITCHEN"]
 
     # # --- Step 2: Navigate to locations ---
-    # rclpy.init()
-    # success = navigate_to_locations(route)
-    # if not success:
-    #     print("Navigation failed, aborting.")
-    #     return
-    # print("Navigating / navigated to the kitchen!!")
-
-    # # rclpy.shutdown()  # close first context so GraspNode can call rclpy.init() cleanly
-    # # --- Step 3: Detect object (sequential — spin until we get a pose) ---
-
-    # print("Rotating head camera")
-    # # rotate head and camera
-    # # robot.head.move_by('head_pan', np.radians(-90))
-    # # robot.head.move_by('head_tilt', np.radians(-35))
-    # # robot.push_command()
-
-    # print("Head camera rotated")
-    
     rclpy.init()
+    success = navigate_to_locations(route)
+    if not success:
+        print("Navigation failed, aborting.")
+        return
+    print("Navigated to the task location!!")
+
+    rclpy.shutdown()  # close first context so GraspNode (inherits HelloNode) can call rclpy.init() cleanly
+    # --- Step 3: Detect object (sequential — spin until we get a pose) ---
+    grasp_node = GraspNode()
+    grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
+    grasp_thread.start()
+    grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
+    grasp_node.switch_to_position_mode()
+    time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
+
+    # rotate head and camera
+    print("Rotating head camera")
+    grasp_node.rotate_camera(-90, 45)
+    print("Head camera rotated")
+    
+    # rclpy.init()
 
     print("Starting color segmentation")
     detector = ColorSegmentationDetector()
@@ -159,12 +158,12 @@ def main():
     print(f"Object detected: {goal_pose.pose.position}")
 
     # --- Step 4 & 5: Grasp + verify loop ---
-    grasp_node = GraspNode()
-    grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
-    grasp_thread.start()
-    grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
-    grasp_node.switch_to_position_mode()
-    time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
+    # grasp_node = GraspNode()
+    # grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
+    # grasp_thread.start()
+    # grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
+    # grasp_node.switch_to_position_mode()
+    # time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
 
     camera_stop = threading.Event()
     camera_thread = threading.Thread(target=stream_head_camera, args=(grasp_node, camera_stop), daemon=True)
@@ -192,10 +191,13 @@ def main():
         elif gemini_mode:
             print("Asking Gemini if the object has been gripped...")
             grip_response = prompt_gemini(client, "grip", img=head_frame)
-            grasp_success = True if grip_response == "YES" else False
+            grasp_success = True if grip_response == "YES" or grip_response is None else False
+            print("Grip is successful OR Gemini cannot parse the grasp. Proceeding with navigation.")
+        else:
+            print("Gemini mode is not enabled. No feedback will be requested.")
 
         # test
-        grasp_success = True
+        # grasp_success = True
 
         if grasp_success:
             print("Grasp verified! Proceeding to drop.")
@@ -209,23 +211,18 @@ def main():
 
     # move to drop location
     grasp_node.switch_to_navigation_mode()
-    deposit_pt = ["COUCH"]
+
+    # hardcoded deposit point
+    deposit_pt = ["SINK"]
     success_2 = navigate_to_locations(deposit_pt)
     if not success_2:
         print("Navigation failed, aborting.")
         return
-    print("Navigating / navigated to the sink!!")
+    print("Navigated to the deposit point!!")
 
     # open the gripper and release object over the drop location
-    # extend arm
-    # robot.arm.move_to(0.5)
-    # robot.push_command()
-    # robot.end_of_arm.move_to('stretch_gripper', np.radians(100))
-    # robot.push_command()
-    # robot.wait_command()
     print("Extending arm and dropping object")
-
-    grasp_node.extend_and_drop()
+    grasp_node.extend_and_drop() # if hanging, Ctrl+C the ROS terminal to release the gripper
 
     # rclpy.shutdown()
 
