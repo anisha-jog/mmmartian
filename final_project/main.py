@@ -100,23 +100,23 @@ def main():
     # print(f"Route: {route}")
 
     # --- Step 2: Navigate to locations ---
-    rclpy.init()
-    success = navigate_to_locations(route)
-    if not success:
-        print("Navigation failed, aborting.")
-        return
-    print("Navigating / navigated to the kitchen!!")
+    # rclpy.init()
+    # success = navigate_to_locations(route)
+    # if not success:
+    #     print("Navigation failed, aborting.")
+    #     return
+    # print("Navigating / navigated to the kitchen!!")
 
-    # rclpy.shutdown()  # close first context so GraspNode can call rclpy.init() cleanly
-    # --- Step 3: Detect object (sequential — spin until we get a pose) ---
+    # # rclpy.shutdown()  # close first context so GraspNode can call rclpy.init() cleanly
+    # # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
-    print("Rotating head camera")
-    # rotate head and camera
-    # robot.head.move_by('head_pan', np.radians(-90))
-    # robot.head.move_by('head_tilt', np.radians(-35))
-    # robot.push_command()
+    # print("Rotating head camera")
+    # # rotate head and camera
+    # # robot.head.move_by('head_pan', np.radians(-90))
+    # # robot.head.move_by('head_tilt', np.radians(-35))
+    # # robot.push_command()
 
-    print("Head camera rotated")
+    # print("Head camera rotated")
     
     rclpy.init()
 
