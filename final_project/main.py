@@ -68,32 +68,32 @@ def stream_head_camera(grasp_node, stop_event):
 
 
 def main():
-    # robot = stretch_body.robot.Robot()
-    # robot.startup()
+    robot = stretch_body.robot.Robot()
+    robot.startup()
 
     gemini_mode = False
 
     # --- Step 1: LLM route extraction ---
-    # client = None
-    # print("starting step one - LLM route extraction")
-    # if gemini_mode:
-    #     # Call LLM and get response
-    #     client = gemini_init()
-    #     print("Gemini client initialized, prompting for route...")
-    #     route_response = prompt_gemini(client, "loc", task=TASK)
-    #     print(f"Gemini response: {route_response}")
-    #     route = None
-    #     if route_response is None:
-    #         print("No route selected. Proceeding with default location.")
-    #         route = ["KITCHEN"]
-    #     else:
-    #         route = route_response.text
+    client = None
+    print("starting step one - LLM route extraction")
+    if gemini_mode:
+        # Call LLM and get response
+        client = gemini_init()
+        print("Gemini client initialized, prompting for route...")
+        route_response = prompt_gemini(client, "loc", task=TASK)
+        print(f"Gemini response: {route_response}")
+        route = None
+        if route_response is None:
+            print("No route selected. Proceeding with default location.")
+            route = ["KITCHEN"]
+        else:
+            route = route_response.text
         
-    #         if route not in get_locations():
-    #             print("Gemini response is not in the correct format. Proceeding with default location.")
-    #             route = "KITCHEN"
-    # else:
-    #     route = "KITCHEN"
+            if route not in get_locations():
+                print("Gemini response is not in the correct format. Proceeding with default location.")
+                route = "KITCHEN"
+    else:
+        route = "KITCHEN"
 
     # For now, hardcode the expected route for the task above
     route = ["HALLWAY", "KITCHEN"]
@@ -110,8 +110,8 @@ def main():
 
     print("Rotating head camera")
     # rotate head and camera
-    # robot.head.move_by('head_pan', np.radians(-90))
-    # robot.head.move_by('head_tilt', np.radians(-35))
+    robot.head.move_by('head_pan', np.radians(-90))
+    robot.head.move_by('head_tilt', np.radians(-35))
     # robot.push_command()
 
     print("Head camera rotated")
