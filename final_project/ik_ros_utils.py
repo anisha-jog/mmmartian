@@ -161,6 +161,8 @@ def get_current_configuration(joint_state):
             return value
         index = names.index(name)
         bounds = chain.links[index].bounds
+        if chain.links[index].bounds[0] == chain.links[index].bounds[1]:
+            chain.links[index].bounds[1] += 1
         print(name, bounds)
         return min(max(value, bounds[0]), bounds[1])
 
@@ -171,11 +173,10 @@ def get_current_configuration(joint_state):
     q_yaw = bound_range('joint_wrist_yaw', joint_state['joint_wrist_yaw'])
     q_pitch = bound_range('joint_wrist_pitch', joint_state['joint_wrist_pitch'])
     q_roll = bound_range('joint_wrist_roll', joint_state['joint_wrist_roll'])
-    q_grip_r = (-np.radians(100), np.radians(100))
     print("printing bounds again")
     for link in chain.links:
         print(link.name, link.bounds)
-    q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, q_grip_r] # added 1 entry at the end for gripper
+    q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, 0.0] # added 1 entry at the end for gripper
     print(q)
     # print("current configuration retrieved")
     return q
