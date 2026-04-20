@@ -68,8 +68,8 @@ def stream_head_camera(grasp_node, stop_event):
 
 
 def main():
-    robot = stretch_body.robot.Robot()
-    robot.startup()
+    # robot = stretch_body.robot.Robot()
+    # robot.startup()
 
     gemini_mode = False
 
@@ -112,8 +112,8 @@ def main():
 
     print("Rotating head camera")
     # rotate head and camera
-    robot.head.move_by('head_pan', np.radians(-90))
-    robot.head.move_by('head_tilt', np.radians(-35))
+    # robot.head.move_by('head_pan', np.radians(-90))
+    # robot.head.move_by('head_tilt', np.radians(-35))
     # robot.push_command()
 
     print("Head camera rotated")
