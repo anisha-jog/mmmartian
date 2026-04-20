@@ -183,6 +183,11 @@ class GraspNode(HelloNode, Node):
         print(f"Rotating camera: {head_tilt:.3f} -> {np.radians(tilt_deg):.3f}")
         self.move_to_pose({'joint_head_tilt': np.radians(tilt_deg)}, blocking=True)
 
+    def start_position(self):
+        self.stow_the_robot()
+        self.move_to_pose({'joint_lift': 0.5}, blocking=True)
+        self.move_to_pose({'joint_gripper_finger_right': np.radians(100)}, blocking=True)
+
     # ------------------------------------------------------------------ #
     #  Node lifecycle                                                      #
     # ------------------------------------------------------------------ #
