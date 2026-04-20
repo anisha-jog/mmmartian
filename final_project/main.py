@@ -68,8 +68,17 @@ def stream_head_camera(grasp_node, stop_event):
 
 
 def main():
-    # robot = stretch_body.robot.Robot()
-    # robot.startup()
+
+    # initialize the ROS node
+    grasp_node = GraspNode()
+    grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
+    grasp_thread.start()
+    grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
+    grasp_node.switch_to_position_mode()
+    time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
+
+    # set a start position for the robot
+    grasp_node.start_position()
 
     gemini_mode = False
 
@@ -103,15 +112,6 @@ def main():
 
     # # rclpy.shutdown()  # close first context so GraspNode (inherits HelloNode) can call rclpy.init() cleanly
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
-    grasp_node = GraspNode()
-    grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
-    grasp_thread.start()
-    grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
-    grasp_node.switch_to_position_mode()
-    time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
-
-    # test joints
-    grasp_node.start_position()
 
     # rotate head and camera
     print("Rotating head camera")
@@ -162,13 +162,6 @@ def main():
     print(f"Object detected: {goal_pose.pose.position}")
 
     # --- Step 4 & 5: Grasp + verify loop ---
-    # grasp_node = GraspNode()
-    # grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
-    # grasp_thread.start()
-    # grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
-    # grasp_node.switch_to_position_mode()
-    # time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
-
     camera_stop = threading.Event()
     camera_thread = threading.Thread(target=stream_head_camera, args=(grasp_node, camera_stop), daemon=True)
     camera_thread.start()
@@ -201,7 +194,7 @@ def main():
             print("Gemini mode is not enabled. No feedback will be requested.")
 
         # test
-        # grasp_success = True
+        grasp_success = True
 
         if grasp_success:
             print("Grasp verified! Proceeding to drop.")
