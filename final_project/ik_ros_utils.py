@@ -176,7 +176,7 @@ def get_current_configuration(joint_state):
     for link in chain.links:
         print(link.name, link.bounds)
     q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, q_grip_r] # added 1 entry at the end for gripper
-
+    print(q)
     # print("current configuration retrieved")
     return q
     # TODO: -------------- end ---------------
