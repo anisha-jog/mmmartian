@@ -110,14 +110,14 @@ def main():
     grasp_node.switch_to_position_mode()
     time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
 
+    # test joints
+    grasp_node.start_position()
+
     # rotate head and camera
     print("Rotating head camera")
     grasp_node.rotate_camera(-90, -45)
     time.sleep(2.0) # let the camera actually rotate before detection starts
     print("Head camera rotated")
-
-    # test joints
-    grasp_node.start_position()
 
     return
     
