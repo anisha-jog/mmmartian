@@ -162,7 +162,10 @@ def get_current_configuration(joint_state):
         index = names.index(name)
         bounds = chain.links[index].bounds
         if chain.links[index].bounds[0] == chain.links[index].bounds[1]:
+            print("invalid", name, bounds)
             chain.links[index].bounds[1] += 1
+            print("new bounds", chain.links[index].bounds)
+            bounds = chain.links[index].bounds
         print(name, bounds)
         return min(max(value, bounds[0]), bounds[1])
 
