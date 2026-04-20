@@ -107,7 +107,7 @@ def main():
         return
     print("Navigating / navigated to the kitchen!!")
 
-    rclpy.shutdown()  # close first context so GraspNode can call rclpy.init() cleanly
+    # rclpy.shutdown()  # close first context so GraspNode can call rclpy.init() cleanly
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
     print("Rotating head camera")
