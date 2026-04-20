@@ -103,14 +103,14 @@ def main():
         print("Gemini mode is disabled. Proceeding with default location.")
 
     # # --- Step 2: Navigate to locations ---
-    # rclpy.init()
-    # success = navigate_to_locations(route)
-    # if not success:
-    #     print("Navigation failed, aborting.")
-    #     return
-    # print("Navigated to the task location!!")
+    rclpy.init()
+    success = navigate_to_locations(route)
+    if not success:
+        print("Navigation failed, aborting.")
+        return
+    print("Navigated to the task location!!")
 
-    # # rclpy.shutdown()  # close first context so GraspNode (inherits HelloNode) can call rclpy.init() cleanly
+    # rclpy.shutdown()  # close first context so GraspNode (inherits HelloNode) can call rclpy.init() cleanly
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
     # rotate head and camera
