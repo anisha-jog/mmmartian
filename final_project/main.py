@@ -209,7 +209,7 @@ def main():
 
     # move to drop location
     grasp_node.switch_to_navigation_mode()
-    deposit_pt = ["SINK"]
+    deposit_pt = ["COUCH"]
     success_2 = navigate_to_locations(deposit_pt)
     if not success_2:
         print("Navigation failed, aborting.")
