@@ -53,7 +53,7 @@ class GraspNode(HelloNode, Node):
                 'joint_lift', 'joint_arm_l0',
                 'joint_wrist_yaw', 'joint_wrist_pitch', 'joint_wrist_roll',
                 'joint_head_pan', 'joint_head_tilt',
-                'joint_gripper_finger_right', 'joint_gripper_finger_left'
+                # 'joint_gripper_finger_right', 'joint_gripper_finger_left'
             ]
             self.joint_state = {}
             for name in joint_names:

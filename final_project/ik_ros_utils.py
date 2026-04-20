@@ -155,7 +155,7 @@ def get_current_configuration(joint_state):
         # print(joint_state)
         # print("THIS IS A CHANGE")
         names = [l.name for l in chain.links]
-        # print(len(names), names)
+        print(len(names), names)
         # ['Base link', 'joint_base_rotation', 'joint_base_translation', 'joint_mast', 'joint_lift', 'joint_arm_l4', 'joint_arm_l3', 'joint_arm_l2', 'joint_arm_l1', 'joint_arm_l0', 'joint_wrist_yaw', 'joint_wrist_yaw_bottom', 'joint_wrist_pitch', 'joint_wrist_roll', 'joint_gripper_s3_body', 'joint_gripper_finger_right']
         if name not in names:
             return value
