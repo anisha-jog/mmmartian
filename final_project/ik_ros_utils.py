@@ -33,6 +33,7 @@ READY_POSE_P2 = {
 # }
 
 def get_xyz_from_msg(msg):
+    x = y = z = None
 
     if isinstance(msg, PoseStamped):
         x = msg.pose.position.x
@@ -53,13 +54,43 @@ def get_modified_urdf():
     original_urdf = urdfpy.URDF.load(urdf_file_path)
     modified_urdf = original_urdf.copy()
 
-    names_of_links_to_remove = ['link_right_wheel', 'link_left_wheel', 'caster_link', 'link_head', 'link_head_pan', 'link_head_tilt', 'link_aruco_right_base', 'link_aruco_left_base', 'link_aruco_shoulder', 'link_aruco_top_wrist', 'link_aruco_inner_wrist', 'camera_bottom_screw_frame', 'camera_link', 'camera_depth_frame', 'camera_depth_optical_frame', 'camera_infra1_frame', 'camera_infra1_optical_frame', 'camera_infra2_frame', 'camera_infra2_optical_frame', 'camera_color_frame', 'camera_color_optical_frame', 'camera_accel_frame', 'camera_accel_optical_frame', 'camera_gyro_frame', 'camera_gyro_optical_frame', 'gripper_camera_bottom_screw_frame', 'gripper_camera_link', 'gripper_camera_depth_frame', 'gripper_camera_depth_optical_frame', 'gripper_camera_infra1_frame', 'gripper_camera_infra1_optical_frame', 'gripper_camera_infra2_frame', 'gripper_camera_infra2_optical_frame', 'gripper_camera_color_frame', 'gripper_camera_color_optical_frame', 'laser', 'base_imu', 'respeaker_base', 'link_wrist_quick_connect', 'link_gripper_finger_right', 'link_gripper_fingertip_right', 'link_aruco_fingertip_right', 'link_gripper_finger_left', 'link_gripper_fingertip_left', 'link_aruco_fingertip_left', 'link_aruco_d405', 'link_head_nav_cam']
-    # links_kept = ['base_link', 'link_mast', 'link_lift', 'link_arm_l4', 'link_arm_l3', 'link_arm_l2', 'link_arm_l1', 'link_arm_l0', 'link_wrist_yaw', 'link_wrist_yaw_bottom', 'link_wrist_pitch', 'link_wrist_roll', 'link_gripper_s3_body', 'link_grasp_center']
+    # sorry for the big blocks i got mad trying to find joints
+    names_of_links_to_remove = ['link_right_wheel', 'link_left_wheel', 'caster_link', 'link_head', 
+                                'link_aruco_right_base', 'link_aruco_left_base', 'link_aruco_shoulder', 
+                                'link_aruco_top_wrist', 'link_aruco_inner_wrist', 'camera_bottom_screw_frame', 
+                                'camera_link', 'camera_depth_frame', 'camera_depth_optical_frame', 
+                                'camera_infra1_frame', 'camera_infra1_optical_frame', 'camera_infra2_frame', 
+                                'camera_infra2_optical_frame', 'camera_color_frame', 'camera_color_optical_frame', 
+                                'camera_accel_frame', 'camera_accel_optical_frame', 'camera_gyro_frame', 
+                                'camera_gyro_optical_frame', 'gripper_camera_bottom_screw_frame', 
+                                'gripper_camera_link', 'gripper_camera_depth_frame', 'gripper_camera_depth_optical_frame', 
+                                'gripper_camera_infra1_frame', 'gripper_camera_infra1_optical_frame', 
+                                'gripper_camera_infra2_frame', 'gripper_camera_infra2_optical_frame', 
+                                'gripper_camera_color_frame', 'gripper_camera_color_optical_frame', 'laser', 
+                                'base_imu', 'respeaker_base', 'link_wrist_quick_connect', 'link_gripper_fingertip_right', 
+                                'link_aruco_fingertip_right', 'link_gripper_fingertip_left', 'link_aruco_fingertip_left', 
+                                'link_aruco_d405', 'link_head_nav_cam']
+    # links_kept = ['base_link', 'link_mast', 'link_lift', 'link_arm_l4', 'link_arm_l3', 'link_arm_l2', 'link_arm_l1', 'link_arm_l0', 'link_wrist_yaw', 'link_wrist_yaw_bottom', 'link_wrist_pitch', 'link_wrist_roll', 'link_gripper_s3_body', 'link_grasp_center', 'link_head_pan', 'link_head_tilt', 'link_gripper_finger_right', 'link_gripper_finger_left']
     links_to_remove = [l for l in modified_urdf._links if l.name in names_of_links_to_remove]
     for lr in links_to_remove:
         modified_urdf._links.remove(lr)
-    names_of_joints_to_remove = ['joint_right_wheel', 'joint_left_wheel', 'caster_joint', 'joint_head', 'joint_head_pan', 'joint_head_tilt', 'joint_aruco_right_base', 'joint_aruco_left_base', 'joint_aruco_shoulder', 'joint_aruco_top_wrist', 'joint_aruco_inner_wrist', 'camera_joint', 'camera_link_joint', 'camera_depth_joint', 'camera_depth_optical_joint', 'camera_infra1_joint', 'camera_infra1_optical_joint', 'camera_infra2_joint', 'camera_infra2_optical_joint', 'camera_color_joint', 'camera_color_optical_joint', 'camera_accel_joint', 'camera_accel_optical_joint', 'camera_gyro_joint', 'camera_gyro_optical_joint', 'gripper_camera_joint', 'gripper_camera_link_joint', 'gripper_camera_depth_joint', 'gripper_camera_depth_optical_joint', 'gripper_camera_infra1_joint', 'gripper_camera_infra1_optical_joint', 'gripper_camera_infra2_joint', 'gripper_camera_infra2_optical_joint', 'gripper_camera_color_joint', 'gripper_camera_color_optical_joint', 'joint_laser', 'joint_base_imu', 'joint_respeaker', 'joint_wrist_quick_connect', 'joint_gripper_finger_right', 'joint_gripper_fingertip_right', 'joint_aruco_fingertip_right', 'joint_gripper_finger_left', 'joint_gripper_fingertip_left', 'joint_aruco_fingertip_left', 'joint_aruco_d405', 'joint_head_nav_cam']
-    # joints_kept = ['joint_mast', 'joint_lift', 'joint_arm_l4', 'joint_arm_l3', 'joint_arm_l2', 'joint_arm_l1', 'joint_arm_l0', 'joint_wrist_yaw', 'joint_wrist_yaw_bottom', 'joint_wrist_pitch', 'joint_wrist_roll', 'joint_gripper_s3_body', 'joint_grasp_center']
+    names_of_joints_to_remove = ['joint_right_wheel', 'joint_left_wheel', 'caster_joint', 'joint_head', 
+                                 'joint_aruco_right_base', 'joint_aruco_left_base', 'joint_aruco_shoulder', 
+                                 'joint_aruco_top_wrist', 'joint_aruco_inner_wrist', 'camera_joint', 
+                                 'camera_link_joint', 'camera_depth_joint', 'camera_depth_optical_joint', 
+                                 'camera_infra1_joint', 'camera_infra1_optical_joint', 'camera_infra2_joint', 
+                                 'camera_infra2_optical_joint', 'camera_color_joint', 'camera_color_optical_joint', 
+                                 'camera_accel_joint', 'camera_accel_optical_joint', 'camera_gyro_joint', 
+                                 'camera_gyro_optical_joint', 'gripper_camera_joint', 'gripper_camera_link_joint', 
+                                 'gripper_camera_depth_joint', 'gripper_camera_depth_optical_joint', 
+                                 'gripper_camera_infra1_joint', 'gripper_camera_infra1_optical_joint', 
+                                 'gripper_camera_infra2_joint', 'gripper_camera_infra2_optical_joint', 
+                                 'gripper_camera_color_joint', 'gripper_camera_color_optical_joint', 'joint_laser', 
+                                 'joint_base_imu', 'joint_respeaker', 'joint_wrist_quick_connect', 
+                                 'joint_gripper_fingertip_right', 'joint_aruco_fingertip_right', 
+                                 'joint_gripper_fingertip_left', 'joint_aruco_fingertip_left', 'joint_aruco_d405', 
+                                 'joint_head_nav_cam']
+    # joints_kept = ['joint_mast', 'joint_lift', 'joint_arm_l4', 'joint_arm_l3', 'joint_arm_l2', 'joint_arm_l1', 'joint_arm_l0', 'joint_wrist_yaw', 'joint_wrist_yaw_bottom', 'joint_wrist_pitch', 'joint_wrist_roll', 'joint_gripper_s3_body', 'joint_grasp_center', 'joint_head_pan', 'joint_head_tilt', 'joint_gripper_finger_right', 'joint_gripper_finger_left']
     joints_to_remove = [l for l in modified_urdf._joints if l.name in names_of_joints_to_remove]
     for jr in joints_to_remove:
         modified_urdf._joints.remove(jr)
@@ -124,8 +155,8 @@ def get_current_configuration(joint_state):
         # print(joint_state)
         # print("THIS IS A CHANGE")
         names = [l.name for l in chain.links]
-        # print(len(names), names)
-        # ['Base link', 'joint_base_rotation', 'joint_base_translation', 'joint_mast', 'joint_lift', 'joint_arm_l4', 'joint_arm_l3', 'joint_arm_l2', 'joint_arm_l1', 'joint_arm_l0', 'joint_wrist_yaw', 'joint_wrist_yaw_bottom', 'joint_wrist_pitch', 'joint_wrist_roll', 'joint_gripper_s3_body', 'joint_grasp_center']
+        print(len(names), names)
+        # ['Base link', 'joint_base_rotation', 'joint_base_translation', 'joint_mast', 'joint_lift', 'joint_arm_l4', 'joint_arm_l3', 'joint_arm_l2', 'joint_arm_l1', 'joint_arm_l0', 'joint_wrist_yaw', 'joint_wrist_yaw_bottom', 'joint_wrist_pitch', 'joint_wrist_roll', 'joint_gripper_s3_body', 'joint_grasp_center', 'joint_head_pan', 'joint_head_tilt']
         if name not in names:
             return value
         index = names.index(name)
@@ -139,15 +170,15 @@ def get_current_configuration(joint_state):
     q_yaw = bound_range('joint_wrist_yaw', joint_state['joint_wrist_yaw'])
     q_pitch = bound_range('joint_wrist_pitch', joint_state['joint_wrist_pitch'])
     q_roll = bound_range('joint_wrist_roll', joint_state['joint_wrist_roll'])
-    q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, 0.0]
+    q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # added 4 entries at the end for camera and gripper
 
     # print("current configuration retrieved")
     return q
     # TODO: -------------- end ---------------
 
-def get_current_grasp_pose():
-    q = get_current_configuration()
-    return chain.forward_kinematics(q)
+# def get_current_grasp_pose():
+#     q = get_current_configuration()
+#     return chain.forward_kinematics(q)
 
 def get_grasp_goal(target_point, target_orientation, q_init):
     # previously the move_to_grasp() function from lab 2

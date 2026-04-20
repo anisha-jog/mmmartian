@@ -75,6 +75,7 @@ def main():
 
     # --- Step 1: LLM route extraction ---
     client = None
+    route = ["KITCHEN"]
     print("starting step one - LLM route extraction")
     if gemini_mode:
         # Call LLM and get response
@@ -82,28 +83,25 @@ def main():
         print("Gemini client initialized, prompting for route...")
         route_response = prompt_gemini(client, "loc", task=TASK)
         print(f"Gemini response: {route_response}")
-        route = None
         if route_response is None:
             print("No route selected. Proceeding with default location.")
-            route = ["KITCHEN"]
         else:
-            route = [route_response.text]
-        
-            if route not in get_locations():
+            if route_response.text not in get_locations():
                 print("Gemini response is not in the correct format. Proceeding with default location.")
-                route = ["KITCHEN"]
+            else:
+                route = [route_response.text]
     else:
-        route = ["KITCHEN"]
+        print("Gemini mode is disabled. Proceeding with default location.")
 
     # # --- Step 2: Navigate to locations ---
     rclpy.init()
-    success = navigate_to_locations(route)
-    if not success:
-        print("Navigation failed, aborting.")
-        return
-    print("Navigated to the task location!!")
+    # success = navigate_to_locations(route)
+    # if not success:
+    #     print("Navigation failed, aborting.")
+    #     return
+    # print("Navigated to the task location!!")
 
-    # rclpy.shutdown()  # close first context so GraspNode (inherits HelloNode) can call rclpy.init() cleanly
+    # # rclpy.shutdown()  # close first context so GraspNode (inherits HelloNode) can call rclpy.init() cleanly
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
     grasp_node = GraspNode()
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
@@ -117,6 +115,8 @@ def main():
     grasp_node.rotate_camera(-90, 45)
     time.sleep(2.0) # let the camera actually rotate before detection starts
     print("Head camera rotated")
+
+    return
     
     # rclpy.init()
 
