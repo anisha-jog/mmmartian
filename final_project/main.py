@@ -103,7 +103,7 @@ def main():
         return
     print("Navigated to the task location!!")
 
-    rclpy.shutdown()  # close first context so GraspNode (inherits HelloNode) can call rclpy.init() cleanly
+    # rclpy.shutdown()  # close first context so GraspNode (inherits HelloNode) can call rclpy.init() cleanly
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
     grasp_node = GraspNode()
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
