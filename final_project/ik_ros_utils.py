@@ -172,8 +172,8 @@ def get_current_configuration(joint_state):
     q_yaw = bound_range('joint_wrist_yaw', joint_state['joint_wrist_yaw'])
     q_pitch = bound_range('joint_wrist_pitch', joint_state['joint_wrist_pitch'])
     q_roll = bound_range('joint_wrist_roll', joint_state['joint_wrist_roll'])
-    # q_grip_r = bound_range('joint_gripper_finger_right', joint_state['joint_gripper_finger_right'])
-    q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, 0.0] # added 1 entry at the end for gripper
+    q_grip_r = bound_range('joint_gripper_finger_right', joint_state['joint_gripper_finger_right'])
+    q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, q_grip_r] # added 1 entry at the end for gripper
 
     # print("current configuration retrieved")
     return q
