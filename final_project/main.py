@@ -124,10 +124,31 @@ def main():
     detector = ColorSegmentationDetector()
     print("Waiting for object detection...")
 
+    cv2.namedWindow('Head Camera (detecting)', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('HSV Mask', cv2.WINDOW_NORMAL)
+
     elapsed = 0.0
     while detector.latest_goal_pose is None and elapsed < DETECT_TIMEOUT:
         rclpy.spin_once(detector, timeout_sec=0.1)
         elapsed += 0.1
+
+        if detector.latest_color is not None:
+            display = detector.latest_color.copy()
+            hsv = cv2.cvtColor(display, cv2.COLOR_BGR2HSV)
+            from color_segmentation import HSV_LOWER, HSV_UPPER, segment_by_color
+            mask = cv2.inRange(hsv, HSV_LOWER, HSV_UPPER)
+            centroid_xy, _ = segment_by_color(display)
+            if centroid_xy is not None:
+                cx, cy = centroid_xy
+                cv2.circle(display, (cx, cy), 8, (0, 255, 0), -1)
+                cv2.drawMarker(display, (cx, cy), (0, 255, 0), cv2.MARKER_CROSS, 20, 2)
+            cv2.imshow('Head Camera (detecting)', display)
+            cv2.imshow('HSV Mask', mask)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cv2.destroyAllWindows()
     goal_pose = detector.latest_goal_pose
     detector.destroy_node()
     rclpy.shutdown()  # close first context so HelloNode.main() can call rclpy.init() cleanly
