@@ -75,11 +75,13 @@ def main():
 
     # --- Step 1: LLM route extraction ---
     client = None
+    print("starting step one - LLM route extraction")
     if gemini_mode:
         # Call LLM and get response
         client = gemini_init()
+        print("Gemini client initialized, prompting for route...")
         route_response = prompt_gemini(client, "loc", task=TASK)
-
+        print(f"Gemini response: {route_response}")
         route = None
         if route_response is None:
             print("No route selected. Proceeding with default location.")
@@ -93,24 +95,26 @@ def main():
     else:
         route = "KITCHEN"
 
-    # # For now, hardcode the expected route for the task above
-    # # route = ["HALLWAY", "KITCHEN"]
-    # # print(f"Route: {route}")
+    # For now, hardcode the expected route for the task above
+    route = ["HALLWAY", "KITCHEN"]
+    # print(f"Route: {route}")
 
-    # # --- Step 2: Navigate to locations ---
-    # success = navigate_to_locations([route])
-    # if not success:
-    #     print("Navigation failed, aborting.")
-    #     return
-    # print("Navigating / navigated to the kitchen!!")
+    # --- Step 2: Navigate to locations ---
+    rclpy.init()
+    success = navigate_to_locations([route])
+    if not success:
+        print("Navigation failed, aborting.")
+        return
+    print("Navigating / navigated to the kitchen!!")
 
-    # # --- Step 3: Detect object (sequential — spin until we get a pose) ---
+    rclpy.shutdown()  # close first context so GraspNode can call rclpy.init() cleanly
+    # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
     print("Rotating head camera")
     # rotate head and camera
     robot.head.move_by('head_pan', np.radians(-90))
     robot.head.move_by('head_tilt', np.radians(-35))
-    robot.push_command()
+    # robot.push_command()
 
     print("Head camera rotated")
     
@@ -181,10 +185,6 @@ def main():
         print("Max grasp attempts reached, aborting.")
         rclpy.shutdown()
         return
-
-    # --- Step 6: Drop object at destination (stub) ---
-    # grasp_node.move_to_drop_location()
-    # grasp_node.release_object()
 
     # move to drop location
     grasp_node.switch_to_navigation_mode()
