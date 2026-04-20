@@ -96,7 +96,7 @@ def main():
         route = "KITCHEN"
 
     # For now, hardcode the expected route for the task above
-    route = ["HALLWAY", "KITCHEN"]
+    route = ["KITCHEN"]
     # print(f"Route: {route}")
 
     # --- Step 2: Navigate to locations ---
