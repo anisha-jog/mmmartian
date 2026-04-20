@@ -161,12 +161,12 @@ def get_current_configuration(joint_state):
             return value
         index = names.index(name)
         bounds = chain.links[index].bounds
+        print(name, bounds)
         if chain.links[index].bounds[0] == chain.links[index].bounds[1]:
             print("invalid", name, bounds)
             chain.links[index].bounds[1] += 1
             print("new bounds", chain.links[index].bounds)
             bounds = chain.links[index].bounds
-        print(name, bounds)
         return min(max(value, bounds[0]), bounds[1])
 
     q_base_rotation = 0.0
@@ -176,6 +176,7 @@ def get_current_configuration(joint_state):
     q_yaw = bound_range('joint_wrist_yaw', joint_state['joint_wrist_yaw'])
     q_pitch = bound_range('joint_wrist_pitch', joint_state['joint_wrist_pitch'])
     q_roll = bound_range('joint_wrist_roll', joint_state['joint_wrist_roll'])
+    q_grip_r = bound_range('joint_gripper_finger_right', joint_state['joint_gripper_finger_right'])
     print("printing bounds again")
     for link in chain.links:
         print(link.name, link.bounds)
