@@ -16,7 +16,7 @@ READY_POSE_P1 = {
 }
 
 READY_POSE_P2 = {
-    'joint_lift': 0.8 ,
+    'joint_lift': 1.0 ,
     'joint_arm': 0.0,
     'joint_wrist_yaw': 0.0,
     'joint_wrist_pitch': -0.1,
