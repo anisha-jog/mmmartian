@@ -71,8 +71,10 @@ def main():
 
     # initialize the ROS node
     grasp_node = GraspNode()
-    grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
-    grasp_thread.start()
+    # grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
+    # grasp_thread.start()
+    grasp_node.main()
+    print("Spin thread alive:", grasp_node.new_thread.is_alive())
     # threading.Thread(target=rclpy.spin, args=(grasp_node,), daemon=True).start()
     grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
     grasp_node.switch_to_position_mode()
