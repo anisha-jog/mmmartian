@@ -73,7 +73,7 @@ def main():
     grasp_node = GraspNode()
     grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
     grasp_thread.start()
-    threading.Thread(target=rclpy.spin, args=(grasp_node,), daemon=True).start()
+    # threading.Thread(target=rclpy.spin, args=(grasp_node,), daemon=True).start()
     grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
     grasp_node.switch_to_position_mode()
     time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
@@ -116,7 +116,12 @@ def main():
     # rotate head and camera
     print("Rotating head camera")
     grasp_node.switch_to_position_mode()
-    grasp_node.rotate_camera(-90, -35)
+
+    elapsed = 0.0
+    while grasp_node.camera_rotated is False and elapsed < 5.0:
+        rclpy.spin_once(grasp_node, timeout_sec=0.1)
+        elapsed += 0.1
+        grasp_node.rotate_camera(-90, -35)
     time.sleep(2.0) # let the camera actually rotate before detection starts
     print("Head camera rotated")
 
