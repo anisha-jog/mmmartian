@@ -182,7 +182,7 @@ class GraspNode(HelloNode, Node):
         print(f"Rotating camera: {head_pan:.3f} -> {np.radians(pan_deg):.3f}")
         self.move_to_pose({'joint_head_pan': np.radians(pan_deg)}, blocking=False) # this may hang
         print(f"Rotating camera: {head_tilt:.3f} -> {np.radians(tilt_deg):.3f}")
-        self.move_to_pose({'joint_head_tilt': np.radians(tilt_deg)}, blocking=True)
+        self.move_to_pose({'joint_head_tilt': np.radians(tilt_deg)}, blocking=False)
 
     def start_position(self):
         self.stow_the_robot()
