@@ -122,8 +122,8 @@ def main():
 
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
-    rclpy.init()
-    time.sleep(2.0) # wait again
+    # rclpy.init()
+    # time.sleep(2.0) # wait again
 
     print("Starting color segmentation")
     detector = ColorSegmentationDetector()
