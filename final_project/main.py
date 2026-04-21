@@ -123,9 +123,6 @@ def main():
     time.sleep(2.0) # let the camera actually rotate before detection starts
     print("Head camera rotated")
     
-    grasp_node.reset_for_retry()
-    print("initial grasp pose set")
-    
 
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
 
@@ -174,6 +171,10 @@ def main():
     camera_stop = threading.Event()
     camera_thread = threading.Thread(target=stream_head_camera, args=(grasp_node, camera_stop), daemon=True)
     camera_thread.start()
+    
+    grasp_node.reset_for_retry()
+    time.sleep(3.0)
+    print("initial grasp pose set")
 
     grasp_success = False
     
