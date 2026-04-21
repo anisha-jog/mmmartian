@@ -159,7 +159,7 @@ class GraspNode(HelloNode, Node):
         """Reset state so a new grasp attempt can be made."""
         self._grasp_done = False
         print("moving grasp to retry")
-        self.move_to_pose(ik.READY_POSE_P2, blocking=True, timeout=3.0)
+        self.move_to_pose(ik.READY_POSE_P2, blocking=True)
 
     # ------------------------------------------------------------------ #
     #  Downstream tasks (stubs)                                            #
@@ -170,7 +170,7 @@ class GraspNode(HelloNode, Node):
         with self.joint_states_lock:
             arm = self.joint_state.get('joint_arm_l0', 0.0)
         print(f"Extending arm: {arm:.3f} -> {min(1.0, arm + 0.5):.3f}")
-        self.move_to_pose({'joint_arm': min(1.0, arm + 0.5)}, blocking=True, timeout=3.0) # this may hang
+        self.move_to_pose({'joint_arm': min(1.0, arm + 0.5)}, blocking=True) # this may hang
         print("Opening gripper")
         self.move_to_pose({'gripper_aperture': 0.5}, blocking=True)
 
@@ -180,9 +180,10 @@ class GraspNode(HelloNode, Node):
             head_pan = self.joint_state.get('joint_head_pan', 0.0)
             head_tilt = self.joint_state.get('joint_head_tilt', 0.0)
         print(f"Rotating camera: {head_pan:.3f} -> {np.radians(pan_deg):.3f}")
-        self.move_to_pose({'joint_head_pan': np.radians(pan_deg)}, blocking=True, timeout=2.0) # this may hang
+        self.move_to_pose({'joint_head_pan': np.radians(pan_deg)}, blocking=False) # this may hang
         print(f"Rotating camera: {head_tilt:.3f} -> {np.radians(tilt_deg):.3f}")
         self.move_to_pose({'joint_head_tilt': np.radians(tilt_deg)}, blocking=True)
+        time.sleep(1.0)
 
     def start_position(self):
         self.stow_the_robot()
