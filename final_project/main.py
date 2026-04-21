@@ -115,13 +115,7 @@ def main():
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
     # rotate head and camera
     print("Rotating head camera")
-    # grasp_node.switch_to_position_mode()
-
-    elapsed = 0.0
-    while grasp_node.camera_rotated is False and elapsed < 5.0:
-        rclpy.spin_once(grasp_node, timeout_sec=0.1)
-        elapsed += 0.1
-        grasp_node.rotate_camera(-90, -35)
+    grasp_node.rotate_camera(-90, -35)
     time.sleep(2.0) # let the camera actually rotate before detection starts
     print("Head camera rotated")
 
@@ -224,7 +218,7 @@ def main():
 
     # open the gripper and release object over the drop location
     print("Extending arm and dropping object")
-    grasp_node.switch_to_position_mode()
+    grasp_node.switch_to_navigation_mode()
     grasp_node.extend_and_drop() # if hanging, Ctrl+C the ROS terminal to release the gripper
 
     rclpy.shutdown()

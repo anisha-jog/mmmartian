@@ -37,8 +37,6 @@ class GraspNode(HelloNode, Node):
         self.joint_state = {}
         self._grasp_done = False
         self._initialized = threading.Event()
-        self.camera_called = True
-        self.camera_rotated = False
 
         # Latest head camera frame for grasp verification
         self.bridge = CvBridge()
@@ -178,19 +176,18 @@ class GraspNode(HelloNode, Node):
 
     def rotate_camera(self, pan_deg, tilt_deg):
         """TODO: Navigate arm/base to sink drop position."""
-        if self.camera_called:
-            return
-        self.camera_called = True
-        
         with self.joint_states_lock:
             head_pan = self.joint_state.get('joint_head_pan', 0.0)
             head_tilt = self.joint_state.get('joint_head_tilt', 0.0)
         print(f"Rotating camera: {head_pan:.3f} -> {np.radians(pan_deg):.3f}")
-        self.move_to_pose({'joint_head_pan': np.radians(pan_deg)}, blocking=False) # this may hang
+        # self.move_to_pose({'joint_head_pan': np.radians(pan_deg)}, blocking=False) # this may hang
         print(f"Rotating camera: {head_tilt:.3f} -> {np.radians(tilt_deg):.3f}")
-        self.move_to_pose({'joint_head_tilt': np.radians(tilt_deg)}, blocking=True)
+        # self.move_to_pose({'joint_head_tilt': np.radians(tilt_deg)}, blocking=True)
+        self.move_to_pose({
+            'joint_head_pan': np.radians(pan_deg),
+            'joint_head_tilt': np.radians(tilt_deg)
+        }, blocking=True)
         time.sleep(1.0)
-        self.camera_rotated = True
 
     def start_position(self):
         self.stow_the_robot()
