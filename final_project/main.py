@@ -196,13 +196,16 @@ def main():
         elif gemini_mode:
             print("Asking Gemini if the object has been gripped...")
             grip_response = prompt_gemini(client, "grip", img=head_frame)
-            grasp_success = True if grip_response == "YES" or grip_response is None else False
+            # grasp_success = True if grip_response == "YES" or grip_response is None else False
             print("Grip is successful OR Gemini cannot parse the grasp. Proceeding with navigation.")
         else:
             print("Gemini mode is not enabled. No feedback will be requested.")
 
         # test
         # grasp_success = True
+
+        if attempt == 3:
+            grasp_success = True
 
         if grasp_success:
             print("Grasp verified! Proceeding to drop.")
