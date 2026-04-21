@@ -34,7 +34,7 @@ import numpy as np
 # using in-gripper camera:
 #    ros2 launch stretch_core d405_basic.launch.py
 # build a map: ros2 launch stretch_nav2 offline_mapping.launch.py teleop_type:=keyboard
-# save a map: ros2 run nav2_map_server map_saver_cli -f martian_map_new
+# save a map: ros2 run nav2_map_server map_saver_cli -f martian_map_new_2
 
 
 TASK = "Put the dishes in the sink."
@@ -103,12 +103,12 @@ def main():
         print("Gemini mode is disabled. Proceeding with default location.")
 
     # # --- Step 2: Navigate to locations ---
-    # grasp_node.switch_to_navigation_mode()
-    # success = navigate_to_locations(route)
-    # if not success:
-    #     print("Navigation failed, aborting.")
-    #     return
-    # print("Navigated to the task location!!")
+    grasp_node.switch_to_navigation_mode()
+    success = navigate_to_locations(route)
+    if not success:
+        print("Navigation failed, aborting.")
+        return
+    print("Navigated to the task location!!")
     
 
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
@@ -216,7 +216,7 @@ def main():
     print("Extending arm and dropping object")
     grasp_node.extend_and_drop() # if hanging, Ctrl+C the ROS terminal to release the gripper
 
-    # rclpy.shutdown()
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':
