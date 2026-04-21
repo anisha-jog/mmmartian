@@ -80,7 +80,7 @@ def main():
         client = gemini_init()
         print("Gemini client initialized, prompting for route...")
         route_response = prompt_gemini(client, "loc", task=TASK)
-        print(f"Gemini response: {route_response.text}")
+        # print(f"Gemini response: {route_response.text}")
         if route_response is None:
             print("No route selected. Proceeding with default location.")
         else:
