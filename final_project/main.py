@@ -119,6 +119,8 @@ def main():
     time.sleep(2.0) # let the camera actually rotate before detection starts
     print("Head camera rotated")
 
+    rclpy.init()
+
     print("Starting color segmentation")
     detector = ColorSegmentationDetector()
     print("Waiting for object detection...")
