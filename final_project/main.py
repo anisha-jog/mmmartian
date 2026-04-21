@@ -91,6 +91,8 @@ def main():
     else:
         print("Gemini mode is disabled. Proceeding with default location.")
 
+    rclpy.init()
+
     # --- Step 2: Navigate to locations ---
     # grasp_node.switch_to_navigation_mode()
     success = navigate_to_locations(route)
@@ -98,6 +100,8 @@ def main():
         print("Navigation failed, aborting.")
         return
     print("Navigated to the task location!!")
+
+    rclpy.shutdown()
 
     # initialize the ROS node
     grasp_node = GraspNode()
