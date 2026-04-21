@@ -173,7 +173,6 @@ def main():
     camera_thread.start()
     
     grasp_node.reset_for_retry()
-    time.sleep(3.0)
     print("initial grasp pose set")
 
     grasp_success = False
