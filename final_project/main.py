@@ -82,6 +82,12 @@ def main():
 
     # set a start position for the robot
     grasp_node.start_position()
+    
+    # rotate head and camera
+    print("Rotating head camera")
+    grasp_node.rotate_camera(-90, -35)
+    time.sleep(2.0) # let the camera actually rotate before detection starts
+    print("Head camera rotated")
 
     gemini_mode = False
 
@@ -115,11 +121,6 @@ def main():
     
 
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
-    # rotate head and camera
-    print("Rotating head camera")
-    grasp_node.rotate_camera(-90, -35)
-    time.sleep(2.0) # let the camera actually rotate before detection starts
-    print("Head camera rotated")
 
     rclpy.init()
     time.sleep(2.0) # wait again
