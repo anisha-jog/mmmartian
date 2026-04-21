@@ -67,10 +67,11 @@ def get_modified_urdf():
                                 'gripper_camera_infra1_frame', 'gripper_camera_infra1_optical_frame', 
                                 'gripper_camera_infra2_frame', 'gripper_camera_infra2_optical_frame', 
                                 'gripper_camera_color_frame', 'gripper_camera_color_optical_frame', 'laser', 
-                                'base_imu', 'respeaker_base', 'link_wrist_quick_connect', 'link_gripper_fingertip_right', 
-                                'link_aruco_fingertip_right', 'link_gripper_fingertip_left', 'link_aruco_fingertip_left', 
-                                'link_aruco_d405', 'link_head_nav_cam']
-    # links_kept = ['base_link', 'link_mast', 'link_lift', 'link_arm_l4', 'link_arm_l3', 'link_arm_l2', 'link_arm_l1', 'link_arm_l0', 'link_wrist_yaw', 'link_wrist_yaw_bottom', 'link_wrist_pitch', 'link_wrist_roll', 'link_gripper_s3_body', 'link_grasp_center', 'link_head_pan', 'link_head_tilt', 'link_gripper_finger_right', 'link_gripper_finger_left']
+                                'base_imu', 'respeaker_base', 'link_wrist_quick_connect', 'link_gripper_finger_right', 
+                                'link_gripper_fingertip_right', 'link_aruco_fingertip_right', 'link_gripper_finger_left',  
+                                'link_gripper_fingertip_left', 'link_aruco_fingertip_left', 'link_aruco_d405', 
+                                'link_head_nav_cam']
+    # links_kept = ['base_link', 'link_mast', 'link_lift', 'link_arm_l4', 'link_arm_l3', 'link_arm_l2', 'link_arm_l1', 'link_arm_l0', 'link_wrist_yaw', 'link_wrist_yaw_bottom', 'link_wrist_pitch', 'link_wrist_roll', 'link_gripper_s3_body', 'link_grasp_center', 'link_head_pan', 'link_head_tilt']
     links_to_remove = [l for l in modified_urdf._links if l.name in names_of_links_to_remove]
     for lr in links_to_remove:
         modified_urdf._links.remove(lr)
@@ -87,10 +88,11 @@ def get_modified_urdf():
                                  'gripper_camera_infra2_joint', 'gripper_camera_infra2_optical_joint', 
                                  'gripper_camera_color_joint', 'gripper_camera_color_optical_joint', 'joint_laser', 
                                  'joint_base_imu', 'joint_respeaker', 'joint_wrist_quick_connect', 
-                                 'joint_gripper_fingertip_right', 'joint_aruco_fingertip_right', 
+                                 'joint_gripper_finger_right', 'joint_gripper_fingertip_right', 
+                                 'joint_aruco_fingertip_right', 'joint_gripper_finger_left', 
                                  'joint_gripper_fingertip_left', 'joint_aruco_fingertip_left', 'joint_aruco_d405', 
                                  'joint_head_nav_cam']
-    # joints_kept = ['joint_mast', 'joint_lift', 'joint_arm_l4', 'joint_arm_l3', 'joint_arm_l2', 'joint_arm_l1', 'joint_arm_l0', 'joint_wrist_yaw', 'joint_wrist_yaw_bottom', 'joint_wrist_pitch', 'joint_wrist_roll', 'joint_gripper_s3_body', 'joint_grasp_center', 'joint_head_pan', 'joint_head_tilt', 'joint_gripper_finger_right', 'joint_gripper_finger_left']
+    # joints_kept = ['joint_mast', 'joint_lift', 'joint_arm_l4', 'joint_arm_l3', 'joint_arm_l2', 'joint_arm_l1', 'joint_arm_l0', 'joint_wrist_yaw', 'joint_wrist_yaw_bottom', 'joint_wrist_pitch', 'joint_wrist_roll', 'joint_gripper_s3_body', 'joint_grasp_center', 'joint_head_pan', 'joint_head_tilt']
     joints_to_remove = [l for l in modified_urdf._joints if l.name in names_of_joints_to_remove]
     for jr in joints_to_remove:
         modified_urdf._joints.remove(jr)
@@ -155,18 +157,18 @@ def get_current_configuration(joint_state):
         # print(joint_state)
         # print("THIS IS A CHANGE")
         names = [l.name for l in chain.links]
-        # print(len(names), names)
-        # ['Base link', 'joint_base_rotation', 'joint_base_translation', 'joint_mast', 'joint_lift', 'joint_arm_l4', 'joint_arm_l3', 'joint_arm_l2', 'joint_arm_l1', 'joint_arm_l0', 'joint_wrist_yaw', 'joint_wrist_yaw_bottom', 'joint_wrist_pitch', 'joint_wrist_roll', 'joint_gripper_s3_body', 'joint_gripper_finger_right']
+        print(len(names), names)
+        # ['Base link', 'joint_base_rotation', 'joint_base_translation', 'joint_mast', 'joint_lift', 'joint_arm_l4', 'joint_arm_l3', 'joint_arm_l2', 'joint_arm_l1', 'joint_arm_l0', 'joint_wrist_yaw', 'joint_wrist_yaw_bottom', 'joint_wrist_pitch', 'joint_wrist_roll', 'joint_gripper_s3_body']
         if name not in names:
             return value
         index = names.index(name)
         bounds = chain.links[index].bounds
         print(name, bounds)
-        if name == 'joint_gripper_finger_right':
-            print("invalid", name, bounds)
-            chain.links[index].bounds = (-np.radians(100), np.radians(100))
-            print("new bounds", chain.links[index].bounds)
-            bounds = chain.links[index].bounds
+        # if name == 'joint_gripper_finger_right':
+        #     print("invalid", name, bounds)
+        #     chain.links[index].bounds = (-np.radians(100), np.radians(100))
+        #     print("new bounds", chain.links[index].bounds)
+        #     bounds = chain.links[index].bounds
         return min(max(value, bounds[0]), bounds[1])
 
     q_base_rotation = 0.0
@@ -176,11 +178,11 @@ def get_current_configuration(joint_state):
     q_yaw = bound_range('joint_wrist_yaw', joint_state['joint_wrist_yaw'])
     q_pitch = bound_range('joint_wrist_pitch', joint_state['joint_wrist_pitch'])
     q_roll = bound_range('joint_wrist_roll', joint_state['joint_wrist_roll'])
-    q_grip_r = bound_range('joint_gripper_finger_right', joint_state['joint_gripper_finger_right'])
-    print("printing bounds again")
-    for link in chain.links:
-        print(link.name, link.bounds)
-    q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0, 0.0] # added 1 entry at the end for gripper
+    # q_grip_r = bound_range('joint_gripper_finger_right', joint_state['joint_gripper_finger_right'])
+    # print("printing bounds again")
+    # for link in chain.links:
+    #     print(link.name, link.bounds)
+    q = [0.0, q_base_rotation, q_base, 0.0, q_lift, 0.0, q_arml, q_arml, q_arml, q_arml, q_yaw, 0.0, q_pitch, q_roll, 0.0]
     print(q)
     # print("current configuration retrieved")
     return q

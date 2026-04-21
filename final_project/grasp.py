@@ -52,8 +52,7 @@ class GraspNode(HelloNode, Node):
             joint_names = [
                 'joint_lift', 'joint_arm_l0',
                 'joint_wrist_yaw', 'joint_wrist_pitch', 'joint_wrist_roll',
-                'joint_head_pan', 'joint_head_tilt',
-                'joint_gripper_finger_right', 'joint_gripper_finger_left'
+                'joint_head_pan', 'joint_head_tilt'
             ]
             self.joint_state = {}
             for name in joint_names:
@@ -161,7 +160,6 @@ class GraspNode(HelloNode, Node):
         self._grasp_done = False
         print("moving grasp to retry")
         self.move_to_pose(ik.READY_POSE_P2, blocking=True)
-        # self.move_to_pose({'joint_gripper_finger_right': np.radians(100)}, blocking=True)
 
     # ------------------------------------------------------------------ #
     #  Downstream tasks (stubs)                                            #
@@ -174,7 +172,7 @@ class GraspNode(HelloNode, Node):
         print(f"Extending arm: {arm:.3f} -> {min(1.0, arm + 0.5):.3f}")
         self.move_to_pose({'joint_arm': min(1.0, arm + 0.5)}, blocking=True) # this may hang
         print("Opening gripper")
-        self.move_to_pose({'joint_gripper_finger_right': np.radians(100)}, blocking=True)
+        self.move_to_pose({'gripper_aperture': 0.5}, blocking=True)
 
     def rotate_camera(self, pan_deg, tilt_deg):
         """TODO: Navigate arm/base to sink drop position."""
