@@ -42,7 +42,15 @@ def prompt_gemini(client, mode, task="", img=None, loc=""):
     if mode == "loc":
         prompt = LOC_PROMPT + task
     elif mode == "grip":
-        prompt = [GRIP_PROMPT, img]
+        # prompt = [GRIP_PROMPT, img]
+        # Convert BGR → JPEG bytes
+        _, buffer = cv2.imencode(".jpg", img)
+        image_bytes = buffer.tobytes()
+        img_clean = genai.types.Part.from_bytes(
+                data=image_bytes,
+                mime_type="image/jpeg"
+            )
+        prompt = [GRIP_PROMPT, img_clean]
     elif mode == "renav":
         prompt = SEC_LOC_PROMPT + task + "\n" + loc
     else:
