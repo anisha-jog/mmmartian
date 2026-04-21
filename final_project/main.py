@@ -115,7 +115,7 @@ def main():
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
     # rotate head and camera
     print("Rotating head camera")
-    grasp_node.switch_to_position_mode()
+    # grasp_node.switch_to_position_mode()
 
     elapsed = 0.0
     while grasp_node.camera_rotated is False and elapsed < 5.0:
