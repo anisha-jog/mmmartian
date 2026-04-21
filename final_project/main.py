@@ -82,7 +82,7 @@ def main():
 
     # set a start position for the robot
     grasp_node.start_position()
-    
+
     # rotate head and camera
     print("Rotating head camera")
     grasp_node.rotate_camera(-90, -35)
@@ -111,7 +111,7 @@ def main():
     else:
         print("Gemini mode is disabled. Proceeding with default location.")
 
-    # # --- Step 2: Navigate to locations ---
+    # --- Step 2: Navigate to locations ---
     grasp_node.switch_to_navigation_mode()
     success = navigate_to_locations(route)
     if not success:

@@ -113,7 +113,7 @@ def navigate_to_locations(location_names: list[str], timeout_s: float = 600.0):
             break
 
     result = navigator.getResult()
-    rclpy.shutdown()
+    # rclpy.shutdown()
 
     if result == TaskResult.SUCCEEDED:
         print("Navigation complete.")
