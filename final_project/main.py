@@ -69,26 +69,6 @@ def stream_head_camera(grasp_node, stop_event):
 
 def main():
 
-    # initialize the ROS node
-    grasp_node = GraspNode()
-    # grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
-    # grasp_thread.start()
-    grasp_node.main()
-    print("Spin thread alive:", grasp_node.new_thread.is_alive())
-    # threading.Thread(target=rclpy.spin, args=(grasp_node,), daemon=True).start()
-    grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
-    grasp_node.switch_to_position_mode()
-    time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
-
-    # set a start position for the robot
-    grasp_node.start_position()
-
-    # rotate head and camera
-    print("Rotating head camera")
-    grasp_node.rotate_camera(-90, -35)
-    time.sleep(2.0) # let the camera actually rotate before detection starts
-    print("Head camera rotated")
-
     gemini_mode = False
 
     # --- Step 1: LLM route extraction ---
@@ -112,12 +92,32 @@ def main():
         print("Gemini mode is disabled. Proceeding with default location.")
 
     # --- Step 2: Navigate to locations ---
-    grasp_node.switch_to_navigation_mode()
+    # grasp_node.switch_to_navigation_mode()
     success = navigate_to_locations(route)
     if not success:
         print("Navigation failed, aborting.")
         return
     print("Navigated to the task location!!")
+
+    # initialize the ROS node
+    grasp_node = GraspNode()
+    # grasp_thread = threading.Thread(target=run_grasp_node, args=(grasp_node,), daemon=True)
+    # grasp_thread.start()
+    grasp_node.main()
+    print("Spin thread alive:", grasp_node.new_thread.is_alive())
+    # threading.Thread(target=rclpy.spin, args=(grasp_node,), daemon=True).start()
+    grasp_node._initialized.wait()  # block until subscriptions and TF are fully set up
+    grasp_node.switch_to_position_mode()
+    time.sleep(1.0)  # let joint state callbacks populate before the first grasp reads them
+
+    # set a start position for the robot
+    grasp_node.start_position()
+
+    # rotate head and camera
+    print("Rotating head camera")
+    grasp_node.rotate_camera(-90, -35)
+    time.sleep(2.0) # let the camera actually rotate before detection starts
+    print("Head camera rotated")
     
 
     # --- Step 3: Detect object (sequential — spin until we get a pose) ---
