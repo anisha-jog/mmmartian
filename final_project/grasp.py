@@ -180,7 +180,7 @@ class GraspNode(HelloNode, Node):
             head_pan = self.joint_state.get('joint_head_pan', 0.0)
             head_tilt = self.joint_state.get('joint_head_tilt', 0.0)
         print(f"Rotating camera: {head_pan:.3f} -> {np.radians(pan_deg):.3f}")
-        self.move_to_pose({'joint_head_pan': np.radians(pan_deg)}, blocking=True) # this may hang
+        self.move_to_pose({'joint_head_pan': np.radians(pan_deg)}, blocking=True, timeout=2.0) # this may hang
         print(f"Rotating camera: {head_tilt:.3f} -> {np.radians(tilt_deg):.3f}")
         self.move_to_pose({'joint_head_tilt': np.radians(tilt_deg)}, blocking=True)
 
