@@ -130,7 +130,9 @@ class GraspNode(HelloNode, Node):
 
         grasp_orient = ikpy.utils.geometry.rpy_matrix(0.0, 0.0, -np.pi / 2)
         q_init = ik.get_current_configuration(self.joint_state)
+        print("init complete")
         q_soln = ik.get_grasp_goal(goal_pos, grasp_orient, q_init)
+        print("solution calculation complete")
         if q_soln is None:
             return
 

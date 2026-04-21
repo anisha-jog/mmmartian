@@ -38,7 +38,7 @@ import numpy as np
 
 
 TASK = "Put the dishes in the sink."
-MAX_GRASP_ATTEMPTS = 3
+MAX_GRASP_ATTEMPTS = 5
 DETECT_TIMEOUT = 30.0  # seconds to wait for a valid detection
 
 
