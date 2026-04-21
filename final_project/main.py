@@ -120,6 +120,7 @@ def main():
     print("Head camera rotated")
 
     rclpy.init()
+    time.sleep(2.0) # wait again
 
     print("Starting color segmentation")
     detector = ColorSegmentationDetector()
