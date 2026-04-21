@@ -69,7 +69,7 @@ def stream_head_camera(grasp_node, stop_event):
 
 def main():
 
-    gemini_mode = False
+    gemini_mode = True
 
     # --- Step 1: LLM route extraction ---
     client = None
@@ -202,7 +202,7 @@ def main():
             print("Gemini mode is not enabled. No feedback will be requested.")
 
         # test
-        grasp_success = True
+        # grasp_success = True
 
         if grasp_success:
             print("Grasp verified! Proceeding to drop.")
