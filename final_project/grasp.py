@@ -176,6 +176,8 @@ class GraspNode(HelloNode, Node):
 
     def rotate_camera(self, pan_deg, tilt_deg):
         """TODO: Navigate arm/base to sink drop position."""
+        print("Spin thread alive:", self.new_thread.is_alive())
+        print(self.trajectory_client.wait_for_server(timeout_sec=2.0))
         with self.joint_states_lock:
             head_pan = self.joint_state.get('joint_head_pan', 0.0)
             head_tilt = self.joint_state.get('joint_head_tilt', 0.0)
@@ -186,7 +188,7 @@ class GraspNode(HelloNode, Node):
         self.move_to_pose({
             'joint_head_pan': np.radians(pan_deg),
             'joint_head_tilt': np.radians(tilt_deg)
-        }, blocking=True)
+        }, blocking=False)
         time.sleep(1.0)
 
     def start_position(self):
