@@ -174,6 +174,7 @@ def main():
 
     grasp_success = False
     grasp_node.reset_for_retry()
+    print("initial grasp pose set")
     
     for attempt in range(1, MAX_GRASP_ATTEMPTS + 1):
         print(f"Grasp attempt {attempt}/{MAX_GRASP_ATTEMPTS}")
