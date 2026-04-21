@@ -160,6 +160,7 @@ class GraspNode(HelloNode, Node):
         self._grasp_done = False
         print("moving grasp to retry")
         self.move_to_pose(ik.READY_POSE_P2, blocking=True)
+        time.sleep(2.0)
 
     # ------------------------------------------------------------------ #
     #  Downstream tasks (stubs)                                            #
